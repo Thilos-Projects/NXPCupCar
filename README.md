@@ -29,7 +29,7 @@ section 1. Fahren I
     Bau Fahrzeug : a1, after m0, 2w
     Ansteuerung der Motoren : a2, after a1, 1w
 
-    Demo 1 - Irgendwie fahren : crit, milestone, p4, 2023-11-17, 1d
+    # Demo 1 - Irgendwie fahren : crit, milestone, p4, 2023-11-17, 1d
 
 
 section 2. Fahren II
