@@ -19,7 +19,7 @@ section 0. Vorbereitung
 
     # Zeitplanung : done, a00, 2023-10-06, 4d
 
-    Konzeptvorstellung : crit, milestone, p1, 2023-10-23, 1d
+    Konzeptvorstellung : crit, milestone, p1, 2023-10-23, 7d
 
 
 
