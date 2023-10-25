@@ -12,6 +12,12 @@ axisFormat  %d.%m.
 
 title Zeitplanung Autonomes Fahrzeug
 
+%% This only works on mermaid.live:
+
+# tickInterval 1week
+# weekday monday
+# todayMarker off
+
 section 0. Vorbereitung
     Kick-Off : crit, milestone, done, p0, 2023-10-06, 1d
 
@@ -19,7 +25,7 @@ section 0. Vorbereitung
 
     # Zeitplanung : done, a00, 2023-10-06, 4d
 
-    Konzeptvorstellung : crit, milestone, p1, 2023-10-30, 1d
+    Konzeptvorstellung : crit, milestone, p1, 2023-10-30, 0d
 
 
 
@@ -72,5 +78,4 @@ section 6. Optimierung
 section Sonstiges
     Weihnachtsferien : p2, 2023-12-23, 2024-01-02
     Semesterende : milestone, p3, 2024-01-28, 1d
-
 ```
