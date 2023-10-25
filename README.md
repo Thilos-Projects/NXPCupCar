@@ -39,7 +39,7 @@ section 1. Fahren I
 section 2. Fahren II
     Meilenstein 2 - Fahren II : m2, after m1, 2w
 
-    # Demo 1 - Irgendwie fahren : crit, milestone, p4, 2023-11-17, 1d
+    # Demo 1 - Irgendwie fahren : crit, milestone, p4, after m1, 2w
 
 
 section 3. Kamera I
@@ -76,6 +76,6 @@ section 6. Optimierung
 
 
 section Sonstiges
-    Weihnachtsferien : p2, 2023-12-23, 2024-01-02
-    Semesterende : milestone, p3, 2024-01-28, 1d
+    Weihnachtsferien : p2, 2023-12-23, 11d
+    Ender der Vorlesungszeit : milestone, p3, 2024-01-28, 1d
 ```
