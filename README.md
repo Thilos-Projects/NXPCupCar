@@ -15,11 +15,11 @@ title Zeitplanung Autonomes Fahrzeug
 section 0. Vorbereitung
     Kick-Off : crit, milestone, done, p0, 2023-10-06, 1d
 
-    Meilenstein 0 - Vorbereitung : active, m0, 2023-10-06, 3w
+    Meilenstein 0 - Vorbereitung : active, m0, 2023-10-06, 24d
 
     # Zeitplanung : done, a00, 2023-10-06, 4d
 
-    Konzeptvorstellung : crit, milestone, p1, 2023-10-23, 7d
+    Konzeptvorstellung : crit, milestone, p1, 2023-10-30, 1d
 
 
 
@@ -29,11 +29,11 @@ section 1. Fahren I
     Bau Fahrzeug : a1, after m0, 2w
     Ansteuerung der Motoren : a2, after a1, 1w
 
-    # Demo 1 - Irgendwie fahren : crit, milestone, p4, 2023-11-17, 1d
-
 
 section 2. Fahren II
     Meilenstein 2 - Fahren II : m2, after m1, 2w
+
+    # Demo 1 - Irgendwie fahren : crit, milestone, p4, 2023-11-17, 1d
 
 
 section 3. Kamera I
