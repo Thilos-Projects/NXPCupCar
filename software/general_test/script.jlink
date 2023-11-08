@@ -1,0 +1,7 @@
+ExitOnError 1
+r
+h
+loadfile "C:\Users\tomse\Documents\Studium\Git-Projekte\NXPCupCar\software\general_test\Debug\general_test.hex"
+qc
+
+qc
