@@ -21,29 +21,27 @@ title Zeitplanung Autonomes Fahrzeug
 section 0. Vorbereitung
     Kick-Off : crit, milestone, done, p0, 2023-10-06, 1d
 
-    Meilenstein 0 - Vorbereitung : active, m0, 2023-10-06, 24d
+    Meilenstein 0 - Vorbereitung : done, m0, 2023-10-06, 24d
 
-    # Zeitplanung : done, a00, 2023-10-06, 4d
-
-    Konzeptvorstellung : crit, milestone, p1, 2023-10-30, 0d
+    Konzeptvorstellung : crit, done, milestone, p1, 2023-10-30, 0d
 
 
 
 section 1. Fahren I
-    Meilenstein 1 - Fahren I : m1, after m0, 3w
+    Meilenstein 1 - Fahren I : active, m1, after m0, 3w
 
-    Bau Fahrzeug : a1, after m0, 2w
+    Bau Fahrzeug : active, a1, after m0, 2w
     Ansteuerung der Motoren : a2, after a1, 1w
 
 
 section 2. Fahren II
     Meilenstein 2 - Fahren II : m2, after m1, 2w
 
-    # Demo 1 - Irgendwie fahren : crit, milestone, p4, after m1, 2w
+    Demo 1 - Irgendwie fahren : crit, milestone, p4, 2023-11-27, 0d
 
 
 section 3. Kamera I
-    Meilenstein 3 - Kamera I : m3, after m0, 3w
+    Meilenstein 3 - Kamera I : active, m3, after m0, 3w
 
 
 section 4. Kamera II
@@ -66,9 +64,9 @@ section 5. Fahren III
     Sichere 8 fahren : milestone, a53, after a42c, 1d
     Sicher alles fahren : milestone, a54, after a42d, 1d
 
-    # Demo 2 - 0 fahren : crit, milestone, p5, after a52, 1d
-    # Demo 3 - 8 fahren : crit, milestone, p6, after a53, 1d
-    # Demo 4 - Alles fahren: crit, milestone, p7, after a54, 1d
+    Demo 2 - 0 fahren : crit, milestone, p5, after a52, 1d
+    Demo 3 - 8 fahren : crit, milestone, p6, after a53, 1d
+    Demo 4 - Alles fahren: crit, milestone, p7, after a54, 1d
 
 
 section 6. Optimierung
