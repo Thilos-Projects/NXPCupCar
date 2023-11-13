@@ -151,27 +151,6 @@ void iPit_Config(PitEnum aPit, UInt16 aPeriodeMs)
 		// Set interrupt priority
 		NVIC_SetPriority(PIT2_IRQn, kPIT_IntPriority);
 	}
-	else if (aPit == kPit3)
-	{
-		// Counting value to do the delay
-		// Counting Value=Delay Time/(1/Core clock)
-		aTmp = aPeriodeMs / (1 / (kClockPeriphkHz));
-		// K10 Sub-Family Reference Manual, Rev. 6, Nov 2011 page 1017
-		// Timer Load Value Register (PIT_LDVALn)
-		PIT->CHANNEL[3].LDVAL = aTmp;
-		// K10 Sub-Family Reference Manual, Rev. 6, Nov 2011 page 1018
-		// Timer Control Register (PIT_TCTRLn)
-		// Enable PIT interrupt
-		PIT->CHANNEL[3].TCTRL |= PIT_TCTRL_TIE_MASK;
-		// Clear prending interrupt
-		NVIC_ClearPendingIRQ(PIT3_IRQn);
-		// Interrupt Set-enable Registers
-		// Interrupt enable
-		NVIC_EnableIRQ(PIT3_IRQn);
-		// Interrupt Priority Registers
-		// Set interrupt priority
-		NVIC_SetPriority(PIT3_IRQn, kPIT_IntPriority);
-	}
 
 	// K10 Sub-Family Reference Manual, Rev. 6, Nov 2011 page 1016
 	// PIT Module Control Register (PIT_MCR)
@@ -203,12 +182,6 @@ void iPit_StartPit(PitEnum aPit)
 		// Timer Control Register (PIT_TCTRLn)
 		// Timer is active
 		PIT->CHANNEL[2].TCTRL |= PIT_TCTRL_TEN_MASK;
-	}
-	else if (aPit == kPit3)
-	{
-		// Timer Control Register (PIT_TCTRLn)
-		// Timer is active
-		PIT->CHANNEL[3].TCTRL |= PIT_TCTRL_TEN_MASK;
 	}
 }
 
@@ -364,28 +337,5 @@ void PIT2_IRQHandler(void)
 
 		if ((false == sDly[kPit2].CounterTab[i].isFree) && (sDly[kPit2].CounterTab[i].Counter == 0))
 			sDly[kPit2].CounterTab[i].DelayDone = true;
-	}
-}
-
-//------------------------------------------------------------
-// PIT 3 interrupt routine
-//------------------------------------------------------------
-void PIT3_IRQHandler(void)
-{
-	UInt16 i = 0;
-	UInt32 aTmp;
-
-	// PIT TIF flag clear
-	PIT->CHANNEL[3].TFLG |= PIT_TFLG_TIF_MASK;
-	aTmp = PIT->CHANNEL[3].CVAL;
-
-	// Counter update
-	for (i = 0; i < kCounterNumber; i++)
-	{
-		if ((false == sDly[kPit3].CounterTab[i].isFree) && (sDly[kPit3].CounterTab[i].Counter > 0))
-			sDly[kPit3].CounterTab[i].Counter--;
-
-		if ((false == sDly[kPit3].CounterTab[i].isFree) && (sDly[kPit3].CounterTab[i].Counter == 0))
-			sDly[kPit3].CounterTab[i].DelayDone = true;
 	}
 }

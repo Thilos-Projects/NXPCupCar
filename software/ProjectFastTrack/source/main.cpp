@@ -32,6 +32,20 @@ extern "C"
 //#include "Applications/gInput.h"
 //#include "Applications/gCompute.h"
 //#include "Applications/gOutput.h"
+
+#include "ThilosAddons/TaskManager.h"
+}
+
+
+void blinkLed0(){
+	static bool modus = false;
+	mLeds_Write(kMaskLed1, modus ? kLedOn : kLedOff);
+	modus != modus;
+}
+void blinkLed1(){
+	static bool modus = false;
+	mLeds_Write(kMaskLed2, modus ? kLedOn : kLedOff);
+	modus != modus;
 }
 
 int main(){
@@ -42,38 +56,22 @@ int main(){
 	mTimer_Setup();
 	mTimer_Open();
 
-	mLeds_Write(kMaskLed1,kLedOn);
-
 	mTimer_EnableHBridge();
 
 	mTimer_SetMotorDuty(0.4f, 0.4f);
 
-	//bool up = true;
-	//float test = 0;
+	taskHandle* ledHandle0 = getTaskHandle();
+	ledHandle0->delay = 1000 / minTaskTimeInMs;
+	ledHandle0->functionToCall = &blinkLed0;
+	ledHandle0->active = true;
+
+	taskHandle* ledHandle1 = getTaskHandle();
+	ledHandle1->delay = 500 / minTaskTimeInMs;
+	ledHandle1->functionToCall = &blinkLed1;
+	ledHandle1->active = true;
 
 	for(UInt32 i = 0; true; i++){
-
-		if(mTimer_GetFaultMoteurLeft())
-			printf("motor left fault");
-		if(mTimer_GetFaultMoteurRight())
-			printf("motor right fault");
-		mLeds_Write(kMaskLed1,kLedOff);
-		for(UInt32 j = 0; j < 2500000; j++);
-		mLeds_Write(kMaskLed1,kLedOn);
-		for(UInt32 j = 0; j < 2500000; j++);
-
-		//if(up)
-			//test+=0.1f;
-		//else
-			//test-=0.1f;
-
-		//if(up && test > 0.9f)
-		//	up = false;
-		//if(!up && test < -0.9f)
-		//	up = true;
-
-		//mTimer_SetMotorDuty(test, 3/8.0f);
-
+		Update();
 	}
 
 	printf("Tshöööööööö\n");

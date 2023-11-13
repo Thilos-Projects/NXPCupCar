@@ -133,8 +133,7 @@ typedef enum
 {
 	kPit0 = 0,
 	kPit1 = 1,
-	kPit2 = 2,
-	kPit3 = 3
+	kPit2 = 2
 } PitEnum;
 
 // Structure contenant une frame re�ue par wifi
