@@ -21,9 +21,9 @@ extern "C"
 //#include "Modules/mAccelMagneto.h"
 //#include "Modules/mGyro.h"
 //#include "Modules/mTimer.h"
-//#include "Modules/mCpu.h"		//mCpu_Setup
+#include "Modules/mCpu.h"		//mCpu_Setup
 //#include "Modules/mSwitch.h"
-//#include "Modules/mLeds.h"
+#include "Modules/mLeds.h"
 //#include "Modules/mAd.h"
 //#include "Modules/mDelay.h"
 //#include "Modules/mRS232.h"
@@ -34,19 +34,22 @@ extern "C"
 //#include "Applications/gOutput.h"
 }
 
-//auskommentieren für final build
-#define _SERIAL_DEBUGGER_
-
-//ersetzt prinf für bessere auskommentier möglichkeiten.
-#ifdef _SERIAL_DEBUGGER_
-#define _printf(n) printf(n)
-#else
-#define _printf(n)
-#endif
-
 int main(){
-	_printf("Hello Car\n");
+	printf("Hello Car\n");
 
+	printf("Tshöööööööö\n");
+	mCpu_Setup();
+	mLeds_Setup();
+
+	mLeds_Write(kMaskLed1,kLedOn);
+
+	for(UInt32 i = 0; true; i++){
+
+		mLeds_Write(kMaskLed1,kLedOff);
+		for(UInt32 j = 0; j < 10000000; j++);
+		mLeds_Write(kMaskLed1,kLedOn);
+		for(UInt32 j = 0; j < 10000000; j++);
+	}
 
 
 
