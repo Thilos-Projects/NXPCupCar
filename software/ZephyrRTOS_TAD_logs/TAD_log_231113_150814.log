@@ -1,0 +1,10 @@
+"Task Aware Debugger for GDB" version 11.8.0 (202306131047)
+Copyright 2016-2023 NXP
+==================================
+15:07:38.482 INFO: [ZephyrRTOS] .config file could not be read [F:\C++Projekte\NXPCupCar\software\ProjectFastTrack\Debug\.config (Das System kann die angegebene Datei nicht finden)]
+15:07:38.482 INFO: [TadModel] DSF session ID 28 has started.
+15:07:40.636 INFO: [TadState] TAD state changed: DEBUG_STARTED -> DEBUG_INIT_0 (SUSPENDED, USER_REQUEST)
+15:07:41.210 INFO: [TadState] TAD state changed: DEBUG_INIT_0 -> DEBUG_INIT_1 (RESUMED, USER_REQUEST)
+15:07:41.223 INFO: [TadState] TAD state changed: DEBUG_INIT_1 -> DEBUG_SUSPENDED (SUSPENDED, BREAKPOINT)
+15:07:45.686 INFO: [TadState] TAD state changed: DEBUG_SUSPENDED -> DEBUG_RESUMED (RESUMED, USER_REQUEST)
+15:08:14.289 INFO: [TadModel] DSF session ID 28 has ended.
