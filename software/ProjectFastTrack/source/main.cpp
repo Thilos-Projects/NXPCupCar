@@ -40,12 +40,12 @@ extern "C"
 void blinkLed0(){
 	static bool modus = false;
 	mLeds_Write(kMaskLed1, modus ? kLedOn : kLedOff);
-	modus != modus;
+	modus = !modus;
 }
 void blinkLed1(){
 	static bool modus = false;
 	mLeds_Write(kMaskLed2, modus ? kLedOn : kLedOff);
-	modus != modus;
+	modus = !modus;
 }
 
 int main(){
