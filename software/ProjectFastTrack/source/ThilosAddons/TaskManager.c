@@ -15,6 +15,11 @@ taskHandle handles[maxTaskCount];
 void Setup(){
 	counter = 0;
 
+	for(UInt16 i = 0; i < maxTaskCount; i++) {
+		handles[i].isFree = true;
+	}
+
+
 	// Enable du clock du p�riph�rique PIT
 	SIM->SCGC6 |= SIM_SCGC6_PIT_MASK;
 
@@ -66,11 +71,13 @@ UInt64 getMillis(){
 }
 
 void Update(){
-	for(UInt16 i = 0; i < maxTaskCount; i++)
+	for(UInt16 i = 0; i < maxTaskCount; i++) {
+		printf("Next Acitvation: %d, Counter %d\n", handles[i].nextActivationAt, counter);
 		if(!handles[i].isFree && handles[i].active && handles[i].nextActivationAt < counter){
 			handles[i].functionToCall();
 			handles[i].nextActivationAt = counter + handles[i].delay;
 		}
+	}
 }
 taskHandle* getTaskHandle(){
 	for(UInt16 i = 0; i < maxTaskCount; i++)

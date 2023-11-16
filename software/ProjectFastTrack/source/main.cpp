@@ -41,11 +41,14 @@ void blinkLed0(){
 	static bool modus = false;
 	mLeds_Write(kMaskLed1, modus ? kLedOn : kLedOff);
 	modus = !modus;
+	printf("Modus in LED0: %d\n",modus);
 }
 void blinkLed1(){
 	static bool modus = false;
 	mLeds_Write(kMaskLed2, modus ? kLedOn : kLedOff);
 	modus = !modus;
+
+	printf("Modus in LED1: %d\n",modus);
 }
 
 int main(){
@@ -59,6 +62,8 @@ int main(){
 	mTimer_EnableHBridge();
 
 	mTimer_SetMotorDuty(0.4f, 0.4f);
+
+	Setup();
 
 	taskHandle* ledHandle0 = getTaskHandle();
 	ledHandle0->delay = 1000 / minTaskTimeInMs;
