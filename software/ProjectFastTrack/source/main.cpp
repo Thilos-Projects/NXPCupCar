@@ -16,7 +16,7 @@ extern "C"
 //hier die SD-card
 //BuildError: #include "sdcard/sdmmc_config.h"
 
-//#include "Modules/mSpi.h"
+#include "Modules/mSpi.h"
 //#include "Modules/mDac.h"
 //#include "Modules/mAccelMagneto.h"
 //#include "Modules/mGyro.h"
@@ -50,6 +50,9 @@ int main(){
 	mTimer_Setup();
 	mTimer_Open();
 
+	mSpi_Setup(); //Pixy 2
+	mSpi_Open(); //Pixy 2
+
 	mLeds_Write(kMaskLed1,kLedOn);
 
 	mTimer_EnableHBridge();
@@ -59,7 +62,7 @@ int main(){
 
 
 
-	//----------------------------------------------
+	//---------------------------------------------- Pixy 2
 	static Int16 sDelay;
 	sDelay = mDelay_GetDelay(kPit1, K_MAIN_INTERVAL);
 	//PRINTF("Hello World\n");
@@ -77,8 +80,7 @@ int main(){
     pixy.changeProg("video");
 
 	/* Tom Ergänzungen: Pixy RGB ausprobieren */
-
-
+    /*
 	uint8_t rot, gruen, blau;
 	uint8_t ergebnis;
 
@@ -89,11 +91,9 @@ int main(){
 		//printf("Ergebnis der getRGB Methode: %d\n",ergebnis);
 		printf("Rot Wert: %d, Gruen Wert: %d, Blau Wert: %d\n",rot, gruen, blau);
 	}
-
-
-
+	*/
 	/* Test: Pixy Line Traking API */
-	/*
+
 	pixy.changeProg("line");
 	uint8_t ergebnis;
 
@@ -102,7 +102,7 @@ int main(){
 		printf("Ergebnis: %d\n",ergebnis);
 		pixy.line.vectors->print();
 	}
-	*/
+
 	printf("End of Pixy Test\n");
 
 	//----------------------------------------------
