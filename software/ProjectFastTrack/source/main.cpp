@@ -51,6 +51,7 @@ void blinkLed1(){
 	printf("Modus in LED1: %d\n",modus);
 }
 
+
 int main(){
 	printf("Hello Car\n");
 	mCpu_Setup();
@@ -74,6 +75,7 @@ int main(){
 	ledHandle1->delay = 500 / minTaskTimeInMs;
 	ledHandle1->functionToCall = &blinkLed1;
 	ledHandle1->active = true;
+
 
 	for(UInt32 i = 0; true; i++){
 		Update();

@@ -20,15 +20,15 @@ typedef struct {
 	bool isFree;
 	bool active;
 	UInt32 delay;					//in minTaskTime
-	UInt64 nextActivationAt;		//in minTaskTime
+	UInt32 nextActivationAt;		//in minTaskTime
 	CallbackFunc functionToCall;
 } taskHandle;
 
 void Setup();
 
 void Interupt();
-UInt64 getMicros();
-UInt64 getMillis();
+UInt32 getMicros();
+UInt32 getMillis();
 
 void Update();
 taskHandle* getTaskHandle();

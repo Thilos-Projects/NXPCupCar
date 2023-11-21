@@ -9,10 +9,11 @@
 #include "Utils/def.h"
 #include "ThilosAddons/TaskManager.h"
 
-UInt64 counter;
+UInt32 counter;
 taskHandle handles[maxTaskCount];
 
 void Setup(){
+	printf("Im Setup \n");
 	counter = 0;
 
 	for(UInt16 i = 0; i < maxTaskCount; i++) {
@@ -60,19 +61,21 @@ void Setup(){
 }
 
 void Interupt() {
-	counter++;
+	counter = counter + 1;
 }
 
-UInt64 getMicros(){
+UInt32 getMicros(){
 	return counter / minTaskTimeInMs / 1000;
 }
-UInt64 getMillis(){
-	return counter / minTaskTimeInMs;
+UInt32 getMillis(){
+	//return counter / minTaskTimeInMs;
+	return counter;
 }
 
 void Update(){
+	//printf("Counter: %d \n",counter);
 	for(UInt16 i = 0; i < maxTaskCount; i++) {
-		printf("Next Acitvation: %d, Counter %d\n", handles[i].nextActivationAt, counter);
+		//printf("Next Acitvation: %d, Counter %d\n", handles[i].nextActivationAt, counter);
 		if(!handles[i].isFree && handles[i].active && handles[i].nextActivationAt < counter){
 			handles[i].functionToCall();
 			handles[i].nextActivationAt = counter + handles[i].delay;
