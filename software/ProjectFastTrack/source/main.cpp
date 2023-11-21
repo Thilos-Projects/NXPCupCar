@@ -67,14 +67,14 @@ int main(){
 	Setup();
 
 	taskHandle* ledHandle0 = getTaskHandle();
-	ledHandle0->delay = 1000 / minTaskTimeInMs;
+	ledHandle0->delay = 100000 * countToMillis;
 	ledHandle0->functionToCall = &blinkLed0;
 	ledHandle0->active = true;
 
 	taskHandle* ledHandle1 = getTaskHandle();
-	ledHandle1->delay = 500 / minTaskTimeInMs;
+	ledHandle1->delay = 5000;
 	ledHandle1->functionToCall = &blinkLed1;
-	ledHandle1->active = true;
+	//ledHandle1->active = true;
 
 
 	for(UInt32 i = 0; true; i++){

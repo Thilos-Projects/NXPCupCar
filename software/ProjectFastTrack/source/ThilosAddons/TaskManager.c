@@ -68,8 +68,8 @@ UInt32 getMicros(){
 	return counter / minTaskTimeInMs / 1000;
 }
 UInt32 getMillis(){
-	//return counter / minTaskTimeInMs;
-	return counter;
+	return counter / minTaskTimeInMs;
+	//return counter;
 }
 
 void Update(){
@@ -78,7 +78,8 @@ void Update(){
 		//printf("Next Acitvation: %d, Counter %d\n", handles[i].nextActivationAt, counter);
 		if(!handles[i].isFree && handles[i].active && handles[i].nextActivationAt < counter){
 			handles[i].functionToCall();
-			handles[i].nextActivationAt = counter + handles[i].delay;
+			//handles[i].nextActivationAt = counter + handles[i].delay;
+			handles[i].nextActivationAt = handles[i].nextActivationAt + handles[i].delay;
 		}
 	}
 }

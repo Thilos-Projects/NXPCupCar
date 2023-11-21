@@ -12,8 +12,9 @@
 
 #include "Utils/def.h"
 
-#define minTaskTimeInMs 0.001f
+#define minTaskTimeInMs 0.1f
 #define maxTaskCount 5
+#define countToMillis 1.3888888f
 
 typedef void (*CallbackFunc)(void);
 typedef struct {
