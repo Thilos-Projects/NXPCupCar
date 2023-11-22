@@ -42,6 +42,7 @@
 #define _PIXY2VIDEO_H
 
 #define VIDEO_REQUEST_GET_RGB 0x70
+#define VIDEO_REQUEST_GET_GRAY_RECT 0x71
 
 template <class LinkType>
 class TPixy2;
@@ -56,6 +57,7 @@ public:
   }
 
   int8_t getRGB(uint16_t x, uint16_t y, uint8_t *r, uint8_t *g, uint8_t *b, bool saturate = true);
+  int8_t getGrayRect(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t strideX, uint8_t strideY, uint8_t *data, bool saturate = true);
 
 private:
   TPixy2<LinkType> *m_pixy;
@@ -90,6 +92,40 @@ int8_t Pixy2Video<LinkType>::getRGB(uint16_t x, uint16_t y, uint8_t *r, uint8_t 
     }
     return PIXY_RESULT_ERROR;
   }
+}
+
+template <class LinkType>
+int8_t Pixy2Video<LinkType>::getGrayRect(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint8_t strideX, uint8_t strideY, uint8_t *data, bool saturate)
+{
+	while (1)
+	{
+		uint8_t len = min(((x1-x0)/strideX)*((y1-y0)/strideY),255);
+		*(int16_t *)(m_pixy->m_bufPayload + 0) = x0;
+		*(int16_t *)(m_pixy->m_bufPayload + 2) = y0;
+		*(int16_t *)(m_pixy->m_bufPayload + 4) = x1;
+		*(int16_t *)(m_pixy->m_bufPayload + 6) = y1;
+		*(m_pixy->m_bufPayload + 8) = saturate;
+		*(m_pixy->m_bufPayload + 9) = strideX;
+		*(m_pixy->m_bufPayload + 10) = strideY;
+		m_pixy->m_length = 11;
+		m_pixy->m_type = VIDEO_REQUEST_GET_GRAY_RECT;
+		m_pixy->sendPacket();
+		if (m_pixy->recvPacket() == 0)
+		{
+			if (m_pixy->m_type == PIXY_TYPE_RESPONSE_RESULT)
+			{
+				for(int i = 0; i < m_pixy->m_length && i < len; i++) *(data+i) = *(m_pixy->m_buf + i);
+				return 0;
+			}
+			// deal with program changing
+			else if (m_pixy->m_type == PIXY_TYPE_RESPONSE_ERROR && (int8_t)m_pixy->m_buf[0] == PIXY_RESULT_PROG_CHANGING)
+			{
+				usleep(500); // don't be a drag
+				continue;
+			}
+		}
+		return PIXY_RESULT_ERROR;
+	}
 }
 
 #endif
