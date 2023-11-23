@@ -80,20 +80,29 @@ int main(){
     pixy.changeProg("video");
 
 	/* Tom Ergänzungen: Pixy RGB ausprobieren */
-    /*
+
 	uint8_t rot, gruen, blau;
 	uint8_t ergebnis;
 
-	ergebnis = pixy.video.getRGB(250, 260, &rot, &gruen, &blau, false);
+	uint8_t data[200];
+
+	//ergebnis = pixy.video.getRGB(250, 260, &rot, &gruen, &blau, false);
+	ergebnis = pixy.video.getGrayRect(10, 10, 20, 20, 1, 1, data, false);
+
 
 	for(;;) {
 		ergebnis = pixy.video.getRGB(250, 260, &rot, &gruen, &blau, false);
-		//printf("Ergebnis der getRGB Methode: %d\n",ergebnis);
+		//ergebnis = pixy.video.getGrayRect(10, 10, 20, 20, 1, 1, data, false);
+		printf("Ergebnis der getRGB Methode: %d\n",ergebnis);
 		printf("Rot Wert: %d, Gruen Wert: %d, Blau Wert: %d\n",rot, gruen, blau);
+		//printf("Data Array Auswertung 1: %d, 2: %d, 3: %d", data[0], data[1], data[2]);
 	}
-	*/
+
+
+
 	/* Test: Pixy Line Traking API */
 
+    /*
 	pixy.changeProg("line");
 	uint8_t ergebnis;
 
@@ -101,7 +110,7 @@ int main(){
 		ergebnis = pixy.line.getMainFeatures();
 		printf("Ergebnis: %d\n",ergebnis);
 		pixy.line.vectors->print();
-	}
+	} */
 
 	printf("End of Pixy Test\n");
 
