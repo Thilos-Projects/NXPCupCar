@@ -86,8 +86,8 @@ int8_t Pixy2Video<LinkType>::getRGB(uint16_t x, uint16_t y, uint8_t *r, uint8_t 
       // deal with program changing
       else if (m_pixy->m_type == PIXY_TYPE_RESPONSE_ERROR && (int8_t)m_pixy->m_buf[0] == PIXY_RESULT_PROG_CHANGING)
       {
-        usleep(500); // don't be a drag
-        continue;
+    	  pixyUsleep(500); // don't be a drag
+    	  continue;
       }
     }
     return PIXY_RESULT_ERROR;
@@ -114,13 +114,14 @@ int8_t Pixy2Video<LinkType>::getGrayRect(uint16_t x0, uint16_t y0, uint16_t x1, 
 		{
 			if (m_pixy->m_type == PIXY_TYPE_RESPONSE_RESULT)
 			{
-				for(int i = 0; i < m_pixy->m_length && i < len; i++) *(data+i) = *(m_pixy->m_buf + i);
+				for(int i = 0; i < m_pixy->m_length && i < len; i++)
+					*(data+i) = *(m_pixy->m_buf + i);
 				return 0;
 			}
 			// deal with program changing
 			else if (m_pixy->m_type == PIXY_TYPE_RESPONSE_ERROR && (int8_t)m_pixy->m_buf[0] == PIXY_RESULT_PROG_CHANGING)
 			{
-				usleep(500); // don't be a drag
+				pixyUsleep(500); // don't be a drag
 				continue;
 			}
 		}
