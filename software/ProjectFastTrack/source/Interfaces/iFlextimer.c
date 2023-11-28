@@ -297,7 +297,11 @@ void FTM1_IRQHandler(void)
 {
 	UInt32 aVal;
 
-	PIT->CHANNEL[3].LDVAL = 2000;
+	//!!!!!!!
+	//Wichtig
+	//geändert weil angeblich unused
+	//PIT->CHANNEL[3].LDVAL = 2000;
+	//!!!!!!!
 
 	// Test si le compteur � fait un overflow
 	if ((FTM1->SC & FTM_SC_TOF_MASK) == FTM_SC_TOF_MASK)

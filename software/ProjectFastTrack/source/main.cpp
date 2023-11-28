@@ -21,7 +21,7 @@ extern "C"
 //#include "Modules/mAccelMagneto.h"
 //#include "Modules/mGyro.h"
 #include "Modules/mTimer.h"
-#include "Modules/mCpu.h"		//mCpu_Setup
+#include "Modules/mCpu.h"
 //#include "Modules/mSwitch.h"
 #include "Modules/mLeds.h"
 //#include "Modules/mAd.h"
@@ -32,25 +32,20 @@ extern "C"
 //#include "Applications/gInput.h"
 //#include "Applications/gCompute.h"
 //#include "Applications/gOutput.h"
-
-#include "ThilosAddons/TaskManager.h"
 }
 
+#include <ThilosAddons/Sceduler.h>
 
-void blinkLed0(){
+void blinkLed0(Sceduler::taskHandle* self){
 	static bool modus = false;
 	mLeds_Write(kMaskLed1, modus ? kLedOn : kLedOff);
 	modus = !modus;
-	printf("Modus in LED0: %d\n",modus);
 }
-void blinkLed1(){
+void blinkLed1(Sceduler::taskHandle* self){
 	static bool modus = false;
 	mLeds_Write(kMaskLed2, modus ? kLedOn : kLedOff);
 	modus = !modus;
-
-	printf("Modus in LED1: %d\n",modus);
 }
-
 
 int main(){
 	printf("Hello Car\n");
@@ -60,28 +55,29 @@ int main(){
 	mTimer_Setup();
 	mTimer_Open();
 
+	//enable Motor
 	mTimer_EnableHBridge();
-
+	//set both motors to 0.4 drive Voltage
 	mTimer_SetMotorDuty(0.4f, 0.4f);
 
-	Setup();
+	//start sceduler
+	Sceduler::Setup();
 
-	taskHandle* ledHandle0 = getTaskHandle();
-	ledHandle0->delay = 100000 * countToMillis;
-	ledHandle0->functionToCall = &blinkLed0;
-	ledHandle0->active = true;
+	//Task Definitionen für Led Blinken
+	Sceduler::getTaskHandle(&blinkLed0, 1000);
+	Sceduler::getTaskHandle(&blinkLed1, 500);
 
-	taskHandle* ledHandle1 = getTaskHandle();
-	ledHandle1->delay = 5000;
-	ledHandle1->functionToCall = &blinkLed1;
-	//ledHandle1->active = true;
+	//motor aus nach 60 sekunden
+	Sceduler::getTaskHandle([](Sceduler::taskHandle* self){
+		mTimer_SetMotorDuty(0.0f, 0.0f);
+		self->isFree = true;
+	}, 60000, true, false);
 
-
-	for(UInt32 i = 0; true; i++){
-		Update();
+	for(;;){
+		//Sceduler frameCall
+		Sceduler::Update();
 	}
 
-	printf("Tshöööööööö\n");
 
 	return 0;
 }
