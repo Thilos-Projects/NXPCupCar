@@ -74,6 +74,11 @@ Sceduler::taskHandle* Sceduler::getTaskHandle(CallbackFunc functionToCall, uint3
 	return 0;
 }
 
+void Sceduler::setTimerActive(taskHandle* handel){
+	handel->active = true;
+	handel->nextActivationAt = counter + handel->delay;
+}
+
 extern "C" {
 	//------------------------------------------------------------
 	// PIT 3 interrupt routine

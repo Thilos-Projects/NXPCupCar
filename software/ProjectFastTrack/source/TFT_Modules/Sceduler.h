@@ -51,6 +51,8 @@ namespace Sceduler{
 
 	//erstelle einen task
 	taskHandle* getTaskHandle(CallbackFunc functionToCall, uint32_t delay, bool active = true, bool imidiate = true);
+
+	void setTimerActive(taskHandle* handel);
 }
 
 #endif /* SCEDULER_H_ */
