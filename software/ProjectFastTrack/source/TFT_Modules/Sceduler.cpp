@@ -5,7 +5,7 @@
  *      Author: TFR
  */
 
-#include <ThilosAddons/Sceduler.h>
+#include <TFT_Modules/Sceduler.h>
 extern "C" {
 	#include <stdio.h>
 	#include <string.h>
