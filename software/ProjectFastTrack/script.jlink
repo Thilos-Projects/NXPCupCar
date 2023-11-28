@@ -1,0 +1,7 @@
+ExitOnError 1
+r
+h
+loadfile "F:\C++Projekte\NXPCupCar\software\ProjectFastTrack\Debug\ProjectFastTrack.hex"
+qc
+
+qc
