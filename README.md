@@ -26,22 +26,27 @@ section 0. Vorbereitung
     Konzeptvorstellung : crit, done, milestone, p1, 2023-10-30, 0d
 
 
-
 section 1. Fahren I
-    Meilenstein 1 - Fahren I : active, m1, after m0, 3w
+    Meilenstein 1 - Fahren I : done, m1, after m0, 3w
 
-    Bau Fahrzeug : active, a1, after m0, 2w
-    Ansteuerung der Motoren : a2, after a1, 1w
+    Bau Fahrzeug : done, a11, after m0, 2w
+    Ansteuerung der Motoren : done, a12, after a11, 1w
 
 
 section 2. Fahren II
-    Meilenstein 2 - Fahren II : m2, after m1, 2w
+    Meilenstein 2 - Fahren II : active, m2, after m1, 2w
 
-    Demo 1 - Irgendwie fahren : crit, milestone, p4, 2023-11-27, 0d
+    Ansteuerung Servo : done, a21, after m1, 1w
+    Hall-Sensoren & Geschwindigkeitsmessung : active, a22, after a21, 1w
+
+    Demo 1 - Irgendwie fahren : crit, milestone, p4, 2023-12-08, 0d
 
 
 section 3. Kamera I
-    Meilenstein 3 - Kamera I : active, m3, after m0, 3w
+    Meilenstein 3 - Kamera I : active, m3, after m0, 5w
+
+    Spike Pixy Firmware : done, a31, after m0, 4w
+    Kantenerkennung : active, a32, after a31, 1w
 
 
 section 4. Kamera II
