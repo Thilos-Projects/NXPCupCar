@@ -68,20 +68,20 @@ void mTimer_Close(void);
 // Moteur A = moteur gauche --> valeur n�gative = en arri�re, valeur pos=en avant
 // Moteur B = moteur droite
 //-----------------------------------------------------------------------------
-void mTimer_GetSpeed(float *aSpeedMotLeft, float *aSpeedMotRight);
+//void mTimer_GetSpeed(float *aSpeedMotLeft, float *aSpeedMotRight);
 
 //---------------------------------------------------------------------------
 // Modifie la position du servo
 // Position entre -1.0 to 1.0
 //---------------------------------------------------------------------------
-void mTimer_SetServoDuty(UInt8 aServoNumber, float aPosition);
+//void mTimer_SetServoDuty(UInt8 aServoNumber, float aPosition);
 
 //---------------------------------------------------------------------------
 // Modifie le duty du PWM
 // Moteur A = moteur gauche
 // Moteur B = moteur droite
 //---------------------------------------------------------------------------
-void mTimer_SetMotorDuty(float aMotorLeft, float aMotorRight);
+//void mTimer_SetMotorDuty(float aMotorLeft, float aMotorRight);
 
 //---------------------------------------------------------------------------
 // Enable des ponts en H des moteurs DC
