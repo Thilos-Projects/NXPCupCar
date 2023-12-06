@@ -42,9 +42,9 @@ void DemoFahrt(Sceduler::taskHandle* self){
 
 	static uint8_t mState = 0;
 	static bool warteDone = true;
-	static Sceduler::taskHandle* warteHandler02Sec = Sceduler::getTaskHandle([&warteDone](Sceduler::taskHandle* self){warteDone = true; self->active = false;}, 2000, false, false);
-	static Sceduler::taskHandle* warteHandler05Sec = Sceduler::getTaskHandle([&warteDone](Sceduler::taskHandle* self){warteDone = true; self->active = false;}, 5000, false, false);
-	static Sceduler::taskHandle* warteHandler10Sec = Sceduler::getTaskHandle([&warteDone](Sceduler::taskHandle* self){warteDone = true; self->active = false;}, 10000, false, false);
+	static Sceduler::taskHandle* warteHandler02Sec = Sceduler::getTaskHandle([&warteDone](Sceduler::taskHandle* self){warteDone = true; self->active = false;}, 1000, false, false);
+	static Sceduler::taskHandle* warteHandler05Sec = Sceduler::getTaskHandle([&warteDone](Sceduler::taskHandle* self){warteDone = true; self->active = false;}, 2000, false, false);
+	static Sceduler::taskHandle* warteHandler10Sec = Sceduler::getTaskHandle([&warteDone](Sceduler::taskHandle* self){warteDone = true; self->active = false;}, 5000, false, false);
 
 	static stateFunc mStates[14] = {
 			//warte 5 sec
@@ -56,7 +56,7 @@ void DemoFahrt(Sceduler::taskHandle* self){
 			//fahre 2 sec vor
 			[warteHandler02Sec, &mState](){
 				setTimerActive(warteHandler02Sec);
-				MotorControl::setSpeed(0.4f, 0.4f);
+				MotorControl::setSpeed(0.5f, 0.5f);
 				MotorControl::setServo(0);
 			},
 			//warete 2 sec
@@ -68,7 +68,7 @@ void DemoFahrt(Sceduler::taskHandle* self){
 			//fahre 2 sec rück
 			[warteHandler02Sec, &mState](){
 				setTimerActive(warteHandler02Sec);
-				MotorControl::setSpeed(-0.4f, -0.4f);
+				MotorControl::setSpeed(-0.5f, -0.5f);
 				MotorControl::setServo(0);
 			},
 			//warte 10 sec
@@ -104,7 +104,7 @@ void DemoFahrt(Sceduler::taskHandle* self){
 			//fahre 2 sec vor schnell
 			[warteHandler02Sec, &mState](){
 				setTimerActive(warteHandler02Sec);
-				MotorControl::setSpeed(0.4f, 0.4f);
+				MotorControl::setSpeed(0.5f, 0.5f);
 				MotorControl::setServo(0);
 			},
 			//fahre kurve 2 sec rechts langsam
@@ -116,7 +116,7 @@ void DemoFahrt(Sceduler::taskHandle* self){
 			//fahre 2 sec vor schnell
 			[warteHandler02Sec, &mState](){
 				setTimerActive(warteHandler02Sec);
-				MotorControl::setSpeed(0.4f, 0.4f);
+				MotorControl::setSpeed(0.5f, 0.5f);
 				MotorControl::setServo(0);
 			},
 			//fahre kurve 2 sec rechts langsam
@@ -229,7 +229,7 @@ int main(){
 
 	MotorControl::Setup();
 
-	//Sceduler::getTaskHandle(&DemoFahrt, 1000, true, true);
+	Sceduler::getTaskHandle(&DemoFahrt, 1000, true, true);
 	Sceduler::getTaskHandle([](Sceduler::taskHandle* self){
 		if(mTimer_GetFaultMoteurLeft()) mLeds_Write(kMaskLed1, kLedOn);
 		if(mTimer_GetFaultMoteurRight()) mLeds_Write(kMaskLed2, kLedOn);
@@ -252,7 +252,11 @@ int main(){
 	}, 500, true, true);
 
 	//MotorControl::setServo(1);
-	MotorControl::setSpeed(0.55f, 0.0f);
+	//Sceduler::getTaskHandle([](Sceduler::taskHandle* self){
+	//	static float invert = 1;
+	//	MotorControl::setSpeed(-0.5f * invert, 0.0f);
+	//	invert *= -1.0f;
+	//}, 5000, true, true);
 
 	for(;;){
 		//Sceduler frameCall

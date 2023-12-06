@@ -17,15 +17,23 @@
 	}
 
 	float PI::doTick(float istPoint, float sollPoint, float deltaTime){
-		float Pout = lookupTable[(uint8_t)(sollPoint*10)%10];					//lookup
-		float next = lookupTable[(uint8_t)(sollPoint*10)%10 + 1];
-		float d = sollPoint - (((uint8_t)(sollPoint*10)%10)/10.0f);
+		uint8_t parts = 10;
 
-		float output = Pout + (next-Pout)*d;
+		float uSP = sollPoint < 0 ? -sollPoint : sollPoint;
+		float sign = sollPoint / uSP;
+		uint8_t first = ((uint8_t)(uSP*parts))%parts;
+		uint8_t next = first + 1;
+
+		float firstF = lookupTable[first];
+		float nextF = lookupTable[next];
+
+		float d = uSP - (first / parts);
+
+		float output = (firstF + (nextF-firstF) * d) * sign;
 
 		if(-0.01f > sollPoint || sollPoint > 0.01f){
 			float error = (sollPoint < 0 ? -sollPoint : sollPoint) - (istPoint < 0 ? -istPoint : istPoint);
-			integralAdder += error * deltaTime * 0.001f;
+			integralAdder += error * deltaTime * 0.5f;
 			float Iout = integralFactor * integralAdder;
 			output *= Iout;
 		}

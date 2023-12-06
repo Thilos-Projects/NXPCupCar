@@ -44,8 +44,8 @@ void MotorControl::Setup(){
 	counterL = 0;
 	counterR = 0;
 
-	pL.setup(1.0f, 1.01f, -1.0f, 1.0f);
-	pR.setup(1.0f, 1.01f, -1.0f, 1.0f);
+	pL.setup(0.9f, 1.02f, -1.0f, 1.0f);
+	pR.setup(0.9f, 1.02f, -1.0f, 1.0f);
 
 	//PWM Servo
 	FTM2->MODE |= FTM_MODE_WPDIS_MASK;
