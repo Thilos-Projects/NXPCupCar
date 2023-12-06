@@ -14,6 +14,7 @@ namespace MotorControl{
 	void getSpeed(float *left, float *right);
 	void setSpeed(float left, float right);
 
+	void doSpeedCalc();
 	void Update();
 }
 

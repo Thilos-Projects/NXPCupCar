@@ -17,7 +17,7 @@ extern "C" {
 #include <stdint.h>
 
 #define countsProMs 0.10f
-#define maxTaskCount 10
+#define maxTaskCount 20
 
 uint32_t counter;
 Sceduler::taskHandle handles[maxTaskCount];
@@ -86,7 +86,7 @@ extern "C" {
 	void PIT3_IRQHandler(void)
 	{
 		// PIT TIF flag clear
-		PIT->CHANNEL[3].TFLG |= PIT_TFLG_TIF_MASK;							/**< Timer Flag Register, array offset: 0x10C, array step: 0x10 */
+		PIT->CHANNEL[3].TFLG |= PIT_TFLG_TIF_MASK;								/**< Timer Flag Register, array offset: 0x10C, array step: 0x10 */
 		uint32_t aTmp = PIT->CHANNEL[3].CVAL;									/**< Current Timer Value Register, array offset: 0x104, array step: 0x10 */
 
 		counter++;

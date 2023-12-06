@@ -9,6 +9,7 @@
 #include "MK64F12.h"
 #include <ThilosAddons/MotorControll.h>
 #include <TFT_Modules/Sceduler.h>
+#include <ThilosAddons/PI.h>
 #include <cstdio>
 
 #define FTM2_CLOCK CORE_CLOCK										  // ClockCount
@@ -27,20 +28,24 @@
 #define FTM0_CLK_PRESCALE 0
 #define FTM0_OVERFLOW_FREQUENCY 5000
 
-float sollGeschwindigkeitL, sollGeschwindigkeitR;
 float istGeschwindigkeitL, istGeschwindigkeitR;
-uint16_t counterL, counterR;
-float lastTime;
+float sollGeschwindigkeitL, sollGeschwindigkeitR;
+int64_t counterL, counterR;
+PI pL, pR;
+float motorLPWMSpeed = 0.0f;
+float motorRPWMSpeed = 0.0f;
 
 void MotorControl::Setup(){
-	sollGeschwindigkeitL = 0;
-	sollGeschwindigkeitR = 0;
+	Sceduler::getTaskHandle([](Sceduler::taskHandle* self){MotorControl::Update();}, 50);
+	Sceduler::getTaskHandle([](Sceduler::taskHandle* self){MotorControl::doSpeedCalc();}, 500);
+
 	istGeschwindigkeitL = 0;
 	istGeschwindigkeitR = 0;
 	counterL = 0;
 	counterR = 0;
-	lastTime = 0;
 
+	pL.setup(1.0f, 1.01f, -1.0f, 1.0f);
+	pR.setup(1.0f, 1.01f, -1.0f, 1.0f);
 
 	//PWM Servo
 	FTM2->MODE |= FTM_MODE_WPDIS_MASK;
@@ -121,27 +126,36 @@ void MotorControl::setSpeed(float left, float right){
 	sollGeschwindigkeitL = left;
 	sollGeschwindigkeitR = right;
 }
+
+void MotorControl::doSpeedCalc(){
+	static uint32_t lastTime;
+	static uint32_t lastCounterL, lastCounterR;
+	uint32_t time = Sceduler::getClock();
+	float deltaTime = time - lastTime;
+	istGeschwindigkeitL = ((float)(counterL-lastCounterL)) / deltaTime;
+	istGeschwindigkeitR = ((float)(counterR-lastCounterR)) / deltaTime;
+
+	if(motorLPWMSpeed < 0)
+		istGeschwindigkeitL = -istGeschwindigkeitL;
+	if(motorRPWMSpeed < 0)
+		istGeschwindigkeitR = -istGeschwindigkeitR;
+
+	lastCounterL = counterL;
+	lastCounterR = counterR;
+	lastTime = time;
+}
 //alle 10 ms oder so
 void MotorControl::Update(){
-	static float motorLPWMSpeed = 0.4f;
-	static float motorRPWMSpeed = 0;
+	static float lastTime;
+	float time = Sceduler::getMillis();
+	float deltaTime = time - lastTime;
+	lastTime = time;
 
-	float speedDiffL = sollGeschwindigkeitL-istGeschwindigkeitL;
+	//PID test
+	motorLPWMSpeed = pL.doTick(istGeschwindigkeitL, sollGeschwindigkeitL, deltaTime / 1000.0f);
+	motorRPWMSpeed = pR.doTick(istGeschwindigkeitR, sollGeschwindigkeitR, deltaTime / 1000.0f);
 
-	if(speedDiffL < 0) motorLPWMSpeed -= 0.01f;
-	else motorLPWMSpeed += 0.01f;
-
-	//if(istGeschwindigkeitL < sollGeschwindigkeitL)
-	//	motorLPWMSpeed += 0.001f;
-	//else if(istGeschwindigkeitL > sollGeschwindigkeitL)
-	//	motorLPWMSpeed -= 0.001f;
-
-	//if(istGeschwindigkeitR < sollGeschwindigkeitR)
-	//	motorRPWMSpeed += 0.001f;
-	//else if(istGeschwindigkeitR > sollGeschwindigkeitR)
-	//	motorRPWMSpeed -= 0.001f;
-
-	float cMax = 0.5f;
+	float cMax = 0.6f;
 
 	//MotorSpeed
 	if (motorLPWMSpeed > cMax) motorLPWMSpeed = cMax;
@@ -171,26 +185,15 @@ void MotorControl::Update(){
 		FTM0->CONTROLS[1].CnV = (uint16_t)((float)FTM0->MOD * -motorRPWMSpeed);
 		FTM0->CONTROLS[2].CnV = 0;
 	}
-
-	//CurrentSpeed
-	//istGeschwindigkeitL = 0;
-	//istGeschwindigkeitR = 0;
 }
 
 extern "C"{
 	void FTM1_IRQHandler(void)
 	{
-		uint32_t aVal;
-
-		static uint32_t sOldTimerValueChL = 0;
-		static uint32_t sOldTimerValueChR = 0;
 		static uint32_t sOverFlowCounterL = 0;
 		static uint32_t sOverFlowCounterR = 0;
-		static float sDeltaChL = 0;
-		static float sDeltaChR = 0;
 
-		if ((FTM1->SC & FTM_SC_TOF_MASK) == FTM_SC_TOF_MASK)
-		{
+		if ((FTM1->SC & FTM_SC_TOF_MASK) == FTM_SC_TOF_MASK) {
 			FTM1->SC &= (~FTM_SC_TOF_MASK);
 
 			sOverFlowCounterL++;
@@ -198,30 +201,23 @@ extern "C"{
 			//KP was hier ab geht
 		}
 
-		if ((FTM1->CONTROLS[0].CnSC & FTM_CnSC_CHF_MASK) == FTM_CnSC_CHF_MASK)
-		{
+		if ((FTM1->CONTROLS[0].CnSC & FTM_CnSC_CHF_MASK) == FTM_CnSC_CHF_MASK) {
 			FTM1->CONTROLS[0].CnSC &= (~FTM_CnSC_CHF_MASK);
-			aVal = FTM1->CONTROLS[0].CnV;
-
-			//Left Motor Stuff
-
-			if (sOverFlowCounterL > 0) sDeltaChL = (sOverFlowCounterL * 65535.0) - sOldTimerValueChL + aVal;
-			else sDeltaChL = aVal - sOldTimerValueChL;
-
-			if (sDeltaChL > 0) istGeschwindigkeitL = (kFreqTCNT / sDeltaChL) / 6;
-			else istGeschwindigkeitL = 0;
-
-			sOldTimerValueChL = aVal;
-
-			sOverFlowCounterL = 0;
+			//aVal = FTM1->CONTROLS[0].CnV;						//time ore somthing like that
+			//Right Motor Stuff
+			static bool first = true;
+			if(!first) counterR++;
+			else first = false;
 		}
 
-		if ((FTM1->CONTROLS[1].CnSC & FTM_CnSC_CHF_MASK) == FTM_CnSC_CHF_MASK)
-		{
+		if ((FTM1->CONTROLS[1].CnSC & FTM_CnSC_CHF_MASK) == FTM_CnSC_CHF_MASK) {
 			FTM1->CONTROLS[1].CnSC &= (~FTM_CnSC_CHF_MASK);
-			aVal = FTM1->CONTROLS[1].CnV;
+			//aVal = FTM1->CONTROLS[1].CnV;						//time ore somthing like that
+			//Left Motor Stuff
+			static bool first = true;
+			if(!first) counterL++;
+			else first = false;
 
-			//Right Motor Stuff
 		}
 	}
 }

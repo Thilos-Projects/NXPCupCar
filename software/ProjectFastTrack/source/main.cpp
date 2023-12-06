@@ -228,7 +228,6 @@ int main(){
 	Sceduler::Setup();
 
 	MotorControl::Setup();
-	Sceduler::getTaskHandle([](Sceduler::taskHandle* self){MotorControl::Update();}, 50);
 
 	//Sceduler::getTaskHandle(&DemoFahrt, 1000, true, true);
 	Sceduler::getTaskHandle([](Sceduler::taskHandle* self){
@@ -236,23 +235,24 @@ int main(){
 		if(mTimer_GetFaultMoteurRight()) mLeds_Write(kMaskLed2, kLedOn);
 	}, 2000, true, true);
 	Sceduler::getTaskHandle([](Sceduler::taskHandle* self){
+		ledBlink(kMaskLed3);
+	}, 2000, true, true);
+	Sceduler::getTaskHandle([](Sceduler::taskHandle* self){
 		float a = mAd_Read(ADCInputEnum::kUBatt);
-		float b= mAd_Read(ADCInputEnum::kPot1);
+		float b = mAd_Read(ADCInputEnum::kPot1);
 		float c = mAd_Read(ADCInputEnum::kPot2);
 		float d = mAd_Read(ADCInputEnum::kIHBridgeLeft);
 		float e = mAd_Read(ADCInputEnum::kIHBridgeRight);
-		printf("ADC Read: \tBatteryVoltage: %e \tPotis: %e, %e \tHBridge: %e, %e\n", a, b, c, d, e);
+		printf("ADC Read: \tBatteryVoltage: %e \tPotis: %e, %e \tHBridge: %e, %e\n", (int16_t)a, (int16_t)b, (int16_t)c, (int16_t)d, (int16_t)e);
 	}, 2000, true, true);
 	Sceduler::getTaskHandle([](Sceduler::taskHandle* self){
 		float a,b;
 		MotorControl::getSpeed(&a, &b);
-		printf("Speed %d, %d\n", (int16_t)a, (int16_t)b);
+		printf("Speed %d, %d\n", (int32_t)(a*100), (int32_t)(b*100));
 	}, 500, true, true);
-	//Sceduler::getTaskHandle([](Sceduler::taskHandle* self){ledBlink(LedMaskEnum::kMaskLed3);}, 500, true, true);
-	//Sceduler::getTaskHandle([](Sceduler::taskHandle* self){ledBlink(LedMaskEnum::kMaskLed4);}, 1000, true, true);
 
-	MotorControl::setServo(1);
-	MotorControl::setSpeed(10.0f, 0.0f);
+	//MotorControl::setServo(1);
+	MotorControl::setSpeed(0.55f, 0.0f);
 
 	for(;;){
 		//Sceduler frameCall
