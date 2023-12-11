@@ -27,36 +27,36 @@ section 0. Vorbereitung
 
 
 section 1. Fahren I
-    Meilenstein 1 - Fahren I : done, m1, after m0, 3w
+    Meilenstein 1 - Fahren I : done, m1, after m0, 4w
 
     Bau Fahrzeug : done, a11, after m0, 2w
-    Ansteuerung der Motoren : done, a12, after a11, 1w
+    Ansteuerung der Motoren : done, a12, after a11, 2w
 
 
 section 2. Fahren II
-    Meilenstein 2 - Fahren II : active, m2, after m1, 2w
+    Meilenstein 2 - Fahren II : done, m2, after m1, 2w
 
     Ansteuerung Servo : done, a21, after m1, 1w
-    Hall-Sensoren & Geschwindigkeitsmessung : active, a22, after a21, 1w
+    Hall-Sensoren & Geschwindigkeitsmessung : done, a22, after a21, 1w
 
-    Demo 1 - Irgendwie fahren : crit, milestone, p4, 2023-12-08, 0d
+    Demo 1 - Irgendwie fahren : done, crit, milestone, p4, 2023-12-08, 0d
 
 
 section 3. Kamera I
-    Meilenstein 3 - Kamera I : active, m3, after m0, 5w
+    Meilenstein 3 - Kamera I : active, m3, after m0, 7w
 
     Spike Pixy Firmware : done, a31, after m0, 4w
-    Kantenerkennung : active, a32, after a31, 1w
+    Kantenerkennung : active, a32, after a31, 3w
 
 
 section 4. Kamera II
-    Meilenstein 4 - Kamera II : m4, after m3, 6w
+    Meilenstein 4 - Kamera II : active, m4, 2023-12-06, 6w
 
-    Entscheidung Erkennungsalgorithmus : a41, after m3, 1w
+    Entscheidung Erkennungsalgorithmus : done, a41, 2023-12-06, 6d
 
-    Umsetzung der Erkennung : a42, after a41, 5w
+    Umsetzung der Erkennung : active, a42, after a41, 5w
 
-    Erkennung Geradeaus : a42a, after a41, 2w
+    Erkennung Geradeaus : active, a42a, after a41, 2w
     Erkennung Kurven : a42b, after a42a, 1w
     Erkennung Kreuzung : a42c, after a42b, 1w
     Erkennung Ziellinie : a42d, after a42c, 1w
@@ -80,5 +80,8 @@ section 6. Optimierung
 
 section Sonstiges
     Weihnachtsferien : p2, 2023-12-23, 11d
+    Prüfungsphase HSD : p8, 2024-01-31, 29d
+    [Platzhalter] Prüfung Autonomes Fahren : crit, milestone, p9, 2024-03-10, 0d
     Ender der Vorlesungszeit : milestone, p3, 2024-01-28, 1d
+
 ```
