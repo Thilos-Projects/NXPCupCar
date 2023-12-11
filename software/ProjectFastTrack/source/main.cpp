@@ -15,6 +15,7 @@ extern "C"
 
 //hier die SD-card
 //BuildError: #include "sdcard/sdmmc_config.h"
+#include "sdcard/sdmmc_config.h"
 
 #include "Modules/mSpi.h"
 #include "Modules/mDac.h"
