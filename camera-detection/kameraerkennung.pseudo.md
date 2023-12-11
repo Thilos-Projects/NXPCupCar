@@ -143,6 +143,6 @@ Input Parameter der zuvor identifizierten Linien
  * @return die Mitte der gefundenen Linien
  */
 int getCenter(lines) {
-  return = lines[0] + lines[1] / 2
+  return = lines[0] + (lines[1] - lines[0]) / 2
 }
 ```
