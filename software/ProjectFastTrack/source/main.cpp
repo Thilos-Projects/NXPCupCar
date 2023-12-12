@@ -37,6 +37,9 @@ extern "C"
 #include <TFT_Modules/Sceduler.h>
 #include <TFT_Modules/CameraSystem.h>
 
+CameraSystem::Line lineAt104;
+CameraSystem::Line lineAt200;
+
 int main(){
 	printf("Hello Car\n");
 
@@ -51,7 +54,7 @@ int main(){
 	mSpi_Open();
 
 	CameraSystem::Setup();
-
+	lineAt104.setupLine(104, 24, 0, 5, 5, 15, 130, 180);
 
 	mLeds_Write(kMaskLed1,kLedOn);
 
@@ -71,7 +74,12 @@ int main(){
 		mTimer_SetMotorDuty(0, 0);
 		self->active = false;
 	}, 20000, true, false);
-	Sceduler::taskHandle* pixyHandel = Sceduler::getTaskHandle(&CameraSystem::cameraAlgorythmus,100);
+
+	Sceduler::taskHandle* pixyHandel = Sceduler::getTaskHandle([](Sceduler::taskHandle* self){
+		float lineTrackCenter;
+		if(CameraSystem::analyzeLine(&lineAt104, &lineTrackCenter))
+			mTimer_SetServoDuty(0, lineTrackCenter * 2);
+	}, 100);
 
 	for(UInt32 i = 0; true; i++){
 		Sceduler::Update();
