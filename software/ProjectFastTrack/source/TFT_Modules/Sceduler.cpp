@@ -16,7 +16,7 @@ extern "C" {
 }
 #include <stdint.h>
 
-#define countsProMs 0.10f
+#define countsProMs 1.00f
 #define maxTaskCount 10
 
 uint32_t counter;

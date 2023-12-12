@@ -1,15 +1,4 @@
 //muss sein weil nur c fähig
-
-void pixyUsleep(int useconds)
-{
-	int i = 0;
-	int j = 0;
-	for (i = 0; i < useconds; i++)
-	{
-		j++;
-	}
-}
-
 extern "C"
 {
 #include <stdio.h>
@@ -46,7 +35,7 @@ extern "C"
 }
 
 #include <TFT_Modules/Sceduler.h>
-#include "Pixy/Pixy2SPI_SS.h"
+#include <TFT_Modules/CameraSystem.h>
 
 int main(){
 	printf("Hello Car\n");
@@ -61,16 +50,8 @@ int main(){
 	mSpi_Setup();
 	mSpi_Open();
 
-	Pixy2SPI_SS pixy;
-	pixy.init();
-	pixy.getVersion();
-	pixy.version->print();
-	printf("HellO World: %ld\n",clock());
-	pixy.setLED(0, 255, 0);
-	//pixy.setLamp(1, 1);
-	pixy.changeProg("video");
+	CameraSystem::Setup();
 
-	Pixy2Video<Link2SPI_SS> pixyVid =  pixy.video;
 
 	mLeds_Write(kMaskLed1,kLedOn);
 
@@ -78,21 +59,22 @@ int main(){
 
 	mTimer_SetMotorDuty(0.4f, 0.4f);
 
-	uint8_t colorDataBuffer[256];
+	Sceduler::Setup();
+
+	Sceduler::taskHandle* ledHandle;
+	ledHandle = Sceduler::getTaskHandle([](Sceduler::taskHandle* self){
+		static bool state = false;
+		mLeds_Write(kMaskLed1,state ? kLedOff : kLedOn);
+		state = !state;
+	}, 500);
+	ledHandle = Sceduler::getTaskHandle([](Sceduler::taskHandle* self){
+		mTimer_SetMotorDuty(0, 0);
+		self->active = false;
+	}, 20000, true, false);
+	Sceduler::taskHandle* pixyHandel = Sceduler::getTaskHandle(&CameraSystem::cameraAlgorythmus,100);
 
 	for(UInt32 i = 0; true; i++){
-		mLeds_Write(kMaskLed1,kLedOff);
-		for(UInt32 j = 0; j < 2500000; j++);
-		mLeds_Write(kMaskLed1,kLedOn);
-		for(UInt32 j = 0; j < 2500000; j++);
-
-		for(int j = 1; j < 16; j++){
-			pixyVid.getGrayRect(1, j, 16, j+1, 1, 1, colorDataBuffer, false);
-			printf("%d", colorDataBuffer[0]);
-			for(int j = 1; j < min(15, 255); j++) printf(",\t%d", colorDataBuffer[j]);
-			printf("\n");
-		}
-		printf("\n\n\n\n");
+		Sceduler::Update();
 	}
 
 	return 0;
