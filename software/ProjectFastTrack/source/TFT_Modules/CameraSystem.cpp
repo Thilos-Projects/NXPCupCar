@@ -4,7 +4,7 @@
  *  Created on: 12.12.2023
  *      Author: TFR
  */
-
+//Pixy Sleep stuff, ist drinn, damit nicht vergessen wird das die Pixy idle waiting betreibt, eine bessere warriante sollte zum optimierungszeitraum gewählt werden.
 void pixyUsleep(int useconds) {
 	int i = 0;
 	int j = 0;
@@ -27,18 +27,16 @@ extern "C" {
 #include "Pixy/Pixy2SPI_SS.h"
 #include <TFT_Modules/CameraSystem.h>
 
+//localer link für die pixy
 Pixy2SPI_SS pixy;
 
+//Camera minimal init
 void CameraSystem::Setup(){
 	pixy.init();
-	pixy.getVersion();
-	pixy.version->print();
-	printf("HellO World: %ld\n",clock());
-	pixy.setLED(0, 255, 0);
-	//pixy.setLamp(1, 1);
 	pixy.changeProg("video");
 }
 
+//print any linear array of numbers
 template<typename T>
 void printArray(T* line, uint16_t length){
 	printf("%d", *(line + 0));
@@ -47,39 +45,54 @@ void printArray(T* line, uint16_t length){
 	printf("\n");
 }
 
+//hohl zeile 104 aus dem bild
 uint8_t* getImageRow(){
+	//genug speicher ür eine linie, wird bei jedem lesen überschrieben
 	static uint8_t rowDataBuffer[316];
+	//hohlt zeile 104
 	pixy.video.getGrayRect(0, 104, 158, 105, 1, 1, rowDataBuffer + 0, false);
 	pixy.video.getGrayRect(158, 104, 316, 105, 1, 1, rowDataBuffer + 158, false);
+	//gibt den pointer zur linie zurück
 	return (uint8_t*)&rowDataBuffer;
 }
 
+//führt einen 1D sobel algorythmus auf einer reihe aus
 int16_t* getSobelRow(uint8_t* rowDataBuffer){
+	//genug speicher ür eine linie, wird bei jedem lesen überschrieben
 	static int16_t rowSobleBuffer[314];
 
+	//ja das ist ein 1D sobel
 	for(int i = 0; i < 314; i++)
 		rowSobleBuffer[i] = (((int16_t)(*(rowDataBuffer+i))) * 2 + ((int16_t)(*(rowDataBuffer+i+2))) * -2); //1D sobel ;)
 
 	return (int16_t*)&rowSobleBuffer;
 }
 
+//eine struktur zum abspeichern einer kante
 struct Edge{
+	//der index des Pixels auf der x achse
 	uint16_t startIndex;
+	//die breite in pixeln
 	uint16_t width;
+	//ist die Kante ein übergang von weiß zu schwarz
 	bool whiteToBlack;
 
+	//löscht die kante
 	void clear(){
 		whiteToBlack = false;
 		width = 0;
 		startIndex = 0;
 	}
+	//ist der eintrag corrupt?
 	bool corrupted(){
 		return width == 0 && startIndex != 0;
 	}
+	//ist die Kante leer?
 	bool isEmpty(){
 		return startIndex == 0;
 	}
 };
+//sucht alle Kanten in einer Reihe
 Edge* getEdges(int16_t* rowSobleBuffer, int16_t schwellwert){
 	static Edge edgesBuffer[157];
 	uint8_t currentEdge = 0;
@@ -87,14 +100,16 @@ Edge* getEdges(int16_t* rowSobleBuffer, int16_t schwellwert){
 	edgesBuffer[currentEdge].clear();
 
 	for(int i = 0; i < 314; i++){
+		//ist der derzeitige wert außerhalb der schwellwerte
 		if(rowSobleBuffer[i] < -schwellwert || schwellwert < rowSobleBuffer[i]){
+			//wird derzeit eine Kante bearbeited
 			if(edgesBuffer[currentEdge].isEmpty()){
 				edgesBuffer[currentEdge].startIndex = i;
 				edgesBuffer[currentEdge].width = 1;
 				edgesBuffer[currentEdge].whiteToBlack = rowSobleBuffer[i] > 0;
 			}
 			else{
-				//neue Edge ohne dass eine leer stelle gefunden wurde
+				//neue Edge ohne dass eine leer stelle gefunden wurde, fange eine neue kante an
 				if(edgesBuffer[currentEdge].whiteToBlack != rowSobleBuffer[i] > 0){
 					currentEdge++;		//neue edge
 					edgesBuffer[currentEdge].startIndex = i;
@@ -102,11 +117,13 @@ Edge* getEdges(int16_t* rowSobleBuffer, int16_t schwellwert){
 					edgesBuffer[currentEdge].whiteToBlack = rowSobleBuffer[i] > 0;
 				}
 				else{
+					//erhöhe die breite der derzeitigen kante
 					edgesBuffer[currentEdge].width++;
 				}
 			}
 		}
 		else{
+			//fange eine neue kante an
 			if(!edgesBuffer[currentEdge].isEmpty()){
 				currentEdge++;		//neue edge
 				edgesBuffer[currentEdge].clear();
@@ -114,6 +131,7 @@ Edge* getEdges(int16_t* rowSobleBuffer, int16_t schwellwert){
 		}
 	}
 
+	//fülle das array mit einem leeren wert, wen der derzeitig letzte nicht leer ist
 	if(!edgesBuffer[currentEdge].isEmpty()){
 		currentEdge++;		//neue edge
 		edgesBuffer[currentEdge].clear();
@@ -122,6 +140,7 @@ Edge* getEdges(int16_t* rowSobleBuffer, int16_t schwellwert){
 	return (Edge*)&edgesBuffer;
 }
 
+//printed eine zeile aller gefundenen kanten
 void printEdges(Edge* edges){
 	uint8_t currentEdge = 0;
 	while(!edges[currentEdge].isEmpty()){
@@ -131,6 +150,7 @@ void printEdges(Edge* edges){
 	printf("\n");
 }
 
+//eine struktur zum abspeichern einer schwarzen lienie
 struct TrackLine{
 	uint16_t centerIndex;
 	uint16_t width;
@@ -142,6 +162,7 @@ struct TrackLine{
 		return centerIndex == 0;
 	}
 };
+//sucht alle schwarze linien in einer Reihe
 TrackLine* findTrackLines(Edge* edges, uint8_t minLineWidth, uint8_t maxLineWidth, uint8_t minEdgeWidth, uint8_t maxEdgeWidth){
 	static TrackLine lines[156];
 
@@ -200,6 +221,7 @@ TrackLine* findTrackLines(Edge* edges, uint8_t minLineWidth, uint8_t maxLineWidt
 	return (TrackLine*)&lines;
 }
 
+//printed eine zeile aller gefundenen schwarzen lienien
 void printTrackLines(TrackLine* lines){
 	uint8_t currentLine = 0;
 	while(!lines[currentLine].isEmpty()){
@@ -209,6 +231,7 @@ void printTrackLines(TrackLine* lines){
 	printf("\n");
 }
 
+//eine struktur zum abspeichern einer möglichen track varriante
 struct TrackLineCombination{
 	uint16_t left;
 	uint16_t right;
@@ -226,15 +249,18 @@ struct TrackLineCombination{
 		return left + width/2;
 	}
 };
+//sucht alle track varrianten und ordnet diese in ein array ein. Jede varriante ist anhand ihres mittelpunktes im array Indeziert.
 TrackLineCombination* generateVallidTrackeLineCombinations(TrackLine* lines, uint16_t minTrackWidth, uint16_t maxTrackWidth){
 	static TrackLineCombination trackeLineCombinations[316];
 
 	for(int i = 0; i< 316; i++)
 		trackeLineCombinations[i].clear();
 
+	//teste alle kombinationen, aus schwarzen linien, um alle möglichen tracks zu generieren
 	for(int i = 0; !lines[i].isEmpty(); i++){
 		for(int j = i+1; !lines[j].isEmpty(); j++){
 			uint16_t width = lines[j].centerIndex - lines[i].centerIndex;
+			//schließt alle tracks aus, die zu breit oder kurz sind
 			if(width < minTrackWidth || maxTrackWidth < width)
 				continue;
 
@@ -248,12 +274,14 @@ TrackLineCombination* generateVallidTrackeLineCombinations(TrackLine* lines, uin
 	return (TrackLineCombination*)trackeLineCombinations;
 }
 
+//printed alle Tracks
 void printTrackLineCombinations(TrackLineCombination* tracks){
 	for(int i = 0; i < 316; i++)
 		printf((tracks + i)->isEmpty() ? "_" : "-");
 	printf("\n");
 }
 
+//führt ein Camera Tracking aus
 void CameraSystem::cameraAlgorythmus(Sceduler::taskHandle* self){
 	uint8_t* lineDataBuffer;
 	int16_t* lineSobleBuffer;
