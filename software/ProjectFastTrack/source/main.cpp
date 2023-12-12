@@ -1,4 +1,15 @@
 //muss sein weil nur c fähig
+
+void pixyUsleep(int useconds)
+{
+	int i = 0;
+	int j = 0;
+	for (i = 0; i < useconds; i++)
+	{
+		j++;
+	}
+}
+
 extern "C"
 {
 #include <stdio.h>
@@ -16,7 +27,7 @@ extern "C"
 //hier die SD-card
 //BuildError: #include "sdcard/sdmmc_config.h"
 
-//#include "Modules/mSpi.h"
+#include "Modules/mSpi.h"
 //#include "Modules/mDac.h"
 //#include "Modules/mAccelMagneto.h"
 //#include "Modules/mGyro.h"
@@ -35,20 +46,54 @@ extern "C"
 }
 
 #include <TFT_Modules/Sceduler.h>
+#include "Pixy/Pixy2SPI_SS.h"
 
 int main(){
 	printf("Hello Car\n");
+
 	mCpu_Setup();
+
 	mLeds_Setup();
 
 	mTimer_Setup();
 	mTimer_Open();
 
-	for(;;){
-		//Sceduler frameCall
-		Sceduler::Update();
-	}
+	mSpi_Setup();
+	mSpi_Open();
 
+	Pixy2SPI_SS pixy;
+	pixy.init();
+	pixy.getVersion();
+	pixy.version->print();
+	printf("HellO World: %ld\n",clock());
+	pixy.setLED(0, 255, 0);
+	//pixy.setLamp(1, 1);
+	pixy.changeProg("video");
+
+	Pixy2Video<Link2SPI_SS> pixyVid =  pixy.video;
+
+	mLeds_Write(kMaskLed1,kLedOn);
+
+	mTimer_EnableHBridge();
+
+	mTimer_SetMotorDuty(0.4f, 0.4f);
+
+	uint8_t colorDataBuffer[256];
+
+	for(UInt32 i = 0; true; i++){
+		mLeds_Write(kMaskLed1,kLedOff);
+		for(UInt32 j = 0; j < 2500000; j++);
+		mLeds_Write(kMaskLed1,kLedOn);
+		for(UInt32 j = 0; j < 2500000; j++);
+
+		for(int j = 1; j < 16; j++){
+			pixyVid.getGrayRect(1, j, 16, j+1, 1, 1, colorDataBuffer, false);
+			printf("%d", colorDataBuffer[0]);
+			for(int j = 1; j < min(15, 255); j++) printf(",\t%d", colorDataBuffer[j]);
+			printf("\n");
+		}
+		printf("\n\n\n\n");
+	}
 
 	return 0;
 }

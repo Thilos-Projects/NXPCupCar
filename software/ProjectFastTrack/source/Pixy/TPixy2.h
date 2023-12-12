@@ -193,7 +193,7 @@ int8_t TPixy2<LinkType>::init(uint32_t arg)
       getResolution(); // get resolution so we have it
       return PIXY_RESULT_OK;
     }
-    usleep(5000); // delay for sync
+    pixyUsleep(5000); // delay for sync
   }
   // timeout
   return PIXY_RESULT_TIMEOUT;
@@ -240,7 +240,7 @@ int16_t TPixy2<LinkType>::getSync()
 #endif
         return PIXY_RESULT_ERROR;
       }
-      usleep(25);
+      pixyUsleep(25);
 
       j++;
       i = 0;
@@ -332,7 +332,7 @@ int8_t TPixy2<LinkType>::changeProg(const char *prog)
     }
     else
       return PIXY_RESULT_ERROR; // some kind of bitstream error
-    usleep(1000);
+    pixyUsleep(1000);
   }
 }
 
