@@ -289,7 +289,9 @@ void cameraAlgorythmus(Sceduler::taskHandle* self){
 	trackLineBuffer = findTrackLines(edgesBuffer, 5, 15, 0, 6);
 	printTrackLines(trackLineBuffer);
 
-	if(trackLineBuffer[1].isEmpty()) {
+	if(trackLineBuffer[0].isEmpty()) {
+		// TODO: NO Track border -> do nothing?
+	} else if(trackLineBuffer[1].isEmpty()) {
 		// Exactly 1 TrackBorder
 		// TODO: Move to config / Constant
 		uint16_t car_center = 316 / 2;
@@ -306,10 +308,10 @@ void cameraAlgorythmus(Sceduler::taskHandle* self){
 			float stellwinkel = destination_center;
 			stellwinkel /= 158.0f;
 			stellwinkel -= 1.0f;
-			mTimer_SetServoDuty(0, stellwinkel * 4);
+			mTimer_SetServoDuty(0, stellwinkel * 6);
 		}
 	} else {
-		// != 1 TrackBorder
+		// 2+ Borders
 		trackLineCombinationsBuffer = generateVallidTrackeLineCombinations(trackLineBuffer, 130, 240);
 		//printTrackLineCombinations(trackLineCombinationsBuffer);
 
@@ -367,7 +369,7 @@ int main(){
 	ledHandle = Sceduler::getTaskHandle([](Sceduler::taskHandle* self){
 		mTimer_SetMotorDuty(0, 0);
 		self->active = false;
-	}, 20000, true, false);
+	}, 30000, true, false);
 	Sceduler::taskHandle* pixyHandel = Sceduler::getTaskHandle(&cameraAlgorythmus,100);
 
 	for(UInt32 i = 0; true; i++){
