@@ -68,8 +68,8 @@ void printArray(T* line, uint16_t length){
 
 uint8_t* getImageRow(){
 	static uint8_t rowDataBuffer[316];
-	pixy.video.getGrayRect(0, 104, 158, 105, 1, 1, rowDataBuffer + 0, false);
-	pixy.video.getGrayRect(158, 104, 316, 105, 1, 1, rowDataBuffer + 158, false);
+	pixy.video.getGrayRect(0, 160, 158, 161, 1, 1, rowDataBuffer + 0, false);
+	pixy.video.getGrayRect(158, 160, 316, 161, 1, 1, rowDataBuffer + 158, false);
 	return (uint8_t*)&rowDataBuffer;
 }
 
@@ -288,8 +288,8 @@ void cameraAlgorythmus(Sceduler::taskHandle* self){
 	//printEdges(edgesBuffer);
 	trackLineBuffer = findTrackLines(edgesBuffer, 5, 15, 0, 6);
 	//printTrackLines(trackLineBuffer);
-	trackLineCombinationsBuffer = generateVallidTrackeLineCombinations(trackLineBuffer, 130, 180);
-	//printTrackLineCombinations(trackLineCombinationsBuffer);
+	trackLineCombinationsBuffer = generateVallidTrackeLineCombinations(trackLineBuffer, 130, 240);
+	printTrackLineCombinations(trackLineCombinationsBuffer);
 
 	uint16_t center = 0;
 
