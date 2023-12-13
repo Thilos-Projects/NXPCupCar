@@ -287,25 +287,49 @@ void cameraAlgorythmus(Sceduler::taskHandle* self){
 	edgesBuffer = getEdges(lineSobleBuffer, 20);
 	//printEdges(edgesBuffer);
 	trackLineBuffer = findTrackLines(edgesBuffer, 5, 15, 0, 6);
-	//printTrackLines(trackLineBuffer);
-	trackLineCombinationsBuffer = generateVallidTrackeLineCombinations(trackLineBuffer, 130, 240);
-	printTrackLineCombinations(trackLineCombinationsBuffer);
+	printTrackLines(trackLineBuffer);
 
-	uint16_t center = 0;
+	if(trackLineBuffer[1].isEmpty()) {
+		// Exactly 1 TrackBorder
+		// TODO: Move to config / Constant
+		uint16_t car_center = 316 / 2;
+		uint16_t destination_center = 0;
+		uint16_t expected_track_width = 250;
+		if (trackLineBuffer[0].centerIndex < car_center) {
+			// TODO
+			destination_center = trackLineBuffer[0].centerIndex + (expected_track_width / 2);
+		} else {
+			// TODO
+			destination_center = trackLineBuffer[0].centerIndex - (expected_track_width / 2);
+		}
+		if(destination_center != 0){
+			float stellwinkel = destination_center;
+			stellwinkel /= 158.0f;
+			stellwinkel -= 1.0f;
+			mTimer_SetServoDuty(0, stellwinkel * 4);
+		}
+	} else {
+		// != 1 TrackBorder
+		trackLineCombinationsBuffer = generateVallidTrackeLineCombinations(trackLineBuffer, 130, 240);
+		//printTrackLineCombinations(trackLineCombinationsBuffer);
 
-	for(int i = 1; i < 317; i++){
-		uint16_t index = 158 + (i/2) * (i%2==0?-1:1);
-		if(!trackLineCombinationsBuffer[index].isEmpty()){
-			center = index;
-			break;
+		uint16_t center = 0;
+
+		for(int i = 1; i < 317; i++){
+			uint16_t index = 158 + (i/2) * (i%2==0?-1:1);
+			if(!trackLineCombinationsBuffer[index].isEmpty()){
+				center = index;
+				break;
+			}
+		}
+		if(center != 0){
+			float stellwinkel = center;
+			stellwinkel /= 158.0f;
+			stellwinkel -= 1.0f;
+			mTimer_SetServoDuty(0, stellwinkel * 2);
 		}
 	}
-	if(center != 0){
-		float stellwinkel = center;
-		stellwinkel /= 158.0f;
-		stellwinkel -= 1.0f;
-		mTimer_SetServoDuty(0, stellwinkel * 2);
-	}
+	
 }
 
 
