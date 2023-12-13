@@ -18,6 +18,21 @@ void printArray(T* line, uint16_t length){
 	printf("\n");
 }
 
+
+void TrackAnalys::TrackAnalyse::Setup(	Pixy2SPI_SS* pixy, uint16_t row, uint16_t schwellwert, uint8_t minLineWidth,
+										uint8_t maxLineWidth, uint8_t minEdgeWidth, uint8_t maxEdgeWidth,
+										uint16_t minTrackWidth, uint16_t maxTrackWidth) {
+	this->pixy = pixy;
+	this->row = row;
+	this->schwellwert = schwellwert;
+	this->minLineWidth = minLineWidth;
+	this->maxLineWidth = maxLineWidth;
+	this->minEdgeWidth = minEdgeWidth;
+	this->maxEdgeWidth = maxEdgeWidth;
+	this->minTrackWidth = minTrackWidth;
+	this->maxTrackWidth = maxTrackWidth;
+}
+
 void TrackAnalys::TrackAnalyse::Edge::clear(){
 	whiteToBlack = false;
 	width = 0;

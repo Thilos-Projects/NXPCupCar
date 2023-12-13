@@ -56,14 +56,13 @@ namespace TrackAnalys {
 		uint16_t minTrackWidth;		//current 130
 		uint16_t maxTrackWidth;		//current 240
 
+		void Setup(	Pixy2SPI_SS* pixy, uint16_t row, uint16_t schwellwert, uint8_t minLineWidth, uint8_t maxLineWidth,
+					uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t minTrackWidth, uint16_t maxTrackWidth);
+
 		void getImageRow();
-
 		void getSobelRow();
-
 		void getEdges();
-
 		void findTrackLines();
-
 		void generateVallidTrackes();
 
 		void callAll();

@@ -120,15 +120,7 @@ int main(){
 	mSpi_Open();
 
 	Setup();
-
-	trackAnalys_0.row = 160;
-	trackAnalys_0.schwellwert = 20;
-	trackAnalys_0.minLineWidth = 5;
-	trackAnalys_0.maxLineWidth = 15;
-	trackAnalys_0.minEdgeWidth = 0;
-	trackAnalys_0.maxEdgeWidth = 6;
-	trackAnalys_0.minTrackWidth = 130;
-	trackAnalys_0.maxTrackWidth = 240;
+	trackAnalys_0.Setup(&pixy, 160, 20, 5, 15, 0, 6, 130, 240);
 
 	mLeds_Write(kMaskLed1,kLedOn);
 
