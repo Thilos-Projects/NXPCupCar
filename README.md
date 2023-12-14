@@ -14,8 +14,8 @@ title Zeitplanung Autonomes Fahrzeug [Team TFT]
 
 %% This only works on mermaid.live:
 
-tickInterval 1week
-weekday monday
+# tickInterval 1week
+# weekday monday
 # todayMarker off
 
 section 0. Vorbereitung
