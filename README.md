@@ -10,12 +10,12 @@ dateFormat DD.MM.YYYY
 axisFormat  %d.%m.
 # excludes 24.12.2023, 25.12.2023, 26.12.2023, 27.12.2023, 28.12.2023, 29.12.2023, 30.12.2023, 31.12.2023, 01.01.2024, 02.01.2024
 
-title Zeitplanung Autonomes Fahrzeug
+title Zeitplanung Autonomes Fahrzeug [Team TFT]
 
 %% This only works on mermaid.live:
 
-# tickInterval 1week
-# weekday monday
+tickInterval 1week
+weekday monday
 # todayMarker off
 
 section 0. Vorbereitung
@@ -43,10 +43,10 @@ section 2. Fahren II
 
 
 section 3. Kamera I
-    Meilenstein 3 - Kamera I : active, m3, after m0, 7w
+    Meilenstein 3 - Kamera I : done, m3, after m0, 43d
 
     Spike Pixy Firmware : done, a31, after m0, 4w
-    Kantenerkennung : active, a32, after a31, 3w
+    Kantenerkennung : done, a32, after a31, 15d
 
 
 section 4. Kamera II
@@ -54,24 +54,24 @@ section 4. Kamera II
 
     Entscheidung Erkennungsalgorithmus : done, a41, 2023-12-06, 6d
 
-    Umsetzung der Erkennung : active, a42, after a41, 5w
+    Umsetzung der Erkennung : active, a42, 2023-12-11, 4w
 
-    Erkennung Geradeaus : active, a42a, after a41, 2w
-    Erkennung Kurven : a42b, after a42a, 1w
+    Erkennung Geradeaus : done, a42a, 2023-12-11, 1w
+    Erkennung Kurven : active, a42b, after a42a, 1w
     Erkennung Kreuzung : a42c, after a42b, 1w
     Erkennung Ziellinie : a42d, after a42c, 1w
 
 
 section 5. Fahren III
-    Meilenstein 5 - Fahren III : m5, after m2, 6w
+    Meilenstein 5 - Fahren III : active, m5, after m2, 6w
 
-    Sichere 0 fahren : milestone, a52, after a42a a42b, 1d
+    Sichere 0 fahren : done, milestone, a52, 2023-12-13, 1d
     Sichere 8 fahren : milestone, a53, after a42c, 1d
     Sicher alles fahren : milestone, a54, after a42d, 1d
 
-    Demo 2 - 0 fahren : crit, milestone, p5, after a52, 1d
-    Demo 3 - 8 fahren : crit, milestone, p6, after a53, 1d
-    Demo 4 - Alles fahren: crit, milestone, p7, after a54, 1d
+    Demo 2 - 0 fahren : crit, milestone, p5, 2023-12-19, 1d
+    [Platzhalter] Demo 3 - 8 fahren : crit, milestone, p6, after a53, 1d
+    [Platzhalter] Demo 4 - Alles fahren: crit, milestone, p7, after a54, 1d
 
 
 section 6. Optimierung
@@ -83,5 +83,6 @@ section Sonstiges
     Prüfungsphase HSD : p8, 2024-01-31, 29d
     [Platzhalter] Prüfung Autonomes Fahren : crit, milestone, p9, 2024-03-10, 0d
     Ender der Vorlesungszeit : milestone, p3, 2024-01-28, 1d
+
 
 ```
