@@ -64,12 +64,14 @@ void cameraAlgorythmus_2(TrackAnalys::TrackAnalyse* analysMethod){
 
 	analysMethod->callAll();
 
+	analysMethod->printTrackLines();
+
 	if(analysMethod->lines[0].isEmpty()) {
 		// TODO: NO Track border -> do nothing?
 	} else if(analysMethod->lines[1].isEmpty()) {
 		// Exactly 1 TrackBorder
 		// TODO: Move to config / Constant
-		uint16_t car_center = 316 / 2;
+		uint16_t car_center = 316 / 2 + 7;
 		uint16_t destination_center = 0;
 		uint16_t expected_track_width = 250;
 		if (analysMethod->lines[0].centerIndex < car_center) {
@@ -83,7 +85,9 @@ void cameraAlgorythmus_2(TrackAnalys::TrackAnalyse* analysMethod){
 			float stellwinkel = destination_center;
 			stellwinkel /= 158.0f;
 			stellwinkel -= 1.0f;
-			printf("Neuer Stellwinkel: %f", stellwinkel * 6);
+			stellwinkel *= 6.0f;
+			printf("Neuer Stellwinkel: %f", stellwinkel);
+			mTimer_SetServoDuty(0, stellwinkel);
 		}
 	} else {
 		uint16_t center = 0;
@@ -99,7 +103,9 @@ void cameraAlgorythmus_2(TrackAnalys::TrackAnalyse* analysMethod){
 			float stellwinkel = center;
 			stellwinkel /= 158.0f;
 			stellwinkel -= 1.0f;
-			printf("Neuer Stellwinkel: %f", stellwinkel * 2);
+			stellwinkel *= 2.0f;
+			printf("Neuer Stellwinkel: %f", stellwinkel);
+			mTimer_SetServoDuty(0, stellwinkel);
 		}
 	}
 }
