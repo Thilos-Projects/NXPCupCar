@@ -65,14 +65,13 @@ namespace CameraAnalysis {
 		void calculateTrackLines();
 		void calculateValidTracks();
 
-		void callAll();
 
 		//----------------------Print-------------------
 		void printImageRow();
 		void printSobleRow();
 		void printEdges();
 		void printTrackLines();
-		void printTrackLineCombinations();
+		void printFoundCenters();
 	};
 }
 

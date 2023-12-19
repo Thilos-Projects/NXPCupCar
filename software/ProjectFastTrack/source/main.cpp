@@ -83,7 +83,11 @@ void pixySetup(){
 
 void cameraAlgorythmus_2(CameraAnalysis::SingleRowAnalysis* analysMethod){
 
-	analysMethod->callAll();
+	analysMethod->getImageRow();
+	analysMethod->calculateSobelRow();
+	analysMethod->calculateEdges();
+	analysMethod->calculateTrackLines();
+	analysMethod->calculateValidTracks();
 
 	analysMethod->printTrackLines();
 

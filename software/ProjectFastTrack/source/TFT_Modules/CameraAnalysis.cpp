@@ -172,13 +172,6 @@ void CameraAnalysis::SingleRowAnalysis::calculateValidTracks(){
 		}
 	}
 }
-void CameraAnalysis::SingleRowAnalysis::callAll(){
-	getImageRow();
-	calculateSobelRow();
-	calculateEdges();
-	calculateTrackLines();
-	calculateValidTracks();
-}
 
 //----------------------Print-------------------
 void CameraAnalysis::SingleRowAnalysis::printImageRow(){
@@ -203,7 +196,7 @@ void CameraAnalysis::SingleRowAnalysis::printTrackLines(){
 	}
 	printf("\n");
 }
-void CameraAnalysis::SingleRowAnalysis::printTrackLineCombinations(){
+void CameraAnalysis::SingleRowAnalysis::printFoundCenters(){
 	for(int i = 0; i < 316; i++)
 		printf((tracks + i)->isEmpty() ? "_" : "-");
 	printf("\n");
