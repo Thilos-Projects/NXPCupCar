@@ -5,7 +5,7 @@
  *      Author: TFR
  */
 
-#include <TFT_Modules/Sceduler.h>
+#include <TFT_Modules/Scheduler.h>
 extern "C" {
 	#include <stdio.h>
 	#include <string.h>
@@ -20,10 +20,10 @@ extern "C" {
 #define maxTaskCount 10
 
 uint32_t counter;
-Sceduler::taskHandle handles[maxTaskCount];
+Scheduler::taskHandle handles[maxTaskCount];
 
 //macht den setup und started den Timer 3(PIT3)
-void Sceduler::Setup(){
+void Scheduler::Setup(){
 	counter = 0;
 
 	for(uint16_t i = 0; i < maxTaskCount; i++) {
@@ -43,15 +43,15 @@ void Sceduler::Setup(){
 	PIT->CHANNEL[3].TCTRL |= PIT_TCTRL_TEN_MASK;
 }
 
-uint32_t Sceduler::getClock(){
+uint32_t Scheduler::getClock(){
 	return counter;
 }
-float Sceduler::getMillis(){
+float Scheduler::getMillis(){
 	return counter / countsProMs;
 }
 
 //wird jeden frame aufgerufen, und fürt zu gegebener zeit die einzelnen callbacks aus.
-void Sceduler::Update(){
+void Scheduler::Update(){
 	for(uint16_t i = 0; i < maxTaskCount; i++) {
 		if(!handles[i].isFree && handles[i].active && handles[i].nextActivationAt < counter){
 			handles[i].functionToCall(&handles[i]);
@@ -61,7 +61,7 @@ void Sceduler::Update(){
 }
 
 //gibt den nächsten freien handel zurück und richted diesen ein, ist keiner frei wird 0 zurückgegeben
-Sceduler::taskHandle* Sceduler::getTaskHandle(CallbackFunc functionToCall, uint32_t delay, bool active, bool imidiate){
+Scheduler::taskHandle* Scheduler::getTaskHandle(CallbackFunc functionToCall, uint32_t delay, bool active, bool imidiate){
 	for(uint16_t i = 0; i < maxTaskCount; i++)
 		if(handles[i].isFree){
 			handles[i].isFree = false;
