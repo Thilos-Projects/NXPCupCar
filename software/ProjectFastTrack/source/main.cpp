@@ -1,3 +1,4 @@
+#define CAR_CENTER_IN_PIXEL 165 //ToDo: 7 Abziehen SOll Wert 158 bei zentraler Kamera
 
 void pixyUsleep(int useconds) {
 	int i = 0;
@@ -56,11 +57,20 @@ CameraAnalysis::SingleRowAnalysis singleRowAnalysis_160;
 //Task Definitionen
 Scheduler::taskHandle* t_blinkLED;
 Scheduler::taskHandle* t_motorStop;
+Scheduler::taskHandle* t_generalCamera;
+
 Scheduler::taskHandle* t_cameraAlgorithm;
+
+
 
 //Bennenungen für Programmstruktur
 void pixySetup();
 void cameraRowsSetup();
+float getSteeringAngleOneLine(CameraAnalysis::SingleRowAnalysis::TrackLine* trackLine);
+int16_t getBestTrackIndexFromMultipleTracks(CameraAnalysis::SingleRowAnalysis* singleRow);
+bool currentRowAnalysis_160(float* steeringAngle);
+float getSteeringAngleSingleTrack(CameraAnalysis::SingleRowAnalysis::Track* singleTrack);
+
 
 void Setup() {
 	mCpu_Setup();
@@ -99,59 +109,120 @@ void cameraRowsSetup() {
 	//ToDo: Hier können weitere Reihen analysiert werden
 }
 
-void cameraAlgorythmus_2(CameraAnalysis::SingleRowAnalysis* analysMethod){
 
-	analysMethod->getImageRow();
-	analysMethod->calculateSobelRow();
-	analysMethod->calculateEdges();
-	analysMethod->calculateTrackLines();
-	analysMethod->calculateValidTracks();
+//Allgemeine Methode des Fahren
+void fahren() {
 
-	analysMethod->printTrackLines();
+	//Kamera Daten abfragen
 
-	if(analysMethod->lines[0].isEmpty()) {
-		// TODO: NO Track border -> do nothing?
-	} else if(analysMethod->lines[1].isEmpty()) {
-		// Exactly 1 TrackBorder
-		// TODO: Move to config / Constant
-		uint16_t car_center = 316 / 2 + 7;
-		uint16_t destination_center = 0;
-		uint16_t expected_track_width = 250;
-		if (analysMethod->lines[0].centerIndex < car_center) {
-			// TODO
-			destination_center = analysMethod->lines[0].centerIndex + (expected_track_width / 2);
-		} else {
-			// TODO
-			destination_center = analysMethod->lines[0].centerIndex - (expected_track_width / 2);
-		}
-		if(destination_center != 0){
-			float stellwinkel = destination_center;
-			stellwinkel /= 158.0f;
-			stellwinkel -= 1.0f;
-			stellwinkel *= 8.0f;
-			printf("Neuer Stellwinkel: %f", stellwinkel);
-			mTimer_SetServoDuty(0, stellwinkel);
-		}
-	} else {
-		uint16_t center = 0;
 
-		for(int i = 1; i < 317; i++){
-			uint16_t index = 158 + (i/2) * (i%2==0?-1:1);
-			if(!analysMethod->tracks[index].isEmpty()){
-				center = index;
-				break;
-			}
-		}
-		if(center != 0){
-			float stellwinkel = center;
-			stellwinkel /= 158.0f;
-			stellwinkel -= 1.0f;
-			stellwinkel *= 2.0f;
-			printf("Neuer Stellwinkel: %f", stellwinkel);
-			mTimer_SetServoDuty(0, stellwinkel);
-		}
+	//Lenkwinkel Berechnen und einstellen
+
+
+	//Geschwindigkeit Berechnen und einstellen
+
+}
+
+
+//Auslesen der Kamera, Sobel und Kanten der übergebenen Reihen!
+void generalCameraTask(CameraAnalysis::SingleRowAnalysis** rowsToDo, uint8_t length) {
+	for(uint8_t i = 0; i<length; i++) {
+		rowsToDo[i]->getImageRow();
+		rowsToDo[i]->calculateSobelRow();
+		rowsToDo[i]->calculateEdges();
 	}
 }
+
+
+void lenkung() {
+
+	mLeds_Write(kMaskLed2,kLedOff);
+
+	//Kameradaten die fehlen!
+	singleRowAnalysis_160.calculateTrackLines();
+	singleRowAnalysis_160.calculateValidTracks();
+
+	float steeringAngle = 0;
+	if (currentRowAnalysis_160(&steeringAngle))
+		mTimer_SetServoDuty(0, steeringAngle);
+}
+
+
+bool currentRowAnalysis_160(float* steeringAngle) {
+
+	if(singleRowAnalysis_160.lines[0].isEmpty()) {
+		//ToDo: getSteeringAngelZeroLines()
+		return false; //kein Wert
+	}
+	else if (singleRowAnalysis_160.lines[1].isEmpty()) {
+		*steeringAngle = getSteeringAngleOneLine(singleRowAnalysis_160.lines + 0);
+	}
+	else {
+		int16_t bestTrackIndex = getBestTrackIndexFromMultipleTracks(&singleRowAnalysis_160);
+		if (bestTrackIndex == -1) {
+			return false;
+		}
+		*steeringAngle = getSteeringAngleSingleTrack(singleRowAnalysis_160.tracks + bestTrackIndex);
+		mLeds_Write(kMaskLed2,kLedOn);
+	}
+	return true;
+}
+
+
+float getSteeringAngleZeroLines() {
+	//ToDo: do Something
+	return 0;
+}
+
+float getSteeringAngleOneLine(CameraAnalysis::SingleRowAnalysis::TrackLine* trackLine) {
+
+	static const uint16_t expected_track_width_160 = 250;
+
+	uint16_t destinationCenter = 0;
+	float steeringAngleOneLine = destinationCenter;
+
+	if (trackLine->centerIndex < CAR_CENTER_IN_PIXEL) {
+		// TODO
+		destinationCenter = trackLine->centerIndex + (expected_track_width_160 / 2);
+	} else {
+		// TODO
+		destinationCenter = trackLine->centerIndex - (expected_track_width_160 / 2);
+	}
+	if(destinationCenter != 0){
+		steeringAngleOneLine = destinationCenter;
+		steeringAngleOneLine /= 158.0f;
+		steeringAngleOneLine -= 1.0f;
+		steeringAngleOneLine *= 8.0f;
+	}
+	return steeringAngleOneLine;
+}
+
+
+//ToDo: es gibt mehrere Lininen (mehr als 1) aber kein valider Track vorhanden muss angeguckt werden
+float getSteeringAngleMultipleLinesWithoutTracks() {
+	return 0; //ToDo
+}
+
+
+//Für den Fall das genau ein Track gefunden wurde
+float getSteeringAngleSingleTrack(CameraAnalysis::SingleRowAnalysis::Track* singleTrack) {
+	float steeringAngleSingleTrack = singleTrack->getCenter();
+	steeringAngleSingleTrack /= 158.0f;
+	steeringAngleSingleTrack -= 1.0f;
+	steeringAngleSingleTrack *= 2.0f;
+	return steeringAngleSingleTrack;
+}
+
+int16_t getBestTrackIndexFromMultipleTracks(CameraAnalysis::SingleRowAnalysis* singleRow) {
+	for(int i = 1; i < 316; i++){
+		uint16_t index = 158 + (i/2) * (i%2==0?-1:1);
+		if(!singleRow->tracks[index].isEmpty()){
+			return index;
+		}
+	}
+	return -1;
+}
+
 
 
 void defineTasks() {
@@ -160,14 +231,25 @@ void defineTasks() {
 		static bool state = false;
 		mLeds_Write(kMaskLed1,state ? kLedOff : kLedOn);
 		state = !state;
-	}, 500);
+	}, 500, false, false);
 
 	t_motorStop = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		mTimer_SetMotorDuty(0, 0);
 		self->active = false;
 	}, 30000, true, false);
 
-	t_cameraAlgorithm = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){cameraAlgorythmus_2(&singleRowAnalysis_160); }, 100);
+
+	t_generalCamera = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
+		static CameraAnalysis::SingleRowAnalysis* usedCameraRows[] =  {
+			&singleRowAnalysis_160
+		};
+		generalCameraTask(usedCameraRows, 1);
+	}, 17);
+
+
+	t_cameraAlgorithm = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
+		lenkung();
+	}, 100);
 
 }
 
