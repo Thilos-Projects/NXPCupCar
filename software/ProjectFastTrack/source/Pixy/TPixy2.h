@@ -233,7 +233,7 @@ int16_t TPixy2<LinkType>::getSync()
     // Pixy guarantees to respond within 100us.
     if (i >= 4)
     {
-      if (j >= 4)
+      if (j >= 8) //TFT: Ursprünglich 4, aber mehr Zeit für Berechnung!!
       {
 #ifdef PIXY_DEBUG
         printf("error: no response\n");
