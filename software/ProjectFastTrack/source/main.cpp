@@ -1,3 +1,4 @@
+
 void pixyUsleep(int useconds) {
 	int i = 0;
 	int j = 0;
@@ -43,14 +44,46 @@ extern "C"
 //#include "Applications/gCompute.h"
 //#include "Applications/gOutput.h"
 }
-#include "TFT_Modules/Sceduler.h"
-#include "TFT_Modules/TrackAnalyse.h"
+#include <TFT_Modules/Scheduler.h>
+#include <TFT_Modules/CameraAnalysis.h>
 
 #include "Pixy/Pixy2SPI_SS.h"
 
+//Lokale Definitionen
 Pixy2SPI_SS pixy;
+CameraAnalysis::SingleRowAnalysis singleRowAnalysis_160;
 
-void Setup(){
+//Task Definitionen
+Scheduler::taskHandle* t_blinkLED;
+Scheduler::taskHandle* t_motorStop;
+Scheduler::taskHandle* t_cameraAlgorithm;
+
+//Bennenungen für Programmstruktur
+void pixySetup();
+void cameraRowsSetup();
+
+void Setup() {
+	mCpu_Setup();
+
+	mLeds_Setup();
+
+	mTimer_Setup();
+	mTimer_Open();
+
+	mSpi_Setup();
+	mSpi_Open();
+
+	pixySetup();
+
+	Scheduler::Setup();
+
+	cameraRowsSetup();
+
+	//Motor Setup (Motor Enable)
+	mTimer_EnableHBridge();
+}
+
+void pixySetup(){
 	pixy.init();
 	pixy.getVersion();
 	pixy.version->print();
@@ -60,9 +93,19 @@ void Setup(){
 	pixy.changeProg("video");
 }
 
-void cameraAlgorythmus_2(TrackAnalys::TrackAnalyse* analysMethod){
+//Eine / Mehrere Zeilen können definiert + gewählt werden
+void cameraRowsSetup() {
+	singleRowAnalysis_160.Setup(&pixy, 160, 20, 5, 15, 0, 6, 130, 240);
+	//ToDo: Hier können weitere Reihen analysiert werden
+}
 
-	analysMethod->callAll();
+void cameraAlgorythmus_2(CameraAnalysis::SingleRowAnalysis* analysMethod){
+
+	analysMethod->getImageRow();
+	analysMethod->calculateSobelRow();
+	analysMethod->calculateEdges();
+	analysMethod->calculateTrackLines();
+	analysMethod->calculateValidTracks();
 
 	analysMethod->printTrackLines();
 
@@ -85,7 +128,7 @@ void cameraAlgorythmus_2(TrackAnalys::TrackAnalyse* analysMethod){
 			float stellwinkel = destination_center;
 			stellwinkel /= 158.0f;
 			stellwinkel -= 1.0f;
-			stellwinkel *= 6.0f;
+			stellwinkel *= 8.0f;
 			printf("Neuer Stellwinkel: %f", stellwinkel);
 			mTimer_SetServoDuty(0, stellwinkel);
 		}
@@ -110,47 +153,36 @@ void cameraAlgorythmus_2(TrackAnalys::TrackAnalyse* analysMethod){
 	}
 }
 
-TrackAnalys::TrackAnalyse trackAnalys_0;
 
-int main(){
-	printf("Hello Car\n");
+void defineTasks() {
 
-	mCpu_Setup();
-
-	mLeds_Setup();
-
-	mTimer_Setup();
-	mTimer_Open();
-
-	mSpi_Setup();
-	mSpi_Open();
-
-	Setup();
-	trackAnalys_0.Setup(&pixy, 160, 20, 5, 15, 0, 6, 130, 240);
-
-	mLeds_Write(kMaskLed1,kLedOn);
-
-	mTimer_EnableHBridge();
-
-	mTimer_SetMotorDuty(0.4f, 0.4f);
-
-	Sceduler::Setup();
-
-	Sceduler::getTaskHandle([](Sceduler::taskHandle* self){
+	t_blinkLED = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		static bool state = false;
 		mLeds_Write(kMaskLed1,state ? kLedOff : kLedOn);
 		state = !state;
 	}, 500);
 
-	Sceduler::getTaskHandle([](Sceduler::taskHandle* self){
+	t_motorStop = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		mTimer_SetMotorDuty(0, 0);
 		self->active = false;
 	}, 30000, true, false);
 
-	Sceduler::getTaskHandle([](Sceduler::taskHandle* self){cameraAlgorythmus_2(&trackAnalys_0); }, 100);
+	t_cameraAlgorithm = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){cameraAlgorythmus_2(&singleRowAnalysis_160); }, 100);
+
+}
+
+int main(){
+	printf("Hello Car\n");
+
+	Setup();
+	defineTasks();
+
+	//ToDo: Geschwindigkeitssteuerung muss noch richtig gesteuert werden!
+	mTimer_SetMotorDuty(0.4f, 0.4f);
+
 
 	for(UInt32 i = 0; true; i++){
-		Sceduler::Update();
+		Scheduler::Update();
 	}
 
 	return 0;

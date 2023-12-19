@@ -12,7 +12,7 @@
 
 #include <stdint.h>
 
-namespace Sceduler{
+namespace Scheduler{
 	//pre def
 	struct taskHandle;
 
