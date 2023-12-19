@@ -50,7 +50,27 @@ extern "C"
 
 Pixy2SPI_SS pixy;
 
-void Setup(){
+
+//Bennenungen für Programmstruktur
+void pixySetup();
+
+
+
+void Setup() {
+	mCpu_Setup();
+
+	mLeds_Setup();
+
+	mTimer_Setup();
+	mTimer_Open();
+
+	mSpi_Setup();
+	mSpi_Open();
+
+	pixySetup();
+}
+
+void pixySetup(){
 	pixy.init();
 	pixy.getVersion();
 	pixy.version->print();
@@ -85,7 +105,7 @@ void cameraAlgorythmus_2(TrackAnalys::TrackAnalyse* analysMethod){
 			float stellwinkel = destination_center;
 			stellwinkel /= 158.0f;
 			stellwinkel -= 1.0f;
-			stellwinkel *= 6.0f;
+			stellwinkel *= 8.0f;
 			printf("Neuer Stellwinkel: %f", stellwinkel);
 			mTimer_SetServoDuty(0, stellwinkel);
 		}
@@ -115,17 +135,8 @@ TrackAnalys::TrackAnalyse trackAnalys_0;
 int main(){
 	printf("Hello Car\n");
 
-	mCpu_Setup();
-
-	mLeds_Setup();
-
-	mTimer_Setup();
-	mTimer_Open();
-
-	mSpi_Setup();
-	mSpi_Open();
-
 	Setup();
+
 	trackAnalys_0.Setup(&pixy, 160, 20, 5, 15, 0, 6, 130, 240);
 
 	mLeds_Write(kMaskLed1,kLedOn);
