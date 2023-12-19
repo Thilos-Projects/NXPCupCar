@@ -1,3 +1,4 @@
+
 void pixyUsleep(int useconds) {
 	int i = 0;
 	int j = 0;
@@ -44,7 +45,7 @@ extern "C"
 //#include "Applications/gOutput.h"
 }
 #include "TFT_Modules/Sceduler.h"
-#include "TFT_Modules/TrackAnalyse.h"
+#include <TFT_Modules/CameraAnalysis.h>
 
 #include "Pixy/Pixy2SPI_SS.h"
 
@@ -53,8 +54,6 @@ Pixy2SPI_SS pixy;
 
 //Bennenungen für Programmstruktur
 void pixySetup();
-
-
 
 void Setup() {
 	mCpu_Setup();
@@ -68,6 +67,8 @@ void Setup() {
 	mSpi_Open();
 
 	pixySetup();
+
+	Sceduler::Setup();
 }
 
 void pixySetup(){
@@ -80,7 +81,7 @@ void pixySetup(){
 	pixy.changeProg("video");
 }
 
-void cameraAlgorythmus_2(TrackAnalys::TrackAnalyse* analysMethod){
+void cameraAlgorythmus_2(CameraAnalysis::SingleRowAnalysis* analysMethod){
 
 	analysMethod->callAll();
 
@@ -130,7 +131,7 @@ void cameraAlgorythmus_2(TrackAnalys::TrackAnalyse* analysMethod){
 	}
 }
 
-TrackAnalys::TrackAnalyse trackAnalys_0;
+CameraAnalysis::SingleRowAnalysis trackAnalys_0;
 
 int main(){
 	printf("Hello Car\n");
@@ -145,7 +146,11 @@ int main(){
 
 	mTimer_SetMotorDuty(0.4f, 0.4f);
 
-	Sceduler::Setup();
+
+
+
+
+	//Task Verwahltung durch Scheduler
 
 	Sceduler::getTaskHandle([](Sceduler::taskHandle* self){
 		static bool state = false;
