@@ -12,6 +12,8 @@
 #include <stdlib.h>
 #include "Pixy/Pixy2SPI_SS.h"
 
+#define TRACKLINE_OUTPUT_LENGTH 10
+
 namespace CameraAnalysis {
 
 	struct SingleRowAnalysis{
@@ -43,17 +45,45 @@ namespace CameraAnalysis {
 		};
 
 		EdgeInput edgeInputs[1]; //Bei Kantenschwellwert Problemen hier mehr hinzufügen
+		EdgeOutput edges[157];
+
 		void calculateEdges();
+		//Ende Kantenerkennung
 
 
-
-		struct TrackLine{
+		//Linienerkennung
+		//TrackLineOutput
+		struct TrackLineOutput{
 			uint16_t centerIndex;
 			uint16_t width;
 
 			void clear();
 			bool isEmpty();
 		};
+		struct TrackLineInput{
+			uint8_t minTrackLineWidth;		//current 5
+			uint8_t maxTrackLineWidth;		//current 15
+			uint8_t minEdgeWidth;			//current 0
+			uint8_t maxEdgeWidth;			//current 6
+		};
+
+		TrackLineInput straightTrackLineInput;
+		TrackLineInput rightCurveTrackLineInput;
+		TrackLineInput leftCurveTrackLineInput;
+		TrackLineInput crossingTrackLineInput;
+		TrackLineInput finishTrackLineInput;
+
+		TrackLineOutput straightTrackLinesOutput[TRACKLINE_OUTPUT_LENGTH];
+		TrackLineOutput rightCurveTrackLinesOutput[TRACKLINE_OUTPUT_LENGTH];
+		TrackLineOutput leftCurveTrackLinesOutput[TRACKLINE_OUTPUT_LENGTH];
+		TrackLineOutput crossingTrackLinesOutput[TRACKLINE_OUTPUT_LENGTH];
+		TrackLineOutput finishTrackLinesOutput[TRACKLINE_OUTPUT_LENGTH];
+
+		void calculateTrackLines();
+		//Ende Lininenerkennung
+
+
+
 		struct Track{
 			uint16_t left;
 			uint16_t right;
@@ -64,30 +94,23 @@ namespace CameraAnalysis {
 			uint16_t getCenter();
 		};
 
-		EdgeOutput edges[157];
-		TrackLine lines[156];
 		Track tracks[316];
 
 
-		uint8_t minTrackLineWidth;		//current 5
-		uint8_t maxTrackLineWidth;		//current 15
-		uint8_t minEdgeWidth;			//current 0
-		uint8_t maxEdgeWidth;			//current 6
+
 		uint16_t minTrackWidth;			//current 130
 		uint16_t maxTrackWidth;			//current 240
 
-		void Setup(	Pixy2SPI_SS* pixy, uint16_t row, uint8_t minTrackLineWidth, uint8_t maxTrackLineWidth,
-					uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t minTrackWidth, uint16_t maxTrackWidth);
+		void Setup(	Pixy2SPI_SS* pixy, uint16_t row, uint16_t minTrackWidth, uint16_t maxTrackWidth);
 
-		void calculateTrackLines();
-		void calculateValidTracks();
+		void calculateValidTracks(TrackLineOutput* lines);
 
 
 		//----------------------Print-------------------
 		void printImageRow();
 		void printSobleRow();
 		void printEdges();
-		void printTrackLines();
+		void printTrackLines(TrackLineOutput* lines);
 		void printFoundCenters();
 	};
 }

@@ -66,7 +66,7 @@ Scheduler::taskHandle* t_cameraAlgorithm;
 //Bennenungen für Programmstruktur
 void pixySetup();
 void cameraRowsSetup();
-float getSteeringAngleOneLine(CameraAnalysis::SingleRowAnalysis::TrackLine* trackLine);
+float getSteeringAngleOneLine(CameraAnalysis::SingleRowAnalysis::TrackLineOutput* trackLine);
 int16_t getBestTrackIndexFromMultipleTracks(CameraAnalysis::SingleRowAnalysis* singleRow);
 bool currentRowAnalysis_160(float* steeringAngle);
 float getSteeringAngleSingleTrack(CameraAnalysis::SingleRowAnalysis::Track* singleTrack);
@@ -90,7 +90,7 @@ void Setup() {
 	cameraRowsSetup();
 
 	//Motor Setup (Motor Enable)
-	//mTimer_EnableHBridge();
+	mTimer_EnableHBridge();
 }
 
 void pixySetup(){
@@ -105,8 +105,33 @@ void pixySetup(){
 
 //Eine / Mehrere Zeilen können definiert + gewählt werden
 void cameraRowsSetup() {
-	singleRowAnalysis_160.Setup(&pixy, 160, 5, 15, 0, 6, 130, 240);
+	singleRowAnalysis_160.Setup(&pixy, 160, 130, 240);
 	singleRowAnalysis_160.edgeInputs[0].edgeThreshold = 20;
+
+	singleRowAnalysis_160.straightTrackLineInput.minTrackLineWidth = 5;
+	singleRowAnalysis_160.straightTrackLineInput.maxTrackLineWidth = 15;
+	singleRowAnalysis_160.straightTrackLineInput.minEdgeWidth = 0;
+	singleRowAnalysis_160.straightTrackLineInput.maxEdgeWidth = 6;
+
+	singleRowAnalysis_160.leftCurveTrackLineInput.minTrackLineWidth = 5;
+	singleRowAnalysis_160.leftCurveTrackLineInput.maxTrackLineWidth = 15;
+	singleRowAnalysis_160.leftCurveTrackLineInput.minEdgeWidth = 0;
+	singleRowAnalysis_160.leftCurveTrackLineInput.maxEdgeWidth = 6;
+
+	singleRowAnalysis_160.rightCurveTrackLineInput.minTrackLineWidth = 5;
+	singleRowAnalysis_160.rightCurveTrackLineInput.maxTrackLineWidth = 15;
+	singleRowAnalysis_160.rightCurveTrackLineInput.minEdgeWidth = 0;
+	singleRowAnalysis_160.rightCurveTrackLineInput.maxEdgeWidth = 6;
+
+	singleRowAnalysis_160.crossingTrackLineInput.minTrackLineWidth = 5;
+	singleRowAnalysis_160.crossingTrackLineInput.maxTrackLineWidth = 15;
+	singleRowAnalysis_160.crossingTrackLineInput.minEdgeWidth = 0;
+	singleRowAnalysis_160.crossingTrackLineInput.maxEdgeWidth = 6;
+
+	singleRowAnalysis_160.finishTrackLineInput.minTrackLineWidth = 5;
+	singleRowAnalysis_160.finishTrackLineInput.maxTrackLineWidth = 15;
+	singleRowAnalysis_160.finishTrackLineInput.minEdgeWidth = 0;
+	singleRowAnalysis_160.finishTrackLineInput.maxEdgeWidth = 6;
 	//ToDo: Hier können weitere Reihen analysiert werden
 }
 
@@ -141,7 +166,7 @@ void lenkung() {
 
 	//Kameradaten die fehlen!
 	singleRowAnalysis_160.calculateTrackLines();
-	singleRowAnalysis_160.calculateValidTracks();
+	singleRowAnalysis_160.calculateValidTracks(singleRowAnalysis_160.straightTrackLinesOutput);
 
 	float steeringAngle = 0;
 	if (currentRowAnalysis_160(&steeringAngle))
@@ -151,12 +176,12 @@ void lenkung() {
 
 bool currentRowAnalysis_160(float* steeringAngle) {
 
-	if(singleRowAnalysis_160.lines[0].isEmpty()) {
+	if(singleRowAnalysis_160.straightTrackLinesOutput[0].isEmpty()) {
 		//ToDo: getSteeringAngelZeroLines()
 		return false; //kein Wert
 	}
-	else if (singleRowAnalysis_160.lines[1].isEmpty()) {
-		*steeringAngle = getSteeringAngleOneLine(singleRowAnalysis_160.lines + 0);
+	else if (singleRowAnalysis_160.straightTrackLinesOutput[1].isEmpty()) {
+		*steeringAngle = getSteeringAngleOneLine(singleRowAnalysis_160.straightTrackLinesOutput + 0);
 	}
 	else {
 		int16_t bestTrackIndex = getBestTrackIndexFromMultipleTracks(&singleRowAnalysis_160);
@@ -175,7 +200,7 @@ float getSteeringAngleZeroLines() {
 	return 0;
 }
 
-float getSteeringAngleOneLine(CameraAnalysis::SingleRowAnalysis::TrackLine* trackLine) {
+float getSteeringAngleOneLine(CameraAnalysis::SingleRowAnalysis::TrackLineOutput* trackLine) {
 
 	static const uint16_t expected_track_width_160 = 250;
 
@@ -261,7 +286,7 @@ int main(){
 	defineTasks();
 
 	//ToDo: Geschwindigkeitssteuerung muss noch richtig gesteuert werden!
-	//mTimer_SetMotorDuty(0.4f, 0.4f);
+	mTimer_SetMotorDuty(0.4f, 0.4f);
 
 
 	for(UInt32 i = 0; true; i++){

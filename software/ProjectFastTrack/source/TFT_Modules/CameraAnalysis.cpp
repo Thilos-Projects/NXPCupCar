@@ -24,15 +24,10 @@ void printArray(T* line, uint16_t length){
 }
 
 
-void CameraAnalysis::SingleRowAnalysis::Setup(	Pixy2SPI_SS* pixy, uint16_t row, uint8_t minTrackLineWidth,
-										uint8_t maxTrackLineWidth, uint8_t minEdgeWidth, uint8_t maxEdgeWidth,
+void CameraAnalysis::SingleRowAnalysis::Setup(	Pixy2SPI_SS* pixy, uint16_t row,
 										uint16_t minTrackWidth, uint16_t maxTrackWidth) {
 	this->pixy = pixy;
 	this->row = row;
-	this->minTrackLineWidth = minTrackLineWidth;
-	this->maxTrackLineWidth = maxTrackLineWidth;
-	this->minEdgeWidth = minEdgeWidth;
-	this->maxEdgeWidth = maxEdgeWidth;
 	this->minTrackWidth = minTrackWidth;
 	this->maxTrackWidth = maxTrackWidth;
 }
@@ -49,10 +44,10 @@ bool CameraAnalysis::SingleRowAnalysis::EdgeOutput::isEmpty(){
 	return startIndex == 0;
 }
 
-void CameraAnalysis::SingleRowAnalysis::TrackLine::clear(){
+void CameraAnalysis::SingleRowAnalysis::TrackLineOutput::clear(){
 	centerIndex = 0;
 }
-bool CameraAnalysis::SingleRowAnalysis::TrackLine::isEmpty(){
+bool CameraAnalysis::SingleRowAnalysis::TrackLineOutput::isEmpty(){
 	return centerIndex == 0;
 }
 
@@ -114,23 +109,22 @@ void CameraAnalysis::SingleRowAnalysis::calculateEdges(){
 		edges[currentEdge].clear();
 	}
 }
-void CameraAnalysis::SingleRowAnalysis::calculateTrackLines(){
+
+void calculateTrackLine(CameraAnalysis::SingleRowAnalysis::EdgeOutput* edges , CameraAnalysis::SingleRowAnalysis::TrackLineInput* input, CameraAnalysis::SingleRowAnalysis::TrackLineOutput* output) {
 	uint8_t currendLinePointer = 0;
 	uint8_t currendEdgePointer = 0;
 	bool lastEdegeVallid = false;
 
-	lines[currendLinePointer].clear();
+	output[currendLinePointer].clear();
 
-	if(edges[currendEdgePointer].isEmpty())
-		return;
 
-	if(minEdgeWidth < edges[currendEdgePointer].width && edges[currendEdgePointer].width < maxEdgeWidth)
+	if(input->minEdgeWidth < edges[currendEdgePointer].width && edges[currendEdgePointer].width < input->maxEdgeWidth)
 		lastEdegeVallid = true;
 
 	currendEdgePointer++;
 
 	while(!edges[currendEdgePointer].isEmpty()){
-		if(edges[currendEdgePointer].width < minEdgeWidth || maxEdgeWidth < edges[currendEdgePointer].width){
+		if(edges[currendEdgePointer].width < input->minEdgeWidth || input->maxEdgeWidth < edges[currendEdgePointer].width){
 			lastEdegeVallid = false;
 			currendEdgePointer++;
 			continue;
@@ -143,22 +137,47 @@ void CameraAnalysis::SingleRowAnalysis::calculateTrackLines(){
 		}
 
 		uint16_t lineWidth = edges[currendEdgePointer].startIndex + edges[currendEdgePointer].width - edges[currendEdgePointer-1].startIndex;
-		if(lineWidth < minTrackLineWidth || maxTrackLineWidth < lineWidth){
+		if(lineWidth < input->minTrackLineWidth || input->maxTrackLineWidth < lineWidth){
 			lastEdegeVallid = true;
 			currendEdgePointer++;
 			continue;
 		}
 
-		lines[currendLinePointer].centerIndex = edges[currendEdgePointer-1].startIndex + lineWidth/2;
-		lines[currendLinePointer].width = lineWidth;
+		output[currendLinePointer].centerIndex = edges[currendEdgePointer-1].startIndex + lineWidth/2;
+		output[currendLinePointer].width = lineWidth;
 
 		currendLinePointer++;
-		lines[currendLinePointer].clear();
+		output[currendLinePointer].clear();
 
 		currendEdgePointer++;
+
+		if(currendLinePointer == TRACKLINE_OUTPUT_LENGTH-1) { //-1 da vorher noch beschrieben wird -> nach 9 Linien raus
+			return;
+		}
 	}
 }
-void CameraAnalysis::SingleRowAnalysis::calculateValidTracks(){
+
+void CameraAnalysis::SingleRowAnalysis::calculateTrackLines(){
+
+	straightTrackLinesOutput[0].clear();
+	rightCurveTrackLinesOutput[0].clear();
+	leftCurveTrackLinesOutput[0].clear();
+	crossingTrackLinesOutput[0].clear();
+	finishTrackLinesOutput[0].clear();
+
+	if(edges[0].isEmpty())
+		return;
+
+	calculateTrackLine(edges, &straightTrackLineInput, straightTrackLinesOutput);
+	calculateTrackLine(edges, &rightCurveTrackLineInput, rightCurveTrackLinesOutput);
+	calculateTrackLine(edges, &leftCurveTrackLineInput, leftCurveTrackLinesOutput);
+	calculateTrackLine(edges, &crossingTrackLineInput, crossingTrackLinesOutput);
+	calculateTrackLine(edges, &finishTrackLineInput, finishTrackLinesOutput);
+
+}
+
+
+void CameraAnalysis::SingleRowAnalysis::calculateValidTracks(TrackLineOutput* lines){
 	for(int i = 0; i< 316; i++)
 		tracks[i].clear();
 
@@ -181,7 +200,7 @@ void CameraAnalysis::SingleRowAnalysis::calculateValidTracks(){
 	}
 	//Ausgabe der Anzahl gefundener Tracks
 	printf("Track Count: %d Center Found; %d \n", trackCount, centerFoud);
-	printTrackLines();
+	printTrackLines(lines);
 	printEdges();
 	mLeds_Write(kMaskLed1,(trackCount/1) % 2 == 1 ? kLedOff : kLedOn);
 	mLeds_Write(kMaskLed2,(trackCount/2) % 2 == 1 ? kLedOff : kLedOn);
@@ -204,7 +223,7 @@ void CameraAnalysis::SingleRowAnalysis::printEdges(){
 	}
 	printf("\n");
 }
-void CameraAnalysis::SingleRowAnalysis::printTrackLines(){
+void CameraAnalysis::SingleRowAnalysis::printTrackLines(TrackLineOutput* lines){
 	uint8_t currentLine = 0;
 	while(!lines[currentLine].isEmpty()){
 		printf("L: %d, %d\t", lines[currentLine].centerIndex, lines[currentLine].width);
