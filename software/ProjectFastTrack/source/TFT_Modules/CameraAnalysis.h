@@ -29,89 +29,23 @@ namespace CameraAnalysis {
 		void calculateSobelRow();
 		//Stop Kamera Abfrage + Sobel
 
-		//Kantenerkennung
-		struct EdgeOutput{
-			uint16_t startIndex;
-			uint16_t width;
-			bool whiteToBlack;
 
-			void clear();
-			bool corrupted();
-			bool isEmpty();
-		};
+		uint16_t edgeThreshold; 		//current 20
+		uint8_t minEdgeWidth;			//current 0
+		uint8_t maxEdgeWidth;			//current 6
+		uint16_t centerPixel;			//current 158
 
-		struct EdgeInput{
-			uint16_t edgeThreshold;			//current 20
-		};
+		uint16_t trackCenter;
+		uint16_t trackWidth;
 
-		EdgeInput edgeInputs[1]; //Bei Kantenschwellwert Problemen hier mehr hinzufügen
-		EdgeOutput edges[157];
+		void findBlancArea();
 
-		void calculateEdges();
-		//Ende Kantenerkennung
-
-
-		//Linienerkennung
-		//TrackLineOutput
-		struct TrackLineOutput{
-			uint16_t centerIndex;
-			uint16_t width;
-
-			void clear();
-			bool isEmpty();
-		};
-		struct TrackLineInput{
-			uint8_t minTrackLineWidth;		//current 5
-			uint8_t maxTrackLineWidth;		//current 15
-			uint8_t minEdgeWidth;			//current 0
-			uint8_t maxEdgeWidth;			//current 6
-		};
-
-		TrackLineInput straightTrackLineInput;
-		TrackLineInput rightCurveTrackLineInput;
-		TrackLineInput leftCurveTrackLineInput;
-		TrackLineInput crossingTrackLineInput;
-		TrackLineInput finishTrackLineInput;
-
-		TrackLineOutput straightTrackLinesOutput[TRACKLINE_OUTPUT_LENGTH];
-		TrackLineOutput rightCurveTrackLinesOutput[TRACKLINE_OUTPUT_LENGTH];
-		TrackLineOutput leftCurveTrackLinesOutput[TRACKLINE_OUTPUT_LENGTH];
-		TrackLineOutput crossingTrackLinesOutput[TRACKLINE_OUTPUT_LENGTH];
-		TrackLineOutput finishTrackLinesOutput[TRACKLINE_OUTPUT_LENGTH];
-
-		void calculateTrackLines();
-		//Ende Lininenerkennung
-
-
-
-		struct Track{
-			uint16_t left;
-			uint16_t right;
-			uint16_t width;
-
-			void clear();
-			bool isEmpty();
-			uint16_t getCenter();
-		};
-
-		Track tracks[316];
-
-
-
-		uint16_t minTrackWidth;			//current 130
-		uint16_t maxTrackWidth;			//current 240
-
-		void Setup(	Pixy2SPI_SS* pixy, uint16_t row, uint16_t minTrackWidth, uint16_t maxTrackWidth);
-
-		void calculateValidTracks(TrackLineOutput* lines);
+		void Setup(Pixy2SPI_SS* pixy, uint16_t row, uint16_t edgeThreshold, 	uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t pixelMitte);
 
 
 		//----------------------Print-------------------
 		void printImageRow();
 		void printSobleRow();
-		void printEdges();
-		void printTrackLines(TrackLineOutput* lines);
-		void printFoundCenters();
 	};
 }
 
