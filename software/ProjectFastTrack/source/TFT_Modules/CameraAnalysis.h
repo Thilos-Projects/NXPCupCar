@@ -13,8 +13,22 @@
 #include "Pixy/Pixy2SPI_SS.h"
 
 namespace CameraAnalysis {
+
 	struct SingleRowAnalysis{
-		struct Edge{
+
+		//Kamera Abfrage + Sobel
+		uint8_t rowDataBuffer[316];
+		int16_t rowSobel[314];
+
+		Pixy2SPI_SS* pixy;
+		uint16_t row;					//current 160
+
+		void getImageRow();
+		void calculateSobelRow();
+		//Stop Kamera Abfrage + Sobel
+
+		//Kantenerkennung
+		struct EdgeOutput{
 			uint16_t startIndex;
 			uint16_t width;
 			bool whiteToBlack;
@@ -23,6 +37,16 @@ namespace CameraAnalysis {
 			bool corrupted();
 			bool isEmpty();
 		};
+
+		struct EdgeInput{
+			uint16_t edgeThreshold;			//current 20
+		};
+
+		EdgeInput edgeInputs[1]; //Bei Kantenschwellwert Problemen hier mehr hinzufügen
+		void calculateEdges();
+
+
+
 		struct TrackLine{
 			uint16_t centerIndex;
 			uint16_t width;
@@ -40,15 +64,11 @@ namespace CameraAnalysis {
 			uint16_t getCenter();
 		};
 
-		uint8_t rowDataBuffer[316];
-		int16_t rowSoble[314];
-		Edge edges[157];
+		EdgeOutput edges[157];
 		TrackLine lines[156];
 		Track tracks[316];
 
-		Pixy2SPI_SS* pixy;
-		uint16_t row;					//current 160
-		uint16_t edgeThreshold;			//current 20
+
 		uint8_t minTrackLineWidth;		//current 5
 		uint8_t maxTrackLineWidth;		//current 15
 		uint8_t minEdgeWidth;			//current 0
@@ -56,12 +76,9 @@ namespace CameraAnalysis {
 		uint16_t minTrackWidth;			//current 130
 		uint16_t maxTrackWidth;			//current 240
 
-		void Setup(	Pixy2SPI_SS* pixy, uint16_t row, uint16_t edgeThreshold, uint8_t minTrackLineWidth, uint8_t maxTrackLineWidth,
+		void Setup(	Pixy2SPI_SS* pixy, uint16_t row, uint8_t minTrackLineWidth, uint8_t maxTrackLineWidth,
 					uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t minTrackWidth, uint16_t maxTrackWidth);
 
-		void getImageRow();
-		void calculateSobelRow();
-		void calculateEdges();
 		void calculateTrackLines();
 		void calculateValidTracks();
 

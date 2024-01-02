@@ -90,7 +90,7 @@ void Setup() {
 	cameraRowsSetup();
 
 	//Motor Setup (Motor Enable)
-	mTimer_EnableHBridge();
+	//mTimer_EnableHBridge();
 }
 
 void pixySetup(){
@@ -105,7 +105,8 @@ void pixySetup(){
 
 //Eine / Mehrere Zeilen können definiert + gewählt werden
 void cameraRowsSetup() {
-	singleRowAnalysis_160.Setup(&pixy, 160, 20, 5, 15, 0, 6, 130, 240);
+	singleRowAnalysis_160.Setup(&pixy, 160, 5, 15, 0, 6, 130, 240);
+	singleRowAnalysis_160.edgeInputs[0].edgeThreshold = 20;
 	//ToDo: Hier können weitere Reihen analysiert werden
 }
 
@@ -260,7 +261,7 @@ int main(){
 	defineTasks();
 
 	//ToDo: Geschwindigkeitssteuerung muss noch richtig gesteuert werden!
-	mTimer_SetMotorDuty(0.4f, 0.4f);
+	//mTimer_SetMotorDuty(0.4f, 0.4f);
 
 
 	for(UInt32 i = 0; true; i++){
