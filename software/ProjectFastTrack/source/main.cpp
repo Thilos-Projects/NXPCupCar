@@ -52,7 +52,8 @@ extern "C"
 
 //Lokale Definitionen
 Pixy2SPI_SS pixy;
-CameraAnalysis::SingleRowAnalysis singleRowAnalysis_160;
+CameraAnalysis::SingleRowAnalysis singleRowAnalysis_100;
+CameraAnalysis::SingleRowAnalysis singleRowAnalysis_50;
 
 //Task Definitionen
 Scheduler::taskHandle* t_blinkLED;
@@ -105,7 +106,8 @@ void pixySetup(){
 
 //Eine / Mehrere Zeilen können definiert + gewählt werden
 void cameraRowsSetup() {
-	singleRowAnalysis_160.Setup(&pixy, 160, 20, 0, 6, 158);
+	singleRowAnalysis_100.Setup(&pixy, 100, 40, 0, 6, 158);
+	singleRowAnalysis_50.Setup(&pixy, 50, 40, 0, 6, 158);
 }
 
 
@@ -136,15 +138,30 @@ void generalCameraTask(CameraAnalysis::SingleRowAnalysis** rowsToDo, uint8_t len
 
 void lenkung() {
 
-	mLeds_Write(kMaskLed2,kLedOff);
+	//mLeds_Write(kMaskLed2,kLedOff);
 
 	//Kameradaten die fehlen!
 	//singleRowAnalysis_160.calculateTrackLines();
 	//singleRowAnalysis_160.calculateValidTracks(singleRowAnalysis_160.straightTrackLinesOutput);
+	singleRowAnalysis_100.findBlancArea();
+	singleRowAnalysis_50.findBlancArea();
 
+	float steeringAngle = (float)singleRowAnalysis_100.trackCenter - (float)singleRowAnalysis_100.centerPixel;
+	steeringAngle /= 79.0f;
+	steeringAngle *= steeringAngle;
+	steeringAngle *= 3.0; //Eigener Skalierungsfaktor -> abhaengig von Geschwindigkeit
+
+
+	if(singleRowAnalysis_100.trackCenter < singleRowAnalysis_100.centerPixel) {
+		mTimer_SetServoDuty(0, -steeringAngle);
+	}
+	else {
+		mTimer_SetServoDuty(0, steeringAngle);
+	}
+	/*
 	float steeringAngle = 0;
 	if (currentRowAnalysis_160(&steeringAngle))
-		mTimer_SetServoDuty(0, steeringAngle);
+		mTimer_SetServoDuty(0, steeringAngle);*/
 }
 
 
@@ -242,7 +259,8 @@ void defineTasks() {
 
 	t_generalCamera = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		static CameraAnalysis::SingleRowAnalysis* usedCameraRows[] =  {
-			&singleRowAnalysis_160
+			&singleRowAnalysis_100,
+			&singleRowAnalysis_50
 		};
 		generalCameraTask(usedCameraRows, 1);
 	}, 17);
@@ -261,7 +279,7 @@ int main(){
 	defineTasks();
 
 	//ToDo: Geschwindigkeitssteuerung muss noch richtig gesteuert werden!
-	//mTimer_SetMotorDuty(0.4f, 0.4f);
+	mTimer_SetMotorDuty(0.4f, 0.4f);
 
 
 	for(UInt32 i = 0; true; i++){
