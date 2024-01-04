@@ -36,7 +36,7 @@ extern "C"
 #include "Modules/mCpu.h"
 //#include "Modules/mSwitch.h"
 #include "Modules/mLeds.h"
-//#include "Modules/mAd.h"
+#include "Modules/mAd.h"
 //#include "Modules/mDelay.h"
 //#include "Modules/mRS232.h"
 //#include "Modules/mVL6180x.h"
@@ -50,9 +50,11 @@ extern "C"
 
 #include "Pixy/Pixy2SPI_SS.h"
 
+#define SERVO_STEERING_OFFSET -0.2f
+
 //Lokale Definitionen
 Pixy2SPI_SS pixy;
-CameraAnalysis::SingleRowAnalysis singleRowAnalysis_100;
+CameraAnalysis::SingleRowAnalysis singleRowAnalysis_180;
 CameraAnalysis::SingleRowAnalysis singleRowAnalysis_50;
 
 //Task Definitionen
@@ -61,6 +63,7 @@ Scheduler::taskHandle* t_motorStop;
 Scheduler::taskHandle* t_generalCamera;
 
 Scheduler::taskHandle* t_cameraAlgorithm;
+Scheduler::taskHandle* t_speedControl;
 
 
 
@@ -84,6 +87,9 @@ void Setup() {
 	mSpi_Setup();
 	mSpi_Open();
 
+	mAd_Setup();
+	mAd_Open();
+
 	pixySetup();
 
 	Scheduler::Setup();
@@ -106,7 +112,7 @@ void pixySetup(){
 
 //Eine / Mehrere Zeilen können definiert + gewählt werden
 void cameraRowsSetup() {
-	singleRowAnalysis_100.Setup(&pixy, 100, 40, 0, 6, 158);
+	singleRowAnalysis_180.Setup(&pixy, 180, 40, 0, 6, 158);
 	singleRowAnalysis_50.Setup(&pixy, 50, 40, 0, 6, 158);
 }
 
@@ -143,20 +149,20 @@ void lenkung() {
 	//Kameradaten die fehlen!
 	//singleRowAnalysis_160.calculateTrackLines();
 	//singleRowAnalysis_160.calculateValidTracks(singleRowAnalysis_160.straightTrackLinesOutput);
-	singleRowAnalysis_100.findBlancArea();
+	singleRowAnalysis_180.findBlancArea();
 	singleRowAnalysis_50.findBlancArea();
 
-	float steeringAngle = (float)singleRowAnalysis_100.trackCenter - (float)singleRowAnalysis_100.centerPixel;
+	float steeringAngle = (float)singleRowAnalysis_180.trackCenter - (float)singleRowAnalysis_180.centerPixel;
 	steeringAngle /= 79.0f;
 	steeringAngle *= steeringAngle;
 	steeringAngle *= 3.0; //Eigener Skalierungsfaktor -> abhaengig von Geschwindigkeit
 
 
-	if(singleRowAnalysis_100.trackCenter < singleRowAnalysis_100.centerPixel) {
-		mTimer_SetServoDuty(0, -steeringAngle);
+	if(singleRowAnalysis_180.trackCenter < singleRowAnalysis_180.centerPixel) {
+		mTimer_SetServoDuty(0, -steeringAngle + SERVO_STEERING_OFFSET);
 	}
 	else {
-		mTimer_SetServoDuty(0, steeringAngle);
+		mTimer_SetServoDuty(0, steeringAngle + SERVO_STEERING_OFFSET);
 	}
 	/*
 	float steeringAngle = 0;
@@ -254,12 +260,12 @@ void defineTasks() {
 	t_motorStop = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		mTimer_SetMotorDuty(0, 0);
 		self->active = false;
-	}, 30000, true, false);
+	}, 90000, false, false);
 
 
 	t_generalCamera = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		static CameraAnalysis::SingleRowAnalysis* usedCameraRows[] =  {
-			&singleRowAnalysis_100,
+			&singleRowAnalysis_180,
 			&singleRowAnalysis_50
 		};
 		generalCameraTask(usedCameraRows, 1);
@@ -270,6 +276,15 @@ void defineTasks() {
 		lenkung();
 	}, 100);
 
+	t_speedControl = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
+		//printf("Analog 1: %d\n", (int)(mAd_Read(ADCInputEnum::kPot1) * 256));
+		//printf("Analog 2: %d\n", (int)(mAd_Read(ADCInputEnum::kPot2) * 256));
+
+		float speed = ((mAd_Read(ADCInputEnum::kPot2) + 1) / 2) * 0.3f + 0.4f;
+
+		mTimer_SetMotorDuty(speed, speed);
+	}, 1000);
+
 }
 
 int main(){
@@ -277,6 +292,7 @@ int main(){
 
 	Setup();
 	defineTasks();
+	// mTimer_SetServoDuty(0, SERVO_STEERING_OFFSET);
 
 	//ToDo: Geschwindigkeitssteuerung muss noch richtig gesteuert werden!
 	mTimer_SetMotorDuty(0.4f, 0.4f);

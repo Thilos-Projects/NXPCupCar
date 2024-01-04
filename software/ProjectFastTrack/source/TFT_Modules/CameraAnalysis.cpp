@@ -99,7 +99,7 @@ void CameraAnalysis::SingleRowAnalysis::findBlancArea() {
 	trackCenter = leftEdge + trackWidth/2;
 
 
-	printf("Mid: %d Width:%d leftEdge:%d rightEdge:%d \n", trackCenter, trackWidth, leftEdge, rightEdge);
+	// printf("Mid: %d Width:%d leftEdge:%d rightEdge:%d \n", trackCenter, trackWidth, leftEdge, rightEdge);
 
 }
 
