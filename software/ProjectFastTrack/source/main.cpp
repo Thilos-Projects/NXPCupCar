@@ -77,6 +77,9 @@ bool currentRowAnalysis_160(float* steeringAngle);
 
 float destinationSpeed = 0.0f;
 
+// This value is found while testing on 04.01.2024
+float pot2 = -0.739776640f;
+
 
 void Setup() {
 	mCpu_Setup();
@@ -158,7 +161,7 @@ void lenkung() {
 	steeringAngle /= 79.0f;
 	steeringAngle *= steeringAngle;
 
-	float steeringFactor = 3.0f + (destinationSpeed - 0.4f) * ((mAd_Read(ADCInputEnum::kPot2) + 1) / 2) * 30.0f;
+	float steeringFactor = 3.0f + (destinationSpeed - 0.4f) * ((pot2 + 1) / 2) * 30.0f;
 
 	steeringAngle *= steeringFactor;
 
@@ -301,10 +304,11 @@ void defineTasks() {
 	}, 100);
 
 	t_speedControl = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
-		//printf("Analog 1: %d\n", (int)(mAd_Read(ADCInputEnum::kPot1) * 256));
-		//printf("Analog 2: %d\n", (int)(mAd_Read(ADCInputEnum::kPot2) * 256));
+		//printf("Analog 1: %d\n", (int)(mAd_Read(ADCInputEnum::kPot1) * 1000000000));
+		//printf("Analog 2: %d\n", (int)(mAd_Read(ADCInputEnum::kPot2) * 1000000000));
+		//destinationSpeed = ((mAd_Read(ADCInputEnum::kPot2) + 1) / 2) * 0.3f + 0.4f;
 
-		destinationSpeed = ((mAd_Read(ADCInputEnum::kPot2) + 1) / 2) * 0.3f + 0.4f;
+		destinationSpeed = ((pot2 + 1) / 2) * 0.3f + 0.4f;
 
 		mTimer_SetMotorDuty(destinationSpeed, destinationSpeed);
 	}, 1000, true);
@@ -319,7 +323,7 @@ int main(){
 	// mTimer_SetServoDuty(0, 1.0f);
 
 	//ToDo: Geschwindigkeitssteuerung muss noch richtig gesteuert werden!
-	mTimer_SetMotorDuty(0.4f, 0.4f);
+	//mTimer_SetMotorDuty(0.4f, 0.4f);
 
 
 	for(UInt32 i = 0; true; i++){
