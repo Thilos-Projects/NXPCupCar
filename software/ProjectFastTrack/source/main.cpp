@@ -75,6 +75,8 @@ int16_t getBestTrackIndexFromMultipleTracks(CameraAnalysis::SingleRowAnalysis* s
 bool currentRowAnalysis_160(float* steeringAngle);
 //float getSteeringAngleSingleTrack(CameraAnalysis::SingleRowAnalysis::Track* singleTrack);
 
+float destinationSpeed = 0.0f;
+
 
 void Setup() {
 	mCpu_Setup();
@@ -155,15 +157,37 @@ void lenkung() {
 	float steeringAngle = (float)singleRowAnalysis_180.trackCenter - (float)singleRowAnalysis_180.centerPixel;
 	steeringAngle /= 79.0f;
 	steeringAngle *= steeringAngle;
-	steeringAngle *= 3.0; //Eigener Skalierungsfaktor -> abhaengig von Geschwindigkeit
+
+	float steeringFactor = 3.0f + (destinationSpeed - 0.4f) * ((mAd_Read(ADCInputEnum::kPot2) + 1) / 2) * 30.0f;
+
+	steeringAngle *= steeringFactor;
+
+	static float minSteeringAngle = 9000.0f;
+	static float maxSteeringAngle = -9000.0f;
 
 
 	if(singleRowAnalysis_180.trackCenter < singleRowAnalysis_180.centerPixel) {
 		mTimer_SetServoDuty(0, -steeringAngle + SERVO_STEERING_OFFSET);
+
+		if (-steeringAngle > maxSteeringAngle) {
+			maxSteeringAngle = -steeringAngle;
+		}
+		if (-steeringAngle < minSteeringAngle) {
+			minSteeringAngle = -steeringAngle;
+		}
 	}
 	else {
 		mTimer_SetServoDuty(0, steeringAngle + SERVO_STEERING_OFFSET);
+
+		if (steeringAngle > maxSteeringAngle) {
+			maxSteeringAngle = steeringAngle;
+		}
+		if (steeringAngle < minSteeringAngle) {
+			minSteeringAngle = steeringAngle;
+		}
 	}
+	
+	// printf("Steering min: %d, max: %d\n", (int)(minSteeringAngle*256), (int)(maxSteeringAngle*256));
 	/*
 	float steeringAngle = 0;
 	if (currentRowAnalysis_160(&steeringAngle))
@@ -280,10 +304,10 @@ void defineTasks() {
 		//printf("Analog 1: %d\n", (int)(mAd_Read(ADCInputEnum::kPot1) * 256));
 		//printf("Analog 2: %d\n", (int)(mAd_Read(ADCInputEnum::kPot2) * 256));
 
-		float speed = ((mAd_Read(ADCInputEnum::kPot2) + 1) / 2) * 0.3f + 0.4f;
+		destinationSpeed = ((mAd_Read(ADCInputEnum::kPot2) + 1) / 2) * 0.3f + 0.4f;
 
-		mTimer_SetMotorDuty(speed, speed);
-	}, 1000);
+		mTimer_SetMotorDuty(destinationSpeed, destinationSpeed);
+	}, 1000, true);
 
 }
 
@@ -292,7 +316,7 @@ int main(){
 
 	Setup();
 	defineTasks();
-	// mTimer_SetServoDuty(0, SERVO_STEERING_OFFSET);
+	// mTimer_SetServoDuty(0, 1.0f);
 
 	//ToDo: Geschwindigkeitssteuerung muss noch richtig gesteuert werden!
 	mTimer_SetMotorDuty(0.4f, 0.4f);
