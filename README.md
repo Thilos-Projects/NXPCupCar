@@ -50,39 +50,39 @@ section 3. Kamera I
 
 
 section 4. Kamera II
-    Meilenstein 4 - Kamera II : active, m4, 2023-12-06, 6w
+    Meilenstein 4 - Kamera II : done, m4, 2023-12-06, 29d
 
     Entscheidung Erkennungsalgorithmus : done, a41, 2023-12-06, 6d
 
-    Umsetzung der Erkennung : active, a42, 2023-12-11, 4w
+    Umsetzung der Erkennung : done, a42, after a41, 3w
 
-    Erkennung Geradeaus : done, a42a, 2023-12-11, 1w
-    Erkennung Kurven : active, a42b, after a42a, 1w
-    Erkennung Kreuzung : a42c, after a42b, 1w
-    Erkennung Ziellinie : a42d, after a42c, 1w
+    Erkennung Geradeaus : done, a42a, after a41, 1w
+    Erkennung Kurven : done, a42b, after a42a, 1w
+    Erkennung Kreuzung : done, a42c, after a42b, 1w
 
 
 section 5. Fahren III
     Meilenstein 5 - Fahren III : active, m5, after m2, 6w
 
     Sichere 0 fahren : done, milestone, a52, 2023-12-13, 1d
-    Sichere 8 fahren : milestone, a53, after a42c, 1d
-    Sicher alles fahren : milestone, a54, after a42d, 1d
+    Sichere 8 fahren : done, milestone, a53, 2024-01-04, 1d
+    Sicher alles fahren : active, milestone, a54, after a42d, 1d
 
-    Demo 2 - 0 fahren : crit, milestone, p5, 2023-12-19, 1d
-    [Platzhalter] Demo 3 - 8 fahren : crit, milestone, p6, after a53, 1d
-    [Platzhalter] Demo 4 - Alles fahren: crit, milestone, p7, after a54, 1d
+    Demo 2 - sichere 0 fahren : done, crit, milestone, p5, 2023-12-19, 1d
+    Demo 3 - sichere 8 fahren : crit, milestone, p6, 2024-01-11, 1d
+    [Platzhalter] Demo 4 - Sicher alles fahren: crit, milestone, p7, 2024-01-26, 1d
 
 
 section 6. Optimierung
     Meilenstein 6 - Optimierung : m6, after m5, 5w
 
+    Erkennung Ziellinie : a42d, after m5, 1w
+
 
 section Sonstiges
-    Weihnachtsferien : p2, 2023-12-23, 11d
+    Weihnachtsferien : done, p2, 2023-12-23, 11d
     Prüfungsphase HSD : p8, 2024-01-31, 29d
     [Platzhalter] Prüfung Autonomes Fahren : crit, milestone, p9, 2024-03-10, 0d
     Ender der Vorlesungszeit : milestone, p3, 2024-01-28, 1d
-
 
 ```
