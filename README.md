@@ -74,9 +74,9 @@ section 5. Fahren III
 
 
 section 6. Optimierung
-    Meilenstein 6 - Optimierung : m6, after m5, 5w
+    Meilenstein 6 - Optimierung : m6, 2024-01-11, 6w
 
-    Erkennung Ziellinie : a42d, after m5, 1w
+    # Erkennung Ziellinie : a42d, 2024-01-18, 1w
 
 
 section Sonstiges
