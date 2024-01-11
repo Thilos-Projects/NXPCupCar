@@ -49,7 +49,7 @@ Scheduler::taskHandle* t_speedControl;
 
 //Bennenungen für Programmstruktur
 void pixySetup();
-void cameraRowsSetup(););
+void cameraRowsSetup();
 int16_t getBestTrackIndexFromMultipleTracks(CameraAnalysis::SingleRowAnalysis* singleRow);
 bool currentRowAnalysis_160(float* steeringAngle);
 
