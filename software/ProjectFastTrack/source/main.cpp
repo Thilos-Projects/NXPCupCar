@@ -33,15 +33,15 @@ extern "C"
 #define TIME_PER_FRAME 17
 
 #define SERVO_STEERING_OFFSET -0.2f
-#define SPEED_MIN 0.4f
+#define SPEED_MIN 0.42f
 #define SPEED_MAX 0.6f
-#define SPEED_ADJUST_TIME 2000.0f
+#define SPEED_ADJUST_TIME 500.0f
 #define MAX_CENTER_DIFF_FOR_SPEED_UP 5
 
 //Lokale Definitionen
 Pixy2SPI_SS pixy;
 CameraAnalysis::SingleRowAnalysis singleRowAnalysis_180;
-CameraAnalysis::SingleRowAnalysis singleRowAnalysis_50;
+CameraAnalysis::SingleRowAnalysis singleRowAnalysis_150;
 
 //Task Definitionen
 Scheduler::taskHandle* t_blinkLED;
@@ -99,7 +99,7 @@ void pixySetup(){
 //Eine / Mehrere Zeilen können definiert + gewählt werden
 void cameraRowsSetup() {
 	singleRowAnalysis_180.Setup(&pixy, 180, 40, 0, 6, 158);
-	singleRowAnalysis_50.Setup(&pixy, 50, 40, 0, 6, 158);
+	singleRowAnalysis_150.Setup(&pixy, 150, 40, 0, 6, 158);
 }
 
 
@@ -118,7 +118,9 @@ void lenkung() {
 	//mLeds_Write(kMaskLed2,kLedOff);
 
 	singleRowAnalysis_180.findBlankArea();
-	singleRowAnalysis_50.findBlankArea();
+	singleRowAnalysis_150.findBlankArea();
+
+	// printf("Centers %d / %d\n", singleRowAnalysis_180.trackCenter, singleRowAnalysis_150.trackCenter);
 
 	float steeringAngle = (float)singleRowAnalysis_180.trackCenter - (float)singleRowAnalysis_180.centerPixel;
 	steeringAngle /= 79.0f;
@@ -157,10 +159,11 @@ void lenkung() {
 
 void adjustSpeed() {
 	singleRowAnalysis_180.calculateTrackDifferences();
+	singleRowAnalysis_150.calculateTrackDifferences();
 
-	int16_t blubb = (int16_t)(((mAd_Read(ADCInputEnum::kPot1) + 1) / 2) * 130.0f) + 20;
+	int16_t blubb = (int16_t)(((mAd_Read(ADCInputEnum::kPot1) + 1) / 2) * 130.0f);
 
-	if (abs((int16_t)singleRowAnalysis_180.trackCenter - (int16_t)singleRowAnalysis_180.centerPixel) < blubb) {
+	if (abs((int16_t)singleRowAnalysis_150.trackCenter - (int16_t)singleRowAnalysis_150.centerPixel) < blubb) {
 		// Increase speed on straight tracks
 		destinationSpeed += (TIME_PER_FRAME / SPEED_ADJUST_TIME) * (SPEED_MAX-SPEED_MIN); // TIME_PER_FRAME * MAXIMUM_RAISE_PER_SECOND
 		if (destinationSpeed > SPEED_MAX) {
@@ -190,9 +193,9 @@ void defineTasks() {
 	t_generalCamera = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		static CameraAnalysis::SingleRowAnalysis* usedCameraRows[] =  {
 			&singleRowAnalysis_180,
-			&singleRowAnalysis_50
+			&singleRowAnalysis_150
 		};
-		generalCameraTask(usedCameraRows, 1);
+		generalCameraTask(usedCameraRows, 2);
 	}, min(17, TIME_PER_FRAME));
 
 
