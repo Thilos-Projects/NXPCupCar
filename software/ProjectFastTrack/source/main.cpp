@@ -30,7 +30,13 @@ extern "C"
 
 #include "Pixy/Pixy2SPI_SS.h"
 
+#define TIME_PER_FRAME 17
+
 #define SERVO_STEERING_OFFSET -0.2f
+#define SPEED_MIN 0.4f
+#define SPEED_MAX 0.6f
+#define SPEED_ADJUST_TIME 2000.0f
+#define MAX_CENTER_DIFF_FOR_SPEED_UP 5
 
 //Lokale Definitionen
 Pixy2SPI_SS pixy;
@@ -146,7 +152,24 @@ void lenkung() {
 			minSteeringAngle = steeringAngle;
 		}
 	}
-	
+
+}
+
+void adjustSpeed() {
+	singleRowAnalysis_180.calculateTrackDifferences();
+
+	int16_t blubb = (int16_t)(((mAd_Read(ADCInputEnum::kPot1) + 1) / 2) * 130.0f) + 20;
+
+	if (abs((int16_t)singleRowAnalysis_180.trackCenter - (int16_t)singleRowAnalysis_180.centerPixel) < blubb) {
+		// Increase speed on straight tracks
+		destinationSpeed += (TIME_PER_FRAME / SPEED_ADJUST_TIME) * (SPEED_MAX-SPEED_MIN); // TIME_PER_FRAME * MAXIMUM_RAISE_PER_SECOND
+		if (destinationSpeed > SPEED_MAX) {
+			destinationSpeed = SPEED_MAX;
+		}
+	} else {
+		// Reset to "turn speed" in turns
+		destinationSpeed = SPEED_MIN;
+	}
 }
 
 
@@ -170,21 +193,14 @@ void defineTasks() {
 			&singleRowAnalysis_50
 		};
 		generalCameraTask(usedCameraRows, 1);
-	}, 17);
+	}, min(17, TIME_PER_FRAME));
 
 
 	t_cameraAlgorithm = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		lenkung();
-	}, 100);
-
-	t_speedControl = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
-		//printf("Analog 1: %d\n", (int)(mAd_Read(ADCInputEnum::kPot1) * 256));
-		//printf("Analog 2: %d\n", (int)(mAd_Read(ADCInputEnum::kPot2) * 256));
-
-		destinationSpeed = ((mAd_Read(ADCInputEnum::kPot2) + 1) / 2) * 0.3f + 0.4f;
-
+		adjustSpeed();
 		mTimer_SetMotorDuty(destinationSpeed, destinationSpeed);
-	}, 1000, true);
+	}, TIME_PER_FRAME);
 
 }
 

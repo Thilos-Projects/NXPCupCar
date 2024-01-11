@@ -103,6 +103,14 @@ void CameraAnalysis::SingleRowAnalysis::findBlankArea() {
 
 }
 
+void CameraAnalysis::SingleRowAnalysis::calculateTrackDifferences() {
+	centerDiff = (uint16_t)abs((int16_t)trackCenter - (int16_t)oldTrackCenter);
+	widthDiff = (uint16_t)abs((int16_t)trackWidth - (int16_t)oldTrackWidth);
+
+	oldTrackCenter = trackCenter;
+	oldTrackWidth = trackWidth;
+}
+
 //----------------------Print-------------------
 void CameraAnalysis::SingleRowAnalysis::printImageRow(){
 	printArray(rowDataBuffer, 316);
