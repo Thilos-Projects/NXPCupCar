@@ -30,8 +30,8 @@ void Scheduler::Setup(){
 		handles[i].isFree = true;
 	}
 
-	//erstelld einen Timer auf Pit3 der alle ... auslöß
-	//Coppied from iPit.c
+	//erstellt einen Timer auf Pit3 der alle ... triggert
+	//Copied from iPit.c
 	SIM->SCGC6 |= SIM_SCGC6_PIT_MASK;
 	PIT->MCR |= PIT_MCR_FRZ_MASK;
 	PIT->CHANNEL[3].LDVAL = kClockPeriphkHz / countsProMs;
@@ -60,7 +60,7 @@ void Scheduler::Update(){
 	}
 }
 
-//gibt den nächsten freien handel zurück und richted diesen ein, ist keiner frei wird 0 zurückgegeben
+//gibt den nächsten freien Handle zurück und richted diesen ein, ist keiner frei wird 0 zurückgegeben
 Scheduler::taskHandle* Scheduler::getTaskHandle(CallbackFunc functionToCall, uint32_t delay, bool active, bool imidiate){
 	for(uint16_t i = 0; i < maxTaskCount; i++)
 		if(handles[i].isFree){

@@ -91,7 +91,7 @@ uint16_t getEdge(bool isLeft, uint16_t centerPixel, int16_t* rowSobel, uint16_t 
 	return edge;
 }
 
-void CameraAnalysis::SingleRowAnalysis::findBlancArea() {
+void CameraAnalysis::SingleRowAnalysis::findBlankArea() {
 	uint16_t leftEdge = getEdge(true, centerPixel, rowSobel, edgeThreshold, minEdgeWidth, maxEdgeWidth);
 	uint16_t rightEdge = getEdge(false, centerPixel, rowSobel, edgeThreshold, minEdgeWidth, maxEdgeWidth);
 

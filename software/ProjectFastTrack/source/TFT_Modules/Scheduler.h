@@ -27,7 +27,7 @@ namespace Scheduler{
 		//delay zwischen den aufrufen
 		uint32_t delay;
 
-		//funktion die perriodisch aufgerufen werden soll
+		//funktion die periodisch aufgerufen werden soll
 		CallbackFunc functionToCall;
 
 		//wenn true wird die struktur freigegeben, der handle ist ungöltig
