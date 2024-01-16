@@ -24,6 +24,8 @@ extern "C"
 #include "Modules/mCpu.h"
 #include "Modules/mLeds.h"
 #include "Modules/mAd.h"
+#include "Modules/mSwitch.h"
+
 }
 #include <TFT_Modules/Scheduler.h>
 #include <TFT_Modules/CameraAnalysis.h>
@@ -44,7 +46,7 @@ CameraAnalysis::SingleRowAnalysis singleRowAnalysis_180;
 CameraAnalysis::SingleRowAnalysis singleRowAnalysis_150;
 
 //Task Definitionen
-Scheduler::taskHandle* t_blinkLED;
+Scheduler::taskHandle* t_testMotorButton;
 Scheduler::taskHandle* t_motorStop;
 Scheduler::taskHandle* t_generalCamera;
 
@@ -60,7 +62,7 @@ int16_t getBestTrackIndexFromMultipleTracks(CameraAnalysis::SingleRowAnalysis* s
 bool currentRowAnalysis_160(float* steeringAngle);
 
 float destinationSpeed = 0.0f;
-
+bool motorEnabled = false;
 
 void Setup() {
 	mCpu_Setup();
@@ -75,6 +77,9 @@ void Setup() {
 
 	mAd_Setup();
 	mAd_Open();
+
+	mSwitch_Setup();
+	mSwitch_Open();
 
 	pixySetup();
 
@@ -177,12 +182,22 @@ void adjustSpeed() {
 
 
 void defineTasks() {
+	t_testMotorButton = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
+		static bool buttonState = false;
 
-	t_blinkLED = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
-		static bool state = false;
-		mLeds_Write(kMaskLed1,state ? kLedOff : kLedOn);
-		state = !state;
-	}, 500, false, false);
+		bool pressed = mSwitch_ReadPushBut(kPushButSW1);
+
+		if(buttonState && !pressed){
+			buttonState = false;
+			motorEnabled = !motorEnabled;
+			if(!motorEnabled)
+				mTimer_SetMotorDuty(0, 0);
+		}
+		if(!buttonState && pressed){
+			buttonState = true;
+		}
+
+	}, 250, true, false);
 
 	t_motorStop = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		mTimer_SetMotorDuty(0, 0);
@@ -202,7 +217,12 @@ void defineTasks() {
 	t_cameraAlgorithm = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		lenkung();
 		adjustSpeed();
-		mTimer_SetMotorDuty(destinationSpeed, destinationSpeed);
+
+		if(motorEnabled)
+			mTimer_SetMotorDuty(destinationSpeed, destinationSpeed);
+		else
+			mTimer_SetMotorDuty(0, 0);
+
 	}, TIME_PER_FRAME);
 
 }
