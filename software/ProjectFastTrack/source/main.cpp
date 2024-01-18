@@ -34,7 +34,7 @@ extern "C"
 
 #define TIME_PER_FRAME 17
 
-#define SERVO_STEERING_OFFSET -0.2f
+#define SERVO_STEERING_OFFSET -0.0f
 #define SPEED_MIN 0.42f
 #define SPEED_MAX 0.6f
 #define SPEED_ADJUST_TIME 500.0f
@@ -126,7 +126,7 @@ void lenkung() {
 	steeringAngle /= 79.0f;
 	steeringAngle *= steeringAngle;
 
-	float steeringFactor = 3.0f + (destinationSpeed - 0.4f) * ((mAd_Read(ADCInputEnum::kPot2) + 1) / 2) * 30.0f;
+	float steeringFactor = ((mAd_Read(ADCInputEnum::kPot2) + 1) / 2) * 10.0f;
 
 	steeringAngle *= steeringFactor;
 
@@ -158,18 +158,26 @@ void lenkung() {
 }
 
 void adjustSpeed() {
-	int16_t blubb = (int16_t)(((mAd_Read(ADCInputEnum::kPot1) + 1) / 2) * 130.0f);
+	//singleRowAnalysis_180.calculateTrackDifferences();
+	//singleRowAnalysis_150.calculateTrackDifferences();
 
-	if (abs((int16_t)singleRowAnalysis_150.trackCenter - (int16_t)singleRowAnalysis_150.centerPixel) < blubb) {
-		// Increase speed on straight tracks
-		destinationSpeed += (TIME_PER_FRAME / SPEED_ADJUST_TIME) * (SPEED_MAX-SPEED_MIN); // TIME_PER_FRAME * MAXIMUM_RAISE_PER_SECOND
-		if (destinationSpeed > SPEED_MAX) {
-			destinationSpeed = SPEED_MAX;
-		}
-	} else {
-		// Reset to "turn speed" in turns
-		destinationSpeed = SPEED_MIN;
-	}
+	//int16_t blubb = (int16_t)(((mAd_Read(ADCInputEnum::kPot1) + 1) / 2) * 130.0f);
+
+	//if (abs((int16_t)singleRowAnalysis_150.trackCenter - (int16_t)singleRowAnalysis_150.centerPixel) < blubb) {
+	//	// Increase speed on straight tracks
+	//	destinationSpeed += (TIME_PER_FRAME / SPEED_ADJUST_TIME) * (SPEED_MAX-SPEED_MIN); // TIME_PER_FRAME * MAXIMUM_RAISE_PER_SECOND
+	//	if (destinationSpeed > SPEED_MAX) {
+	//		destinationSpeed = SPEED_MAX;
+	///	}
+	//} else {
+	//	// Reset to "turn speed" in turns
+	//	destinationSpeed = SPEED_MIN;
+	//}
+
+
+	float blubb = (((mAd_Read(ADCInputEnum::kPot1) + 1) / 2) * (SPEED_MAX - SPEED_MIN) + SPEED_MIN);
+
+	destinationSpeed = blubb;
 }
 
 void defineTasks() {
@@ -179,8 +187,9 @@ void defineTasks() {
 		bool pressed = mSwitch_ReadPushBut(kPushButSW1);
 
 		if(buttonState && !pressed){
+			mLeds_Write(kMaskLed1, kLedOn);
 			buttonState = false;
-			motorEnabled = !motorEnabled;
+			motorEnabled = true;
 			if(!motorEnabled)
 				mTimer_SetMotorDuty(0, 0);
 		}

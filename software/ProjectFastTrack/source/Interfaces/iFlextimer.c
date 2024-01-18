@@ -68,8 +68,8 @@ $History: $
 #define FTM2_CLOCK CORE_CLOCK										  // Le clock est le Cpu Clock
 #define FTM2_CLK_PRESCALE 7											  // Prescaler -> 7 = divide by 128
 #define FTM2_OVERFLOW_FREQUENCY 100.0								  // Fr�quence du PWM de 100Hz
-#define SERVO_MIN_DUTY_CYCLE (float)(.0010 * FTM2_OVERFLOW_FREQUENCY) // Largeur de pulse min = 1ms
-#define SERVO_MAX_DUTY_CYCLE (float)(.0020 * FTM2_OVERFLOW_FREQUENCY) // Largeur de pulse max = 2ms
+#define SERVO_MIN_DUTY_CYCLE (float)(.0007 * FTM2_OVERFLOW_FREQUENCY) // Largeur de pulse min = 1ms
+#define SERVO_MAX_DUTY_CYCLE (float)(.0023 * FTM2_OVERFLOW_FREQUENCY) // Largeur de pulse max = 2ms
 
 //------------------------------------------------------------
 // Globales
