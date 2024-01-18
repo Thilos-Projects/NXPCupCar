@@ -39,10 +39,17 @@ namespace CameraAnalysis {
 		uint16_t trackCenter;
 		uint16_t trackWidth;
 
+		uint16_t oldTrackCenter;
+		uint16_t oldTrackWidth;
+
+		int16_t centerDiff;
+		int16_t widthDiff;
+
 		void findBlancArea();
 
 		void Setup(Pixy2SPI_SS* pixy, uint16_t row, uint16_t edgeThreshold, uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t pixelMitte, uint16_t minEdgeThicness);
 
+		void calculateTrackDifferences();
 
 		//----------------------Print-------------------
 		void printImageRow();
