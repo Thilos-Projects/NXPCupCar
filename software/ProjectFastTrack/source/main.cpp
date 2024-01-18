@@ -53,8 +53,6 @@ Scheduler::taskHandle* t_generalCamera;
 Scheduler::taskHandle* t_cameraAlgorithm;
 Scheduler::taskHandle* t_speedControl;
 
-
-
 //Bennenungen für Programmstruktur
 void pixySetup();
 void cameraRowsSetup();
@@ -103,10 +101,9 @@ void pixySetup(){
 
 //Eine / Mehrere Zeilen können definiert + gewählt werden
 void cameraRowsSetup() {
-	singleRowAnalysis_180.Setup(&pixy, 180, 40, 0, 6, 158);
-	singleRowAnalysis_150.Setup(&pixy, 150, 40, 0, 6, 158);
+	singleRowAnalysis_180.Setup(&pixy, 180, 40, 0, 6, 158, 6);
+	singleRowAnalysis_150.Setup(&pixy, 150, 40, 0, 6, 158, 6);
 }
-
 
 //Auslesen der Kamera, Sobel und Kanten der übergebenen Reihen!
 void generalCameraTask(CameraAnalysis::SingleRowAnalysis** rowsToDo, uint8_t length) {
@@ -196,14 +193,12 @@ void defineTasks() {
 		if(!buttonState && pressed){
 			buttonState = true;
 		}
-
 	}, 250, true, false);
 
 	t_motorStop = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		mTimer_SetMotorDuty(0, 0);
 		self->active = false;
 	}, 90000, false, false);
-
 
 	t_generalCamera = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		static CameraAnalysis::SingleRowAnalysis* usedCameraRows[] =  {
@@ -213,7 +208,6 @@ void defineTasks() {
 		generalCameraTask(usedCameraRows, 2);
 	}, min(17, TIME_PER_FRAME));
 
-
 	t_cameraAlgorithm = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		lenkung();
 		adjustSpeed();
@@ -222,7 +216,6 @@ void defineTasks() {
 			mTimer_SetMotorDuty(destinationSpeed, destinationSpeed);
 		else
 			mTimer_SetMotorDuty(0, 0);
-
 	}, TIME_PER_FRAME);
 
 }
