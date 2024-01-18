@@ -1,5 +1,3 @@
-#define CAR_CENTER_IN_PIXEL 165 //ToDo: 7 Abziehen SOll Wert 158 bei zentraler Kamera
-
 void pixyUsleep(int useconds) {
 	int i = 0;
 	int j = 0;
@@ -18,68 +16,51 @@ extern "C"
 #include <stdlib.h>
 #include <math.h>
 
-//#include "board.h"
-//#include "peripherals.h"
-//#include "pin_mux.h"
-//#include "clock_config.h"
-//#include "MK64F12.h"
-//#include "fsl_debug_console.h"
-
 //hier die SD-card
 //BuildError: #include "sdcard/sdmmc_config.h"
 
 #include "Modules/mSpi.h"
-//#include "Modules/mDac.h"
-//#include "Modules/mAccelMagneto.h"
-//#include "Modules/mGyro.h"
 #include "Modules/mTimer.h"
 #include "Modules/mCpu.h"
-//#include "Modules/mSwitch.h"
 #include "Modules/mLeds.h"
 #include "Modules/mAd.h"
-//#include "Modules/mDelay.h"
-//#include "Modules/mRS232.h"
-//#include "Modules/mVL6180x.h"
+#include "Modules/mSwitch.h"
 
-//#include "Applications/gInput.h"
-//#include "Applications/gCompute.h"
-//#include "Applications/gOutput.h"
 }
 #include <TFT_Modules/Scheduler.h>
 #include <TFT_Modules/CameraAnalysis.h>
 
 #include "Pixy/Pixy2SPI_SS.h"
 
+#define TIME_PER_FRAME 17
+
 #define SERVO_STEERING_OFFSET -0.2f
+#define SPEED_MIN 0.42f
+#define SPEED_MAX 0.6f
+#define SPEED_ADJUST_TIME 500.0f
+#define MAX_CENTER_DIFF_FOR_SPEED_UP 5
 
 //Lokale Definitionen
 Pixy2SPI_SS pixy;
 CameraAnalysis::SingleRowAnalysis singleRowAnalysis_180;
-CameraAnalysis::SingleRowAnalysis singleRowAnalysis_50;
+CameraAnalysis::SingleRowAnalysis singleRowAnalysis_150;
 
 //Task Definitionen
-Scheduler::taskHandle* t_blinkLED;
+Scheduler::taskHandle* t_testMotorButton;
 Scheduler::taskHandle* t_motorStop;
 Scheduler::taskHandle* t_generalCamera;
 
 Scheduler::taskHandle* t_cameraAlgorithm;
 Scheduler::taskHandle* t_speedControl;
 
-
-
 //Bennenungen für Programmstruktur
 void pixySetup();
 void cameraRowsSetup();
-//float getSteeringAngleOneLine(CameraAnalysis::SingleRowAnalysis::TrackLineOutput* trackLine);
 int16_t getBestTrackIndexFromMultipleTracks(CameraAnalysis::SingleRowAnalysis* singleRow);
 bool currentRowAnalysis_160(float* steeringAngle);
-//float getSteeringAngleSingleTrack(CameraAnalysis::SingleRowAnalysis::Track* singleTrack);
 
 float destinationSpeed = 0.0f;
-
-// This value is found while testing on 04.01.2024
-float pot2 = -0.739776640f;
-
+bool motorEnabled = false;
 
 void Setup() {
 	mCpu_Setup();
@@ -94,6 +75,9 @@ void Setup() {
 
 	mAd_Setup();
 	mAd_Open();
+
+	mSwitch_Setup();
+	mSwitch_Open();
 
 	pixySetup();
 
@@ -117,51 +101,32 @@ void pixySetup(){
 
 //Eine / Mehrere Zeilen können definiert + gewählt werden
 void cameraRowsSetup() {
-	singleRowAnalysis_180.Setup(&pixy, 180, 40, 0, 6, 158);
-	singleRowAnalysis_50.Setup(&pixy, 50, 40, 0, 6, 158);
+	singleRowAnalysis_180.Setup(&pixy, 180, 40, 0, 6, 158, 5);
+	singleRowAnalysis_150.Setup(&pixy, 150, 40, 0, 6, 158, 5);
 }
-
-
-//Allgemeine Methode des Fahren
-void fahren() {
-
-	//Kamera Daten abfragen
-
-
-	//Lenkwinkel Berechnen und einstellen
-
-
-	//Geschwindigkeit Berechnen und einstellen
-
-}
-
 
 //Auslesen der Kamera, Sobel und Kanten der übergebenen Reihen!
 void generalCameraTask(CameraAnalysis::SingleRowAnalysis** rowsToDo, uint8_t length) {
 	for(uint8_t i = 0; i<length; i++) {
 		rowsToDo[i]->getImageRow();
 		rowsToDo[i]->calculateSobelRow();
-		rowsToDo[i]->findBlancArea();
 		//rowsToDo[i]->calculateEdges();
 	}
 }
 
-
 void lenkung() {
-
 	//mLeds_Write(kMaskLed2,kLedOff);
 
-	//Kameradaten die fehlen!
-	//singleRowAnalysis_160.calculateTrackLines();
-	//singleRowAnalysis_160.calculateValidTracks(singleRowAnalysis_160.straightTrackLinesOutput);
 	singleRowAnalysis_180.findBlancArea();
-	singleRowAnalysis_50.findBlancArea();
+	singleRowAnalysis_150.findBlancArea();
+
+	// printf("Centers %d / %d\n", singleRowAnalysis_180.trackCenter, singleRowAnalysis_150.trackCenter);
 
 	float steeringAngle = (float)singleRowAnalysis_180.trackCenter - (float)singleRowAnalysis_180.centerPixel;
 	steeringAngle /= 79.0f;
 	steeringAngle *= steeringAngle;
 
-	float steeringFactor = 3.0f + (destinationSpeed - 0.4f) * ((pot2 + 1) / 2) * 30.0f;
+	float steeringFactor = 3.0f + (destinationSpeed - 0.4f) * ((mAd_Read(ADCInputEnum::kPot2) + 1) / 2) * 30.0f;
 
 	steeringAngle *= steeringFactor;
 
@@ -189,100 +154,41 @@ void lenkung() {
 			minSteeringAngle = steeringAngle;
 		}
 	}
-	
-	// printf("Steering min: %d, max: %d\n", (int)(minSteeringAngle*256), (int)(maxSteeringAngle*256));
-	/*
-	float steeringAngle = 0;
-	if (currentRowAnalysis_160(&steeringAngle))
-		mTimer_SetServoDuty(0, steeringAngle);*/
+
 }
 
+void adjustSpeed() {
+	int16_t blubb = (int16_t)(((mAd_Read(ADCInputEnum::kPot1) + 1) / 2) * 130.0f);
 
-bool currentRowAnalysis_160(float* steeringAngle) {
-/*
-	if(singleRowAnalysis_160.straightTrackLinesOutput[0].isEmpty()) {
-		//ToDo: getSteeringAngelZeroLines()
-		return false; //kein Wert
-	}
-	else if (singleRowAnalysis_160.straightTrackLinesOutput[1].isEmpty()) {
-		*steeringAngle = getSteeringAngleOneLine(singleRowAnalysis_160.straightTrackLinesOutput + 0);
-	}
-	else {
-		int16_t bestTrackIndex = getBestTrackIndexFromMultipleTracks(&singleRowAnalysis_160);
-		if (bestTrackIndex == -1) {
-			return false;
+	if (abs((int16_t)singleRowAnalysis_150.trackCenter - (int16_t)singleRowAnalysis_150.centerPixel) < blubb) {
+		// Increase speed on straight tracks
+		destinationSpeed += (TIME_PER_FRAME / SPEED_ADJUST_TIME) * (SPEED_MAX-SPEED_MIN); // TIME_PER_FRAME * MAXIMUM_RAISE_PER_SECOND
+		if (destinationSpeed > SPEED_MAX) {
+			destinationSpeed = SPEED_MAX;
 		}
-		*steeringAngle = getSteeringAngleSingleTrack(singleRowAnalysis_160.tracks + bestTrackIndex);
-		mLeds_Write(kMaskLed2,kLedOn);
-	}
-	return true; */
-}
-
-
-float getSteeringAngleZeroLines() {
-	//ToDo: do Something
-	return 0;
-}
-/*
-float getSteeringAngleOneLine(CameraAnalysis::SingleRowAnalysis::TrackLineOutput* trackLine) {
-
-	static const uint16_t expected_track_width_160 = 250;
-
-	uint16_t destinationCenter = 0;
-	float steeringAngleOneLine = destinationCenter;
-
-	if (trackLine->centerIndex < CAR_CENTER_IN_PIXEL) {
-		// TODO
-		destinationCenter = trackLine->centerIndex + (expected_track_width_160 / 2);
 	} else {
-		// TODO
-		destinationCenter = trackLine->centerIndex - (expected_track_width_160 / 2);
+		// Reset to "turn speed" in turns
+		destinationSpeed = SPEED_MIN;
 	}
-	if(destinationCenter != 0){
-		steeringAngleOneLine = destinationCenter;
-		steeringAngleOneLine /= 158.0f;
-		steeringAngleOneLine -= 1.0f;
-		steeringAngleOneLine *= 8.0f;
-	}
-	return steeringAngleOneLine;
-}*/
-
-
-//ToDo: es gibt mehrere Lininen (mehr als 1) aber kein valider Track vorhanden muss angeguckt werden
-float getSteeringAngleMultipleLinesWithoutTracks() {
-	return 0; //ToDo
 }
-
-
-//Für den Fall das genau ein Track gefunden wurde
-/*
-float getSteeringAngleSingleTrack(CameraAnalysis::SingleRowAnalysis::Track* singleTrack) {
-	float steeringAngleSingleTrack = singleTrack->getCenter();
-	steeringAngleSingleTrack /= 158.0f;
-	steeringAngleSingleTrack -= 1.0f;
-	steeringAngleSingleTrack *= 2.0f;
-	return steeringAngleSingleTrack;
-}
-
-int16_t getBestTrackIndexFromMultipleTracks(CameraAnalysis::SingleRowAnalysis* singleRow) {
-	for(int i = 1; i < 316; i++){
-		uint16_t index = 158 + (i/2) * (i%2==0?-1:1);
-		if(!singleRow->tracks[index].isEmpty()){
-			return index;
-		}
-	}
-	return -1;
-}
-*/
-
 
 void defineTasks() {
+	t_testMotorButton = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
+		static bool buttonState = false;
 
-	t_blinkLED = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
-		static bool state = false;
-		mLeds_Write(kMaskLed1,state ? kLedOff : kLedOn);
-		state = !state;
-	}, 500, false, false);
+		bool pressed = mSwitch_ReadPushBut(kPushButSW1);
+
+		if(buttonState && !pressed){
+			buttonState = false;
+			motorEnabled = !motorEnabled;
+			if(!motorEnabled)
+				mTimer_SetMotorDuty(0, 0);
+		}
+		if(!buttonState && pressed){
+			buttonState = true;
+		}
+
+	}, 250, true, false);
 
 	t_motorStop = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		mTimer_SetMotorDuty(0, 0);
@@ -293,25 +199,22 @@ void defineTasks() {
 	t_generalCamera = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		static CameraAnalysis::SingleRowAnalysis* usedCameraRows[] =  {
 			&singleRowAnalysis_180,
-			&singleRowAnalysis_50
+			&singleRowAnalysis_150
 		};
-		generalCameraTask(usedCameraRows, 1);
-	}, 17);
+		generalCameraTask(usedCameraRows, 2);
+	}, min(17, TIME_PER_FRAME));
 
 
 	t_cameraAlgorithm = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		lenkung();
-	}, 100);
+		adjustSpeed();
 
-	t_speedControl = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
-		//printf("Analog 1: %d\n", (int)(mAd_Read(ADCInputEnum::kPot1) * 1000000000));
-		//printf("Analog 2: %d\n", (int)(mAd_Read(ADCInputEnum::kPot2) * 1000000000));
-		//destinationSpeed = ((mAd_Read(ADCInputEnum::kPot2) + 1) / 2) * 0.3f + 0.4f;
+		if(motorEnabled)
+			mTimer_SetMotorDuty(destinationSpeed, destinationSpeed);
+		else
+			mTimer_SetMotorDuty(0, 0);
 
-		destinationSpeed = ((pot2 + 1) / 2) * 0.3f + 0.4f;
-
-		mTimer_SetMotorDuty(destinationSpeed, destinationSpeed);
-	}, 1000, true);
+	}, TIME_PER_FRAME);
 
 }
 
@@ -320,11 +223,6 @@ int main(){
 
 	Setup();
 	defineTasks();
-	// mTimer_SetServoDuty(0, 1.0f);
-
-	//ToDo: Geschwindigkeitssteuerung muss noch richtig gesteuert werden!
-	//mTimer_SetMotorDuty(0.4f, 0.4f);
-
 
 	for(UInt32 i = 0; true; i++){
 		Scheduler::Update();

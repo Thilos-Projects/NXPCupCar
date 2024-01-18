@@ -34,13 +34,14 @@ namespace CameraAnalysis {
 		uint8_t minEdgeWidth;			//current 0
 		uint8_t maxEdgeWidth;			//current 6
 		uint16_t centerPixel;			//current 158
+		uint16_t minEdgeThicness;			//current 10
 
 		uint16_t trackCenter;
 		uint16_t trackWidth;
 
 		void findBlancArea();
 
-		void Setup(Pixy2SPI_SS* pixy, uint16_t row, uint16_t edgeThreshold, 	uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t pixelMitte);
+		void Setup(Pixy2SPI_SS* pixy, uint16_t row, uint16_t edgeThreshold, uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t pixelMitte, uint16_t minEdgeThicness);
 
 
 		//----------------------Print-------------------
