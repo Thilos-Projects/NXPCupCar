@@ -34,7 +34,7 @@ namespace CameraAnalysis {
 		uint8_t minEdgeWidth;			//current 0
 		uint8_t maxEdgeWidth;			//current 6
 		uint16_t centerPixel;			//current 158
-		uint16_t minThicness;			//current 158
+		uint16_t minThickness;			//current 158
 
 		uint16_t trackCenter;
 		uint16_t trackWidth;
@@ -49,7 +49,7 @@ namespace CameraAnalysis {
 
 		void calculateTrackDifferences();
 
-		void Setup(Pixy2SPI_SS* pixy, uint16_t row, uint16_t edgeThreshold, 	uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t pixelMitte, uint16_t minThicness);
+		void Setup(Pixy2SPI_SS* pixy, uint16_t row, uint16_t edgeThreshold, 	uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t pixelMitte, uint16_t minThickness);
 
 
 		//----------------------Print-------------------

@@ -32,7 +32,7 @@ void CameraAnalysis::SingleRowAnalysis::Setup(Pixy2SPI_SS* pixy, uint16_t row, u
 	this->minEdgeWidth = minEdgeWidth;
 	this->maxEdgeWidth = maxEdgeWidth;
 	this->centerPixel = centerPixel;
-	this->minThicness = minThicness;
+	this->minThickness = minThicness;
 }
 void CameraAnalysis::SingleRowAnalysis::getImageRow(){
 	pixy->video.getGrayRect(0, row, 158, row+1, 1, 1, rowDataBuffer + 0, false);
@@ -93,7 +93,7 @@ uint16_t getEdge(bool isLeft, uint16_t centerPixel, int16_t* rowSobel, uint16_t 
 }
 
 
-uint16_t getEdgeWithThikness(bool isLeft, uint16_t centerPixel, int16_t* rowSobel, uint16_t edgeThreshold, uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint8_t minThicness) {
+uint16_t getEdgeWithThickness(bool isLeft, uint16_t centerPixel, int16_t* rowSobel, uint16_t edgeThreshold, uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint8_t minThickness) {
 	uint16_t edgeStartPosition;
 	uint16_t edgeWidth;
 	bool isAnEdgeFound = false;
@@ -126,7 +126,7 @@ uint16_t getEdgeWithThikness(bool isLeft, uint16_t centerPixel, int16_t* rowSobe
 					continue;
 				}
 
-				if(edgeWidth < minThicness){
+				if(edgeWidth < minThickness){
 					//Sobel threshold reached, edge found, edge in wrong direction, edge with right, edge Thicness was wrong
 					isAnEdgeFound = false;
 					continue;
@@ -148,7 +148,7 @@ uint16_t getEdgeWithThikness(bool isLeft, uint16_t centerPixel, int16_t* rowSobe
 				continue;
 			}
 
-			if(edgeWidth > minThicness){
+			if(edgeWidth > minThickness){
 				//Sobel threshold not reached, edge found, edge with right, edge Thicness was right
 				break;
 			}
@@ -167,8 +167,8 @@ uint16_t getEdgeWithThikness(bool isLeft, uint16_t centerPixel, int16_t* rowSobe
 
 
 void CameraAnalysis::SingleRowAnalysis::findBlankArea() {
-	uint16_t leftEdge = getEdgeWithThikness(true, centerPixel, rowSobel, edgeThreshold, minEdgeWidth, maxEdgeWidth, minThicness);
-	uint16_t rightEdge = getEdgeWithThikness(false, centerPixel, rowSobel, edgeThreshold, minEdgeWidth, maxEdgeWidth, minThicness);
+	uint16_t leftEdge = getEdgeWithThickness(true, centerPixel, rowSobel, edgeThreshold, minEdgeWidth, maxEdgeWidth, minThickness);
+	uint16_t rightEdge = getEdgeWithThickness(false, centerPixel, rowSobel, edgeThreshold, minEdgeWidth, maxEdgeWidth, minThickness);
 
 	trackWidth = rightEdge - leftEdge;
 	trackCenter = leftEdge + trackWidth/2;
