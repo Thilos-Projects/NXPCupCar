@@ -101,8 +101,8 @@ void pixySetup(){
 
 //Eine / Mehrere Zeilen können definiert + gewählt werden
 void cameraRowsSetup() {
-	singleRowAnalysis_180.Setup(&pixy, 180, 40, 0, 6, 158, 6);
-	singleRowAnalysis_150.Setup(&pixy, 150, 40, 0, 6, 158, 6);
+	singleRowAnalysis_180.Setup(&pixy, 180, 40, 0, 6, 158, 4);
+	singleRowAnalysis_150.Setup(&pixy, 150, 40, 0, 6, 158, 4);
 }
 
 //Auslesen der Kamera, Sobel und Kanten der übergebenen Reihen!
