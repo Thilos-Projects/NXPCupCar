@@ -25,14 +25,14 @@ void printArray(T* line, uint16_t length){
 
 
 void CameraAnalysis::SingleRowAnalysis::Setup(Pixy2SPI_SS* pixy, uint16_t row, uint16_t edgeThreshold,
-		uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t centerPixel, uint16_t minThicness) {
+		uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t centerPixel, uint16_t minThickness) {
 	this->pixy = pixy;
 	this->row = row;
 	this->edgeThreshold = edgeThreshold;
 	this->minEdgeWidth = minEdgeWidth;
 	this->maxEdgeWidth = maxEdgeWidth;
 	this->centerPixel = centerPixel;
-	this->minThickness = minThicness;
+	this->minThickness = minThickness;
 }
 void CameraAnalysis::SingleRowAnalysis::getImageRow(){
 	pixy->video.getGrayRect(0, row, 158, row+1, 1, 1, rowDataBuffer + 0, false);
@@ -127,12 +127,12 @@ uint16_t getEdgeWithThickness(bool isLeft, uint16_t centerPixel, int16_t* rowSob
 				}
 
 				if(edgeWidth < minThickness){
-					//Sobel threshold reached, edge found, edge in wrong direction, edge with right, edge Thicness was wrong
+					//Sobel threshold reached, edge found, edge in wrong direction, edge with right, edge thickness was wrong
 					isAnEdgeFound = false;
 					continue;
 				}
 
-				//Sobel threshold reached, edge found, edge in wrong direction, edge with right, edge Thicness was right
+				//Sobel threshold reached, edge found, edge in wrong direction, edge with right, edge thickness was right
 				break;
 			}
 
@@ -149,11 +149,11 @@ uint16_t getEdgeWithThickness(bool isLeft, uint16_t centerPixel, int16_t* rowSob
 			}
 
 			if(edgeWidth > minThickness){
-				//Sobel threshold not reached, edge found, edge with right, edge Thicness was right
+				//Sobel threshold not reached, edge found, edge with right, edge thickness was right
 				break;
 			}
 
-			//Sobel threshold not reached, edge found, edge with right, edge Thicness was wrong
+			//Sobel threshold not reached, edge found, edge with right, edge thickness was wrong
 			edgeWidth++;
 			continue;
 		}
