@@ -25,13 +25,14 @@ void printArray(T* line, uint16_t length){
 
 
 void CameraAnalysis::SingleRowAnalysis::Setup(Pixy2SPI_SS* pixy, uint16_t row, uint16_t edgeThreshold,
-		uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t centerPixel) {
+		uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t centerPixel, uint16_t minThickness) {
 	this->pixy = pixy;
 	this->row = row;
 	this->edgeThreshold = edgeThreshold;
 	this->minEdgeWidth = minEdgeWidth;
 	this->maxEdgeWidth = maxEdgeWidth;
 	this->centerPixel = centerPixel;
+	this->minThickness = minThickness;
 }
 void CameraAnalysis::SingleRowAnalysis::getImageRow(){
 	pixy->video.getGrayRect(0, row, 158, row+1, 1, 1, rowDataBuffer + 0, false);
@@ -91,9 +92,83 @@ uint16_t getEdge(bool isLeft, uint16_t centerPixel, int16_t* rowSobel, uint16_t 
 	return edge;
 }
 
+
+uint16_t getEdgeWithThickness(bool isLeft, uint16_t centerPixel, int16_t* rowSobel, uint16_t edgeThreshold, uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint8_t minThickness) {
+	uint16_t edgeStartPosition;
+	uint16_t edgeWidth;
+	bool isAnEdgeFound = false;
+
+	bool isEdgeWithinSobelThreshold;
+	bool doesEdgeChangeInRightDirection;
+
+	for(uint16_t i = centerPixel; isLeft? (i > 2) : (i < 310); isLeft ? (i--) : (i++)) {
+		isEdgeWithinSobelThreshold = rowSobel[i] < -edgeThreshold || edgeThreshold < rowSobel[i];
+		doesEdgeChangeInRightDirection = isLeft ? (rowSobel[i] < 0) : (rowSobel[i] > 0);
+		int16_t temp = rowSobel[i];
+
+		if(isEdgeWithinSobelThreshold) {
+			if(!isAnEdgeFound){
+				if(!doesEdgeChangeInRightDirection)
+					//Sobel threshold reached, no edge found, edge in wrong direction
+					continue;
+
+				//Sobel threshold reached, no edge found, edge in right direction
+				isAnEdgeFound = true;
+				edgeStartPosition = i;
+				edgeWidth = 1;
+				continue;
+			}
+
+			if(!doesEdgeChangeInRightDirection){
+				if(edgeWidth < minEdgeWidth || maxEdgeWidth < edgeWidth) {
+					//Sobel threshold reached, edge found, edge in wrong direction, edge with false
+					isAnEdgeFound = false;
+					continue;
+				}
+
+				if(edgeWidth < minThickness){
+					//Sobel threshold reached, edge found, edge in wrong direction, edge with right, edge thickness was wrong
+					isAnEdgeFound = false;
+					continue;
+				}
+
+				//Sobel threshold reached, edge found, edge in wrong direction, edge with right, edge thickness was right
+				break;
+			}
+
+			//Sobel threshold reached, edge found, edge in right direction
+			edgeWidth++;
+			continue;
+		}
+
+		if(isAnEdgeFound){
+			if(edgeWidth < minEdgeWidth || maxEdgeWidth < edgeWidth) {
+				//Sobel threshold not reached, edge found, edge with false
+				isAnEdgeFound = false;
+				continue;
+			}
+
+			if(edgeWidth > minThickness){
+				//Sobel threshold not reached, edge found, edge with right, edge thickness was right
+				break;
+			}
+
+			//Sobel threshold not reached, edge found, edge with right, edge thickness was wrong
+			edgeWidth++;
+			continue;
+		}
+	}
+
+	if(!isAnEdgeFound)
+		edgeStartPosition = isLeft ? 2 : 310;
+
+	return edgeStartPosition;
+}
+
+
 void CameraAnalysis::SingleRowAnalysis::findBlankArea() {
-	uint16_t leftEdge = getEdge(true, centerPixel, rowSobel, edgeThreshold, minEdgeWidth, maxEdgeWidth);
-	uint16_t rightEdge = getEdge(false, centerPixel, rowSobel, edgeThreshold, minEdgeWidth, maxEdgeWidth);
+	uint16_t leftEdge = getEdgeWithThickness(true, centerPixel, rowSobel, edgeThreshold, minEdgeWidth, maxEdgeWidth, minThickness);
+	uint16_t rightEdge = getEdgeWithThickness(false, centerPixel, rowSobel, edgeThreshold, minEdgeWidth, maxEdgeWidth, minThickness);
 
 	trackWidth = rightEdge - leftEdge;
 	trackCenter = leftEdge + trackWidth/2;
@@ -101,6 +176,14 @@ void CameraAnalysis::SingleRowAnalysis::findBlankArea() {
 
 	// printf("Mid: %d Width:%d leftEdge:%d rightEdge:%d \n", trackCenter, trackWidth, leftEdge, rightEdge);
 
+}
+
+void CameraAnalysis::SingleRowAnalysis::calculateTrackDifferences() {
+	centerDiff = (uint16_t)abs((int16_t)trackCenter - (int16_t)oldTrackCenter);
+	widthDiff = (uint16_t)abs((int16_t)trackWidth - (int16_t)oldTrackWidth);
+
+	oldTrackCenter = trackCenter;
+	oldTrackWidth = trackWidth;
 }
 
 //----------------------Print-------------------
