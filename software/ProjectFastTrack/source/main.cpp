@@ -29,6 +29,11 @@ extern "C"
 }
 #include <TFT_Modules/Scheduler.h>
 #include <TFT_Modules/CameraAnalysis.h>
+#include "TFT_Modules/ControlConfigStruct.h"
+
+uint8_t controlConfigsLength;
+ControlConfig* controlConfigs;
+#include "TFT_Modules/ControlConfigs.h"
 
 #include "Pixy/Pixy2SPI_SS.h"
 
@@ -221,6 +226,8 @@ void defineTasks() {
 }
 
 int main(){
+	loadControlConfigs(&controlConfigsLength, &controlConfigs);
+
 	printf("Hello Car\n");
 
 	Setup();
