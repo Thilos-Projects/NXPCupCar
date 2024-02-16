@@ -34,9 +34,9 @@ extern "C"
 
 #define TIME_PER_FRAME 17
 
-#define SERVO_STEERING_OFFSET -0.2f
-#define SPEED_MIN 0.42f
-#define SPEED_MAX 0.6f
+#define SERVO_STEERING_OFFSET 0.0f
+#define SPEED_MIN 0.5f
+#define SPEED_MAX 0.55f
 #define SPEED_ADJUST_TIME 500.0f
 #define MAX_CENTER_DIFF_FOR_SPEED_UP 5
 
@@ -94,15 +94,15 @@ void pixySetup(){
 	pixy.getVersion();
 	pixy.version->print();
 	printf("HellO World: %ld\n",clock());
-	pixy.setLED(0, 255, 0);
+	pixy.setLED(255, 255, 0);
 	//pixy.setLamp(1, 1);
 	pixy.changeProg("video");
 }
 
 //Eine / Mehrere Zeilen können definiert + gewählt werden
 void cameraRowsSetup() {
-	singleRowAnalysis_180.Setup(&pixy, 180, 40, 0, 6, 158, 4);
-	singleRowAnalysis_150.Setup(&pixy, 150, 40, 0, 6, 158, 4);
+	singleRowAnalysis_180.Setup(&pixy, 150, 40, 0, 6, 158, 4);
+	singleRowAnalysis_150.Setup(&pixy, 100, 40, 0, 6, 158, 4);
 }
 
 //Auslesen der Kamera, Sobel und Kanten der übergebenen Reihen!
@@ -128,7 +128,7 @@ void lenkung() {
 	steeringAngle /= 79.0f;
 	steeringAngle *= steeringAngle;
 
-	float steeringFactor = 3.0f + (destinationSpeed - 0.4f) * ((mAd_Read(ADCInputEnum::kPot2) + 1) / 2) * 30.0f;
+	float steeringFactor = 3.0f;// + (destinationSpeed - 0.4f) * ((mAd_Read(ADCInputEnum::kPot2) + 1) / 2) * 30.0f;
 
 	steeringAngle *= steeringFactor;
 

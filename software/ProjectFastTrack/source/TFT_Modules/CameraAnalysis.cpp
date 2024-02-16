@@ -13,6 +13,7 @@ void pixyUsleep(int useconds);
 
 extern "C" {
 	#include "Modules/mLeds.h"
+	#include "Modules/mTimer.h"
 }
 
 template<typename T>
@@ -169,6 +170,13 @@ uint16_t getEdgeWithThickness(bool isLeft, uint16_t centerPixel, int16_t* rowSob
 void CameraAnalysis::SingleRowAnalysis::findBlankArea() {
 	uint16_t leftEdge = getEdgeWithThickness(true, centerPixel, rowSobel, edgeThreshold, minEdgeWidth, maxEdgeWidth, minThickness);
 	uint16_t rightEdge = getEdgeWithThickness(false, centerPixel, rowSobel, edgeThreshold, minEdgeWidth, maxEdgeWidth, minThickness);
+
+	if(rightEdge <= leftEdge){
+		mLeds_Write(LedMaskEnum::kMaskLed4, LedStateEnum::kLedOn);
+		mTimer_SetMotorDuty(0, 0);
+		mTimer_SetServoDuty(0, 0);
+		while(true);
+	}
 
 	trackWidth = rightEdge - leftEdge;
 	trackCenter = leftEdge + trackWidth/2;
