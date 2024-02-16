@@ -35,7 +35,7 @@ extern "C"
 #define TIME_PER_FRAME 17
 
 #define SERVO_STEERING_OFFSET 0.0f
-#define SPEED_MIN 0.5f
+#define SPEED_MIN 0.4f
 #define SPEED_MAX 0.55f
 #define SPEED_ADJUST_TIME 500.0f
 #define MAX_CENTER_DIFF_FOR_SPEED_UP 5
@@ -163,9 +163,9 @@ void adjustSpeed() {
 	singleRowAnalysis_180.calculateTrackDifferences();
 	singleRowAnalysis_150.calculateTrackDifferences();
 
-	int16_t blubb = (int16_t)(((mAd_Read(ADCInputEnum::kPot1) + 1) / 2) * 130.0f);
+	int16_t speedUpThresholdBlubb = (int16_t)(((mAd_Read(ADCInputEnum::kPot1) + 1) / 2) * 130.0f);
 
-	if (abs((int16_t)singleRowAnalysis_150.trackCenter - (int16_t)singleRowAnalysis_150.centerPixel) < blubb) {
+	if (abs((int16_t)singleRowAnalysis_150.trackCenter - (int16_t)singleRowAnalysis_150.centerPixel) < speedUpThresholdBlubb) {
 		// Increase speed on straight tracks
 		destinationSpeed += (TIME_PER_FRAME / SPEED_ADJUST_TIME) * (SPEED_MAX-SPEED_MIN); // TIME_PER_FRAME * MAXIMUM_RAISE_PER_SECOND
 		if (destinationSpeed > SPEED_MAX) {
