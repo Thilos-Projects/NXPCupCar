@@ -35,8 +35,8 @@ extern "C"
 #define TIME_PER_FRAME 17
 
 #define SERVO_STEERING_OFFSET 0.0f
-#define SPEED_MIN 0.5f
-#define SPEED_MAX 0.55f
+#define SPEED_MIN 0.42f
+#define SPEED_MAX 0.5f
 #define SPEED_ADJUST_TIME 500.0f
 #define MAX_CENTER_DIFF_FOR_SPEED_UP 5
 
@@ -95,7 +95,7 @@ void pixySetup(){
 	pixy.version->print();
 	printf("HellO World: %ld\n",clock());
 	pixy.setLED(255, 255, 0);
-	//pixy.setLamp(1, 1);
+	pixy.setLamp(255, 255);
 	pixy.changeProg("video");
 }
 
@@ -128,7 +128,7 @@ void lenkung() {
 	steeringAngle /= 79.0f;
 	steeringAngle *= steeringAngle;
 
-	float steeringFactor = 3.0f;// + (destinationSpeed - 0.4f) * ((mAd_Read(ADCInputEnum::kPot2) + 1) / 2) * 30.0f;
+	float steeringFactor = 2.7f;// + (destinationSpeed - 0.4f) * ((mAd_Read(ADCInputEnum::kPot2) + 1) / 2) * 30.0f;
 
 	steeringAngle *= steeringFactor;
 
@@ -163,7 +163,7 @@ void adjustSpeed() {
 	singleRowAnalysis_180.calculateTrackDifferences();
 	singleRowAnalysis_150.calculateTrackDifferences();
 
-	int16_t blubb = (int16_t)(((mAd_Read(ADCInputEnum::kPot1) + 1) / 2) * 130.0f);
+	int16_t blubb = (int16_t)(((mAd_Read(ADCInputEnum::kPot1) + 1) / 2) * 40.0f);
 
 	if (abs((int16_t)singleRowAnalysis_150.trackCenter - (int16_t)singleRowAnalysis_150.centerPixel) < blubb) {
 		// Increase speed on straight tracks
