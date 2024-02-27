@@ -19,14 +19,22 @@ struct RowConfig {
 
 struct ControlConfig {
     uint16_t timePerFrame = 17;
-    float servoSteeringOffset = 0.0f;
+
+    // Pixy-Stuff
     uint8_t pixyLedColorR = 255, pixyLedColorG = 255, pixyLedColorB = 255;
     uint16_t pixyLamps = 0x0101; // 8-Bit upper | 8-Bit lower
     const char* cameraProgram = "video";
+
+    // Camera-Stuff
     uint8_t rowConfigLength = 0;
     RowConfig* rowConfigs;
+
+    // Steering-Stuff
+    float servoSteeringOffset = 0.0f;
     float steeringPotentialFactor = 0.0f;
     float steeringDerivativeFactor = 0.0f;
+
+    // Speed-Stuff
     uint8_t brakeFrameCount = 0;
     uint8_t brakeRowDistance = 0;
     float brakeSpeed = 0.0f;
