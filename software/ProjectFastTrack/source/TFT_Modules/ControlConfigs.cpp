@@ -8,10 +8,6 @@ void loadControlConfigs(uint8_t* controlConfigsLength, ControlConfig* controlCon
 
     controlConfigs[0].timePerFrame = 17;
     controlConfigs[0].servoSteeringOffset = 0.0f;
-    controlConfigs[0].speedMin = 0.4f;
-    controlConfigs[0].speedMax = 0.55f;
-    controlConfigs[0].speedAdjustTIme = 500.0f;
-    controlConfigs[0].maxCenterDiffForSpeedUp = 5;
     controlConfigs[0].pixyLedColorR = 255;
     controlConfigs[0].pixyLedColorG = 127;
     controlConfigs[0].pixyLedColorB = 0;
