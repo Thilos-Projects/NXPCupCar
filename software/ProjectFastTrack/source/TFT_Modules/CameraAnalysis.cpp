@@ -34,6 +34,9 @@ void CameraAnalysis::SingleRowAnalysis::Setup(Pixy2SPI_SS* pixy, uint16_t row, u
 	this->maxEdgeWidth = maxEdgeWidth;
 	this->centerPixel = centerPixel;
 	this->minThickness = minThickness;
+
+	this->trackCenter = 0;
+	this->trackWidth = 0;
 }
 void CameraAnalysis::SingleRowAnalysis::getImageRow(){
 	pixy->video.getGrayRect(0, row, 158, row+1, 1, 1, rowDataBuffer + 0, false);
@@ -186,13 +189,6 @@ void CameraAnalysis::SingleRowAnalysis::findBlankArea() {
 
 }
 
-void CameraAnalysis::SingleRowAnalysis::calculateTrackDifferences() {
-	centerDiff = (uint16_t)abs((int16_t)trackCenter - (int16_t)oldTrackCenter);
-	widthDiff = (uint16_t)abs((int16_t)trackWidth - (int16_t)oldTrackWidth);
-
-	oldTrackCenter = trackCenter;
-	oldTrackWidth = trackWidth;
-}
 
 //----------------------Print-------------------
 void CameraAnalysis::SingleRowAnalysis::printImageRow(){
