@@ -32,23 +32,16 @@ extern "C"
 #include "TFT_Modules/ControlConfigStruct.h"
 
 uint8_t controlConfigsLength;
-ControlConfig* controlConfigs;
+ControlConfig controlConfigs[10];
+ControlConfig* currentConfig;
 #include "TFT_Modules/ControlConfigs.h"
 
 #include "Pixy/Pixy2SPI_SS.h"
 
-#define TIME_PER_FRAME 17
-
-#define SERVO_STEERING_OFFSET 0.0f
-#define SPEED_MIN 0.4f
-#define SPEED_MAX 0.55f
-#define SPEED_ADJUST_TIME 500.0f
-#define MAX_CENTER_DIFF_FOR_SPEED_UP 5
-
 //Lokale Definitionen
 Pixy2SPI_SS pixy;
-CameraAnalysis::SingleRowAnalysis singleRowAnalysis_180;
-CameraAnalysis::SingleRowAnalysis singleRowAnalysis_150;
+uint8_t rowAnalysisLength = 0;
+CameraAnalysis::SingleRowAnalysis singleRowAnalysis[2]; // Should be maximum size of row configs
 
 //Task Definitionen
 Scheduler::taskHandle* t_testMotorButton;
@@ -62,6 +55,7 @@ Scheduler::taskHandle* t_speedControl;
 void pixySetup();
 void cameraRowsSetup();
 int16_t getBestTrackIndexFromMultipleTracks(CameraAnalysis::SingleRowAnalysis* singleRow);
+// TODO: Refactor
 bool currentRowAnalysis_160(float* steeringAngle);
 
 float destinationSpeed = 0.0f;
@@ -99,50 +93,61 @@ void pixySetup(){
 	pixy.getVersion();
 	pixy.version->print();
 	printf("HellO World: %ld\n",clock());
-	pixy.setLED(255, 255, 0);
-	//pixy.setLamp(1, 1);
-	pixy.changeProg("video");
+	pixy.setLED(currentConfig->pixyLedColorR, currentConfig->pixyLedColorG, currentConfig->pixyLedColorB);
+	pixy.setLamp((uint8_t)(currentConfig->pixyLamps>>8), (uint8_t)(currentConfig->pixyLamps>>0));
+	pixy.changeProg(currentConfig->cameraProgram);
 }
 
 //Eine / Mehrere Zeilen können definiert + gewählt werden
 void cameraRowsSetup() {
-	singleRowAnalysis_180.Setup(&pixy, 150, 40, 0, 6, 158, 4);
-	singleRowAnalysis_150.Setup(&pixy, 100, 40, 0, 6, 158, 4);
+	rowAnalysisLength = currentConfig->rowConfigLength;
+	for (uint8_t i = 0; i < rowAnalysisLength; i++)
+	{
+		RowConfig* currentRow = &currentConfig->rowConfigs[i];
+		singleRowAnalysis[i].Setup(
+			&pixy,
+			currentRow->row,
+			currentRow->edgeThreshold,
+			currentRow->minEdgeWidth,
+			currentRow->maxEdgeWidth,
+			currentRow->centerPixel,
+			currentRow->minThickness
+		);
+	}
 }
 
 //Auslesen der Kamera, Sobel und Kanten der übergebenen Reihen!
-void generalCameraTask(CameraAnalysis::SingleRowAnalysis** rowsToDo, uint8_t length) {
+void generalCameraTask(CameraAnalysis::SingleRowAnalysis* rowsToDo, uint8_t length) {
 	for(uint8_t i = 0; i<length; i++) {
-		rowsToDo[i]->getImageRow();
-		rowsToDo[i]->calculateSobelRow();
-		rowsToDo[i]->findBlankArea();
+		rowsToDo[i].getImageRow();
+		rowsToDo[i].calculateSobelRow();
+		//rowsToDo[i]->findBlankArea();
 		//rowsToDo[i]->calculateEdges();
 	}
 }
 
 
 void lenkung() {
-	//mLeds_Write(kMaskLed2,kLedOff);
+	CameraAnalysis::SingleRowAnalysis* steeringRowAnalysis = &singleRowAnalysis[0];
 
-	singleRowAnalysis_180.findBlankArea();
-	singleRowAnalysis_150.findBlankArea();
+	steeringRowAnalysis->findBlankArea();
+
+	//mLeds_Write(kMaskLed2,kLedOff);
 
 	// printf("Centers %d / %d\n", singleRowAnalysis_180.trackCenter, singleRowAnalysis_150.trackCenter);
 
-	float steeringAngle = (float)singleRowAnalysis_180.trackCenter - (float)singleRowAnalysis_180.centerPixel;
+	float steeringAngle = (float)steeringRowAnalysis->trackCenter - (float)steeringRowAnalysis->centerPixel;
 	steeringAngle /= 79.0f;
 	steeringAngle *= steeringAngle;
 
-	float steeringFactor = 3.0f;// + (destinationSpeed - 0.4f) * ((mAd_Read(ADCInputEnum::kPot2) + 1) / 2) * 30.0f;
-
-	steeringAngle *= steeringFactor;
+	steeringAngle *= currentConfig->steeringFactor;
 
 	static float minSteeringAngle = 9000.0f;
 	static float maxSteeringAngle = -9000.0f;
 
 
-	if(singleRowAnalysis_180.trackCenter < singleRowAnalysis_180.centerPixel) {
-		mTimer_SetServoDuty(0, -steeringAngle + SERVO_STEERING_OFFSET);
+	if(steeringRowAnalysis->trackCenter < steeringRowAnalysis->centerPixel) {
+		mTimer_SetServoDuty(0, -steeringAngle + currentConfig->servoSteeringOffset);
 
 		if (-steeringAngle > maxSteeringAngle) {
 			maxSteeringAngle = -steeringAngle;
@@ -152,7 +157,7 @@ void lenkung() {
 		}
 	}
 	else {
-		mTimer_SetServoDuty(0, steeringAngle + SERVO_STEERING_OFFSET);
+		mTimer_SetServoDuty(0, steeringAngle + currentConfig->servoSteeringOffset);
 
 		if (steeringAngle > maxSteeringAngle) {
 			maxSteeringAngle = steeringAngle;
@@ -165,20 +170,21 @@ void lenkung() {
 }
 
 void adjustSpeed() {
-	singleRowAnalysis_180.calculateTrackDifferences();
-	singleRowAnalysis_150.calculateTrackDifferences();
+	CameraAnalysis::SingleRowAnalysis* speedRowAnalysis = &singleRowAnalysis[1];
+	speedRowAnalysis->calculateTrackDifferences();
 
+	// TODO: Use Config value instead of Poti
 	int16_t speedUpThresholdBlubb = (int16_t)(((mAd_Read(ADCInputEnum::kPot1) + 1) / 2) * 130.0f);
 
-	if (abs((int16_t)singleRowAnalysis_150.trackCenter - (int16_t)singleRowAnalysis_150.centerPixel) < speedUpThresholdBlubb) {
+	if (abs((int16_t)speedRowAnalysis->trackCenter - (int16_t)speedRowAnalysis->centerPixel) < speedUpThresholdBlubb) {
 		// Increase speed on straight tracks
-		destinationSpeed += (TIME_PER_FRAME / SPEED_ADJUST_TIME) * (SPEED_MAX-SPEED_MIN); // TIME_PER_FRAME * MAXIMUM_RAISE_PER_SECOND
-		if (destinationSpeed > SPEED_MAX) {
-			destinationSpeed = SPEED_MAX;
+		destinationSpeed += (currentConfig->timePerFrame / currentConfig->speedAdjustTIme) * (currentConfig->speedMax - currentConfig->speedMin); // TIME_PER_FRAME * MAXIMUM_RAISE_PER_SECOND
+		if (destinationSpeed > currentConfig->speedMax) {
+			destinationSpeed = currentConfig->speedMax;
 		}
 	} else {
 		// Reset to "turn speed" in turns
-		destinationSpeed = SPEED_MIN;
+		destinationSpeed = currentConfig->speedMin;
 	}
 }
 
@@ -206,12 +212,8 @@ void defineTasks() {
 	}, 90000, false, false);
 
 	t_generalCamera = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
-		static CameraAnalysis::SingleRowAnalysis* usedCameraRows[] =  {
-			&singleRowAnalysis_180,
-			&singleRowAnalysis_150
-		};
-		generalCameraTask(usedCameraRows, 2);
-	}, min(17, TIME_PER_FRAME));
+		generalCameraTask(singleRowAnalysis, rowAnalysisLength);
+	}, min(17, currentConfig->timePerFrame));
 
 	t_cameraAlgorithm = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		lenkung();
@@ -221,12 +223,13 @@ void defineTasks() {
 			mTimer_SetMotorDuty(destinationSpeed, destinationSpeed);
 		else
 			mTimer_SetMotorDuty(0, 0);
-	}, TIME_PER_FRAME);
+	}, currentConfig->timePerFrame);
 
 }
 
 int main(){
-	loadControlConfigs(&controlConfigsLength, &controlConfigs);
+	loadControlConfigs(&controlConfigsLength, controlConfigs);
+	currentConfig = &controlConfigs[0];
 
 	printf("Hello Car\n");
 

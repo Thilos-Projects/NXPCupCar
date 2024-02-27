@@ -9,6 +9,6 @@ extern "C"
 
 #include "ControlConfigStruct.h"
 
-void loadControlConfigs(uint8_t* controlConfigsLength, ControlConfig** controlConfigs);
+void loadControlConfigs(uint8_t* controlConfigsLength, ControlConfig* controlConfigs);
 
 #endif

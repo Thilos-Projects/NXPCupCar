@@ -22,7 +22,8 @@ struct ControlConfig {
     float speedMax = 0.0f;
     float speedAdjustTIme = 1000.0f;
     uint16_t maxCenterDiffForSpeedUp = 0;
-    uint8_t pixyLedColorR = 255, pixyLeadColorG = 255, pixyLedColorB = 255;
+    uint8_t pixyLedColorR = 255, pixyLedColorG = 255, pixyLedColorB = 255;
+    uint16_t pixyLamps = 0x0101; // 8-Bit upper | 8-Bit lower
     const char* cameraProgram = "video";
     uint8_t rowConfigLength = 0;
     RowConfig* rowConfigs;
