@@ -94,9 +94,10 @@ void pixySetup(){
 
 void controlCar() {
 	// Setup
+	static CameraAnalysis::SingleRowAnalysis currentRowAnalysis;
+	static float lastSteeringAngle = 0.0f;
 	int16_t trackCenterDifferences[6]; 
 	uint8_t currentRowIndex;
-	static CameraAnalysis::SingleRowAnalysis currentRowAnalysis;
 	uint8_t countStraightTracks = 0;
 	uint8_t countTurnTracks = 0;
 	uint8_t countCrossingTracks = 0;
@@ -158,25 +159,38 @@ void controlCar() {
 
 	// Control Car
 	float avgTrackCenterDifference = trackCenterDifferences[0];
-	for (uint8_t i = 1; i < currentRowIndex; i++)
-	{
-		avgTrackCenterDifference += trackCenterDifferences[i];
-	}
-	avgTrackCenterDifference /= currentRowIndex;
+	if (currentRowIndex != 0) {
+		for (uint8_t i = 1; i < currentRowIndex; i++)
+		{
+			avgTrackCenterDifference += trackCenterDifferences[i];
+		}
+		avgTrackCenterDifference /= currentRowIndex;
+	}	
+	
 
 	// Steering
 	float steeringAngle = avgTrackCenterDifference;
 	steeringAngle /= 79.0f;
 	steeringAngle *= steeringAngle;
 
-	steeringAngle *= currentConfig->steeringFactor;
+	steeringAngle *= (currentConfig->steeringFactor / 6) * (6 - countStraightTracks);
+
+	float steeringAngleDerivative = ((lastSteeringAngle - steeringAngle) / currentConfig->timePerFrame) * currentConfig->steeringDerivativeFactor;
+
+	steeringAngle += steeringAngleDerivative;
 
 	if (avgTrackCenterDifference < 0) {
+		lastSteeringAngle = -steeringAngle + currentConfig->servoSteeringOffset;
 		mTimer_SetServoDuty(0, -steeringAngle + currentConfig->servoSteeringOffset);
 	}
 	else {
+		lastSteeringAngle = steeringAngle + currentConfig->servoSteeringOffset;
 		mTimer_SetServoDuty(0, steeringAngle + currentConfig->servoSteeringOffset);
 	}
+
+	// Speed
+	uint8_t countNonTurnTracks = countStraightTracks + countCrossingTracks;
+	destinationSpeed = currentConfig->speedMin + ((currentConfig->speedMax - currentConfig->speedMin) * (countNonTurnTracks / 6.0f));
 
 }
 
@@ -200,9 +214,6 @@ void defineTasks() {
 
 	t_cameraAlgorithm = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		controlCar();
-
-		// TODO
-		destinationSpeed = currentConfig->speedMin;
 
 		if(motorEnabled)
 			mTimer_SetMotorDuty(destinationSpeed, destinationSpeed);

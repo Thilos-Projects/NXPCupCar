@@ -18,6 +18,7 @@ void loadControlConfigs(uint8_t* controlConfigsLength, ControlConfig* controlCon
     controlConfigs[0].pixyLamps = 0x0101;
     controlConfigs[0].cameraProgram = "video";
     controlConfigs[0].steeringFactor = 3.0f;
+    controlConfigs[0].steeringDerivativeFactor = 1.0f;
 
     controlConfigs[0].rowConfigLength = 6;
     controlConfigs[0].rowConfigs = (RowConfig*)malloc(sizeof(RowConfig) * controlConfigs[0].rowConfigLength);
@@ -47,7 +48,7 @@ void loadControlConfigs(uint8_t* controlConfigsLength, ControlConfig* controlCon
     controlConfigs[0].rowConfigs[2].maxEdgeWidth = 5;
     controlConfigs[0].rowConfigs[2].centerPixel= 158;
     controlConfigs[0].rowConfigs[2].minThickness = 3;
-    controlConfigs[0].rowConfigs[2].maxCenterDifferenceForTurn = 20;
+    controlConfigs[0].rowConfigs[2].maxCenterDifferenceForTurn = 15;
     // Fourth Row Config
     controlConfigs[0].rowConfigs[3].row = 82;
     controlConfigs[0].rowConfigs[3].rowClose = 77;
@@ -56,7 +57,7 @@ void loadControlConfigs(uint8_t* controlConfigsLength, ControlConfig* controlCon
     controlConfigs[0].rowConfigs[3].maxEdgeWidth = 4;
     controlConfigs[0].rowConfigs[3].centerPixel= 158;
     controlConfigs[0].rowConfigs[3].minThickness = 2;
-    controlConfigs[0].rowConfigs[3].maxCenterDifferenceForTurn = 20;
+    controlConfigs[0].rowConfigs[3].maxCenterDifferenceForTurn = 15;
     // Fifth Row Config
     controlConfigs[0].rowConfigs[4].row = 74;
     controlConfigs[0].rowConfigs[4].rowClose = 69;
@@ -65,7 +66,7 @@ void loadControlConfigs(uint8_t* controlConfigsLength, ControlConfig* controlCon
     controlConfigs[0].rowConfigs[4].maxEdgeWidth = 4;
     controlConfigs[0].rowConfigs[4].centerPixel= 158;
     controlConfigs[0].rowConfigs[4].minThickness = 1;
-    controlConfigs[0].rowConfigs[4].maxCenterDifferenceForTurn = 20;
+    controlConfigs[0].rowConfigs[4].maxCenterDifferenceForTurn = 10;
     // Sixth Row Config
     controlConfigs[0].rowConfigs[5].row = 58;
     controlConfigs[0].rowConfigs[5].rowClose = 53;
@@ -74,5 +75,5 @@ void loadControlConfigs(uint8_t* controlConfigsLength, ControlConfig* controlCon
     controlConfigs[0].rowConfigs[5].maxEdgeWidth = 3;
     controlConfigs[0].rowConfigs[5].centerPixel= 158;
     controlConfigs[0].rowConfigs[5].minThickness = 0;
-    controlConfigs[0].rowConfigs[5].maxCenterDifferenceForTurn = 20;
+    controlConfigs[0].rowConfigs[5].maxCenterDifferenceForTurn = 10;
 }

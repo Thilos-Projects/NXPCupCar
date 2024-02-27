@@ -30,6 +30,7 @@ struct ControlConfig {
     uint8_t rowConfigLength = 0;
     RowConfig* rowConfigs;
     float steeringFactor = 0.0f;
+    float steeringDerivativeFactor = 0.0f;
 };
 
 #endif
