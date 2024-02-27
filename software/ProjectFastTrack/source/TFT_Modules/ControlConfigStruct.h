@@ -20,6 +20,7 @@ struct RowConfig {
 struct ControlConfig {
     uint16_t timePerFrame = 17;
     float servoSteeringOffset = 0.0f;
+    // TODO: Speed min and max are obsolete
     float speedMin = 0.0f;
     float speedMax = 0.0f;
     float speedAdjustTIme = 1000.0f;
@@ -31,6 +32,11 @@ struct ControlConfig {
     RowConfig* rowConfigs;
     float steeringFactor = 0.0f;
     float steeringDerivativeFactor = 0.0f;
+    uint8_t brakeFrameCount = 0;
+    uint8_t brakeRowDistance = 0;
+    float brakeSpeed = 0.0f;
+    float straightSpeed = 0.0f;
+    float turnSpeed = 0.0f;
 };
 
 #endif

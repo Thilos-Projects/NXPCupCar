@@ -19,6 +19,11 @@ void loadControlConfigs(uint8_t* controlConfigsLength, ControlConfig* controlCon
     controlConfigs[0].cameraProgram = "video";
     controlConfigs[0].steeringFactor = 3.0f;
     controlConfigs[0].steeringDerivativeFactor = 1.0f;
+    controlConfigs[0].brakeFrameCount = 3;
+    controlConfigs[0].brakeRowDistance = 2;
+    controlConfigs[0].brakeSpeed = -0.3f;
+    controlConfigs[0].straightSpeed = 0.55f;
+    controlConfigs[0].turnSpeed = 0.4f;
 
     controlConfigs[0].rowConfigLength = 6;
     controlConfigs[0].rowConfigs = (RowConfig*)malloc(sizeof(RowConfig) * controlConfigs[0].rowConfigLength);

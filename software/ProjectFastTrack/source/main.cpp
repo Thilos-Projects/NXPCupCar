@@ -96,6 +96,7 @@ void controlCar() {
 	// Setup
 	static CameraAnalysis::SingleRowAnalysis currentRowAnalysis;
 	static float lastSteeringAngle = 0.0f;
+	static uint8_t brakeAppliedFor = 0;
 	int16_t trackCenterDifferences[6]; 
 	uint8_t currentRowIndex;
 	uint8_t countStraightTracks = 0;
@@ -189,8 +190,17 @@ void controlCar() {
 	}
 
 	// Speed
-	uint8_t countNonTurnTracks = countStraightTracks + countCrossingTracks;
-	destinationSpeed = currentConfig->speedMin + ((currentConfig->speedMax - currentConfig->speedMin) * (countNonTurnTracks / 6.0f));
+	if (currentRowIndex < currentConfig->brakeRowDistance) { // Break or Turn
+		if (brakeAppliedFor < currentConfig->brakeFrameCount) {
+			destinationSpeed = currentConfig->brakeSpeed;
+			brakeAppliedFor++;
+		} else {
+			destinationSpeed = currentConfig->turnSpeed;
+		}
+	} else { // Straight
+		brakeAppliedFor = 0;
+		destinationSpeed = currentConfig->straightSpeed;
+	}
 
 }
 
