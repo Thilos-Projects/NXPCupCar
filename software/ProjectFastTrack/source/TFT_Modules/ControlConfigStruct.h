@@ -8,11 +8,13 @@ extern "C"
 
 struct RowConfig {
     uint16_t row = 0;
+    uint16_t rowClose = 0;
     uint16_t edgeThreshold = 0;
     uint8_t minEdgeWidth = 0;
     uint8_t maxEdgeWidth = 0;
     uint16_t centerPixel = 158;
     uint16_t minThickness = 0;
+    uint8_t maxCenterDifferenceForTurn = 0;
 };
 
 struct ControlConfig {

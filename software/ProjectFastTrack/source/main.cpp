@@ -45,15 +45,11 @@ CameraAnalysis::SingleRowAnalysis singleRowAnalysis[2]; // Should be maximum siz
 
 //Task Definitionen
 Scheduler::taskHandle* t_testMotorButton;
-Scheduler::taskHandle* t_motorStop;
-Scheduler::taskHandle* t_generalCamera;
 
 Scheduler::taskHandle* t_cameraAlgorithm;
-Scheduler::taskHandle* t_speedControl;
 
 //Bennenungen für Programmstruktur
 void pixySetup();
-void cameraRowsSetup();
 int16_t getBestTrackIndexFromMultipleTracks(CameraAnalysis::SingleRowAnalysis* singleRow);
 // TODO: Refactor
 bool currentRowAnalysis_160(float* steeringAngle);
@@ -82,8 +78,6 @@ void Setup() {
 
 	Scheduler::Setup();
 
-	cameraRowsSetup();
-
 	//Motor Setup (Motor Enable)
 	mTimer_EnableHBridge();
 }
@@ -98,94 +92,92 @@ void pixySetup(){
 	pixy.changeProg(currentConfig->cameraProgram);
 }
 
-//Eine / Mehrere Zeilen können definiert + gewählt werden
-void cameraRowsSetup() {
-	rowAnalysisLength = currentConfig->rowConfigLength;
-	for (uint8_t i = 0; i < rowAnalysisLength; i++)
+void controlCar() {
+	// Setup
+	int16_t trackCenterDifferences[6]; 
+	uint8_t currentRowIndex;
+	static CameraAnalysis::SingleRowAnalysis currentRowAnalysis;
+	uint8_t countStraightTracks = 0;
+	uint8_t countTurnTracks = 0;
+	uint8_t countCrossingTracks = 0;
+
+	mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOff);
+	mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOff);
+	mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOff);
+	mLeds_Write(LedMaskEnum::kMaskLed4, LedStateEnum::kLedOff);
+
+	// Loop
+	for (currentRowIndex = 0; currentRowIndex < currentConfig->rowConfigLength; currentRowIndex++)
 	{
-		RowConfig* currentRow = &currentConfig->rowConfigs[i];
-		singleRowAnalysis[i].Setup(
+		// Load current Row
+		RowConfig* currentRowConfig = &currentConfig->rowConfigs[currentRowIndex];
+		currentRowAnalysis.Setup(
 			&pixy,
-			currentRow->row,
-			currentRow->edgeThreshold,
-			currentRow->minEdgeWidth,
-			currentRow->maxEdgeWidth,
-			currentRow->centerPixel,
-			currentRow->minThickness
+			currentRowConfig->row,
+			currentRowConfig->edgeThreshold,
+			currentRowConfig->minEdgeWidth,
+			currentRowConfig->maxEdgeWidth,
+			currentRowConfig->centerPixel,
+			currentRowConfig->minThickness
 		);
+
+		// Analyze Row Image
+		currentRowAnalysis.getImageRow();
+		currentRowAnalysis.calculateSobelRow();
+		currentRowAnalysis.findBlankArea();
+
+		// Detect Turn / Crossing / Straight
+		int16_t trackCenterDifference = (int16_t)currentRowAnalysis.trackCenter - (int16_t)currentRowAnalysis.centerPixel;
+		if (abs(trackCenterDifference) > currentRowConfig->maxCenterDifferenceForTurn) {
+			// Update Row
+			currentRowAnalysis.row = currentRowConfig->rowClose;
+			
+			// Analyze Row Image
+			currentRowAnalysis.getImageRow();
+			currentRowAnalysis.calculateSobelRow();
+			currentRowAnalysis.findBlankArea();
+			
+			int16_t trackCenterCloseDifference = (int16_t)currentRowAnalysis.trackCenter - (int16_t)currentRowAnalysis.centerPixel;
+
+			if ((trackCenterCloseDifference < 0) == (trackCenterDifference < 0)) { // Turn Track
+				mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
+				countTurnTracks++;
+				trackCenterDifferences[currentRowIndex] = trackCenterDifference;
+				break;
+			} else { // Crossing Strack
+				mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOn);
+				countCrossingTracks++;
+				trackCenterDifferences[currentRowIndex] = (trackCenterCloseDifference + trackCenterDifference) / 2;
+			}
+		} else { // Straight Track
+			mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOn);
+			countStraightTracks++;
+			trackCenterDifferences[currentRowIndex] = trackCenterDifference;
+		}
 	}
-}
 
-//Auslesen der Kamera, Sobel und Kanten der übergebenen Reihen!
-void generalCameraTask(CameraAnalysis::SingleRowAnalysis* rowsToDo, uint8_t length) {
-	for(uint8_t i = 0; i<length; i++) {
-		rowsToDo[i].getImageRow();
-		rowsToDo[i].calculateSobelRow();
-		//rowsToDo[i]->findBlankArea();
-		//rowsToDo[i]->calculateEdges();
+	// Control Car
+	float avgTrackCenterDifference = trackCenterDifferences[0];
+	for (uint8_t i = 1; i < currentRowIndex; i++)
+	{
+		avgTrackCenterDifference += trackCenterDifferences[i];
 	}
-}
+	avgTrackCenterDifference /= currentRowIndex;
 
-
-void lenkung() {
-	CameraAnalysis::SingleRowAnalysis* steeringRowAnalysis = &singleRowAnalysis[0];
-
-	steeringRowAnalysis->findBlankArea();
-
-	//mLeds_Write(kMaskLed2,kLedOff);
-
-	// printf("Centers %d / %d\n", singleRowAnalysis_180.trackCenter, singleRowAnalysis_150.trackCenter);
-
-	float steeringAngle = (float)steeringRowAnalysis->trackCenter - (float)steeringRowAnalysis->centerPixel;
+	// Steering
+	float steeringAngle = avgTrackCenterDifference;
 	steeringAngle /= 79.0f;
 	steeringAngle *= steeringAngle;
 
 	steeringAngle *= currentConfig->steeringFactor;
 
-	static float minSteeringAngle = 9000.0f;
-	static float maxSteeringAngle = -9000.0f;
-
-
-	if(steeringRowAnalysis->trackCenter < steeringRowAnalysis->centerPixel) {
+	if (avgTrackCenterDifference < 0) {
 		mTimer_SetServoDuty(0, -steeringAngle + currentConfig->servoSteeringOffset);
-
-		if (-steeringAngle > maxSteeringAngle) {
-			maxSteeringAngle = -steeringAngle;
-		}
-		if (-steeringAngle < minSteeringAngle) {
-			minSteeringAngle = -steeringAngle;
-		}
 	}
 	else {
 		mTimer_SetServoDuty(0, steeringAngle + currentConfig->servoSteeringOffset);
-
-		if (steeringAngle > maxSteeringAngle) {
-			maxSteeringAngle = steeringAngle;
-		}
-		if (steeringAngle < minSteeringAngle) {
-			minSteeringAngle = steeringAngle;
-		}
 	}
 
-}
-
-void adjustSpeed() {
-	CameraAnalysis::SingleRowAnalysis* speedRowAnalysis = &singleRowAnalysis[1];
-	speedRowAnalysis->calculateTrackDifferences();
-
-	// TODO: Use Config value instead of Poti
-	int16_t speedUpThresholdBlubb = (int16_t)(((mAd_Read(ADCInputEnum::kPot1) + 1) / 2) * 130.0f);
-
-	if (abs((int16_t)speedRowAnalysis->trackCenter - (int16_t)speedRowAnalysis->centerPixel) < speedUpThresholdBlubb) {
-		// Increase speed on straight tracks
-		destinationSpeed += (currentConfig->timePerFrame / currentConfig->speedAdjustTIme) * (currentConfig->speedMax - currentConfig->speedMin); // TIME_PER_FRAME * MAXIMUM_RAISE_PER_SECOND
-		if (destinationSpeed > currentConfig->speedMax) {
-			destinationSpeed = currentConfig->speedMax;
-		}
-	} else {
-		// Reset to "turn speed" in turns
-		destinationSpeed = currentConfig->speedMin;
-	}
 }
 
 
@@ -206,25 +198,17 @@ void defineTasks() {
 		}
 	}, 250, true, false);
 
-	t_motorStop = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
-		mTimer_SetMotorDuty(0, 0);
-		self->active = false;
-	}, 90000, false, false);
-
-	t_generalCamera = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
-		generalCameraTask(singleRowAnalysis, rowAnalysisLength);
-	}, min(17, currentConfig->timePerFrame));
-
 	t_cameraAlgorithm = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
-		lenkung();
-		adjustSpeed();
+		controlCar();
+
+		// TODO
+		destinationSpeed = currentConfig->speedMin;
 
 		if(motorEnabled)
 			mTimer_SetMotorDuty(destinationSpeed, destinationSpeed);
 		else
 			mTimer_SetMotorDuty(0, 0);
 	}, currentConfig->timePerFrame);
-
 }
 
 int main(){
