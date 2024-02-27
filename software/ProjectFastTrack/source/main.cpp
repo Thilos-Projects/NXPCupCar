@@ -45,8 +45,8 @@ CameraAnalysis::SingleRowAnalysis singleRowAnalysis[2]; // Should be maximum siz
 
 //Task Definitionen
 Scheduler::taskHandle* t_testMotorButton;
-
 Scheduler::taskHandle* t_cameraAlgorithm;
+Scheduler::taskHandle* t_batteryLevelMonitor;
 
 //Bennenungen für Programmstruktur
 void pixySetup();
@@ -56,6 +56,8 @@ bool currentRowAnalysis_160(float* steeringAngle);
 
 float destinationSpeed = 0.0f;
 bool motorEnabled = false;
+float batteryLevel = 0.0f;
+float batteryAccelerationFactor = 1.0f;
 
 void Setup() {
 	mCpu_Setup();
@@ -90,6 +92,10 @@ void pixySetup(){
 	pixy.setLED(currentConfig->pixyLedColorR, currentConfig->pixyLedColorG, currentConfig->pixyLedColorB);
 	pixy.setLamp((uint8_t)(currentConfig->pixyLamps>>8), (uint8_t)(currentConfig->pixyLamps>>0));
 	pixy.changeProg(currentConfig->cameraProgram);
+}
+
+float speedBattery(float destAcceleration) { // Speed Berry with Destination Excel
+	return destAcceleration * batteryAccelerationFactor;
 }
 
 void controlCar() {
@@ -225,11 +231,27 @@ void defineTasks() {
 	t_cameraAlgorithm = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		controlCar();
 
-		if(motorEnabled)
-			mTimer_SetMotorDuty(destinationSpeed, destinationSpeed);
-		else
+		if(motorEnabled) {
+			float speed = speedBattery(destinationSpeed);
+			mTimer_SetMotorDuty(speed, speed);
+		} else
 			mTimer_SetMotorDuty(0, 0);
 	}, currentConfig->timePerFrame);
+
+	t_batteryLevelMonitor = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
+		batteryLevel = mAd_Read(ADCInputEnum::kUBatt);
+		for (uint8_t i = 1; i < currentConfig->batteryLevelLookupLength; i++)
+		{
+			if (batteryLevel > currentConfig->batteryLevelLookup[i].batteryLevel) {
+				BatteryLevelLookupEntry currentEntry = currentConfig->batteryLevelLookup[i];
+				BatteryLevelLookupEntry previousEntry = currentConfig->batteryLevelLookup[i - 1];
+				float scaler = (batteryLevel - currentEntry.batteryLevel) / (previousEntry.batteryLevel - currentEntry.batteryLevel);
+				batteryAccelerationFactor = scaler * (previousEntry.accelerationFactor - currentEntry.accelerationFactor) + currentEntry.accelerationFactor;
+				break;
+			}
+		}
+		
+	}, currentConfig->batteryLevelCheckInterval);
 }
 
 int main(){

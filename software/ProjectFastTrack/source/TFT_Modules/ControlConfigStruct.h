@@ -17,6 +17,11 @@ struct RowConfig {
     uint8_t maxCenterDifferenceForTurn = 0;
 };
 
+struct BatteryLevelLookupEntry {
+    float batteryLevel = 0.0f;
+    float accelerationFactor = 1.0f;
+};
+
 struct ControlConfig {
     uint16_t timePerFrame = 17;
 
@@ -40,6 +45,11 @@ struct ControlConfig {
     float brakeSpeed = 0.0f;
     float straightSpeed = 0.0f;
     float turnSpeed = 0.0f;
+
+    // Speed-Battery-Control
+    uint16_t batteryLevelCheckInterval = 1000;
+    uint8_t batteryLevelLookupLength = 0;
+    BatteryLevelLookupEntry* batteryLevelLookup; // From top down (first entry highest voltage)
 };
 
 #endif

@@ -77,4 +77,14 @@ void loadControlConfigs(uint8_t* controlConfigsLength, ControlConfig* controlCon
     controlConfigs[0].rowConfigs[5].centerPixel= 158;
     controlConfigs[0].rowConfigs[5].minThickness = 0;
     controlConfigs[0].rowConfigs[5].maxCenterDifferenceForTurn = 10;
+
+    // Battery - SORTED!
+    controlConfigs[0].batteryLevelCheckInterval = 1000;
+    controlConfigs[0].batteryLevelLookupLength = 2;
+    controlConfigs[0].batteryLevelLookup = (BatteryLevelLookupEntry*)malloc(sizeof(BatteryLevelLookupEntry) * controlConfigs[0].batteryLevelLookupLength);
+    controlConfigs[0].batteryLevelLookup[0].batteryLevel = 8.5f;
+    controlConfigs[0].batteryLevelLookup[0].accelerationFactor = 1.0f;
+    controlConfigs[0].batteryLevelLookup[1].batteryLevel = 6.9f;
+    controlConfigs[0].batteryLevelLookup[1].accelerationFactor = 1.0f;
+
 }
