@@ -174,7 +174,7 @@ void controlCar() {
 	steeringAngle /= 79.0f;
 	steeringAngle *= steeringAngle;
 
-	steeringAngle *= (currentConfig->steeringFactor / 6) * (6 - countStraightTracks);
+	steeringAngle *= (currentConfig->steeringPotentialFactor / 6) * (6 - countStraightTracks);
 
 	float steeringAngleDerivative = ((lastSteeringAngle - steeringAngle) / currentConfig->timePerFrame) * currentConfig->steeringDerivativeFactor;
 

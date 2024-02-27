@@ -25,7 +25,7 @@ struct ControlConfig {
     const char* cameraProgram = "video";
     uint8_t rowConfigLength = 0;
     RowConfig* rowConfigs;
-    float steeringFactor = 0.0f;
+    float steeringPotentialFactor = 0.0f;
     float steeringDerivativeFactor = 0.0f;
     uint8_t brakeFrameCount = 0;
     uint8_t brakeRowDistance = 0;

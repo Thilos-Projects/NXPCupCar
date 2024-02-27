@@ -13,7 +13,7 @@ void loadControlConfigs(uint8_t* controlConfigsLength, ControlConfig* controlCon
     controlConfigs[0].pixyLedColorB = 0;
     controlConfigs[0].pixyLamps = 0x0101;
     controlConfigs[0].cameraProgram = "video";
-    controlConfigs[0].steeringFactor = 3.0f;
+    controlConfigs[0].steeringPotentialFactor = 3.0f;
     controlConfigs[0].steeringDerivativeFactor = 1.0f;
     controlConfigs[0].brakeFrameCount = 3;
     controlConfigs[0].brakeRowDistance = 2;
