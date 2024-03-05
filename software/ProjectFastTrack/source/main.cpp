@@ -40,19 +40,14 @@ ControlConfig* currentConfig;
 
 //Lokale Definitionen
 Pixy2SPI_SS pixy;
-uint8_t rowAnalysisLength = 0;
-CameraAnalysis::SingleRowAnalysis singleRowAnalysis[2]; // Should be maximum size of row configs
-
 //Task Definitionen
 Scheduler::taskHandle* t_testMotorButton;
 Scheduler::taskHandle* t_cameraAlgorithm;
 Scheduler::taskHandle* t_batteryLevelMonitor;
+Scheduler::taskHandle* t_dipSwitchConfig;
 
 //Bennenungen für Programmstruktur
 void pixySetup();
-int16_t getBestTrackIndexFromMultipleTracks(CameraAnalysis::SingleRowAnalysis* singleRow);
-// TODO: Refactor
-bool currentRowAnalysis_160(float* steeringAngle);
 
 float destinationSpeed = 0.0f;
 bool motorEnabled = false;
@@ -103,6 +98,7 @@ void controlCar() {
 	static CameraAnalysis::SingleRowAnalysis currentRowAnalysis;
 	static float lastSteeringAngle = 0.0f;
 	static uint8_t brakeAppliedFor = 0;
+	static uint8_t brakeCooledDownFor = 0;
 	int16_t trackCenterDifferences[6]; 
 	uint8_t currentRowIndex;
 	uint8_t countStraightTracks = 0;
@@ -167,12 +163,13 @@ void controlCar() {
 	// Control Car
 	float avgTrackCenterDifference = trackCenterDifferences[0];
 	if (currentRowIndex != 0) {
-		for (uint8_t i = 1; i < currentRowIndex; i++)
-		{
-			avgTrackCenterDifference += trackCenterDifferences[i];
-		}
-		avgTrackCenterDifference /= currentRowIndex;
-	}	
+		//for (uint8_t i = 1; i < currentRowIndex; i++)
+		//{
+		//	avgTrackCenterDifference += trackCenterDifferences[i];
+		//}
+		//avgTrackCenterDifference /= currentRowIndex;
+		avgTrackCenterDifference = trackCenterDifferences[currentRowIndex-1];	//changed
+	}
 	
 
 	// Steering
@@ -197,17 +194,20 @@ void controlCar() {
 
 	// Speed
 	if (currentRowIndex < currentConfig->brakeRowDistance) { // Break or Turn
-		if (brakeAppliedFor < currentConfig->brakeFrameCount) {
+		if (brakeAppliedFor < currentConfig->brakeFrameCount && brakeCooledDownFor == currentConfig->brakeFrameCooldown) {
 			destinationSpeed = currentConfig->brakeSpeed;
 			brakeAppliedFor++;
 		} else {
 			destinationSpeed = currentConfig->turnSpeed;
+			brakeCooledDownFor = 0;
 		}
 	} else { // Straight
 		brakeAppliedFor = 0;
+		brakeCooledDownFor++;
+		if(brakeCooledDownFor > currentConfig->brakeFrameCooldown)
+			brakeCooledDownFor = currentConfig->brakeFrameCooldown;
 		destinationSpeed = currentConfig->straightSpeed;
 	}
-
 }
 
 
@@ -252,6 +252,16 @@ void defineTasks() {
 		}
 		
 	}, currentConfig->batteryLevelCheckInterval);
+
+	t_dipSwitchConfig = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
+		uint8_t switchmode = 0;
+		switchmode += mSwitch_ReadSwitch(SwitchEnum::kSw1);
+		switchmode += mSwitch_ReadSwitch(SwitchEnum::kSw2) * 2;
+		switchmode += mSwitch_ReadSwitch(SwitchEnum::kSw3) * 4;
+		switchmode += mSwitch_ReadSwitch(SwitchEnum::kSw4) * 8;
+		if(switchmode < controlConfigsLength)
+			currentConfig = &controlConfigs[switchmode];
+	}, 1000);
 }
 
 int main(){

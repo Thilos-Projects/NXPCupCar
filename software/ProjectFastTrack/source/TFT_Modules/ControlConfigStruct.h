@@ -40,7 +40,8 @@ struct ControlConfig {
     float steeringDerivativeFactor = 0.0f;
 
     // Speed-Stuff
-    uint8_t brakeFrameCount = 0;
+    uint8_t brakeFrameCount = 0;			//kleiner 255
+    uint8_t brakeFrameCooldown = 0;			//kleiner 255
     uint8_t brakeRowDistance = 0;
     float brakeSpeed = 0.0f;
     float straightSpeed = 0.0f;
