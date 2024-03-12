@@ -163,12 +163,12 @@ void controlCar() {
 	// Control Car
 	float avgTrackCenterDifference = trackCenterDifferences[0];
 	if (currentRowIndex != 0) {
-		//for (uint8_t i = 1; i < currentRowIndex; i++)
-		//{
-		//	avgTrackCenterDifference += trackCenterDifferences[i];
-		//}
-		//avgTrackCenterDifference /= currentRowIndex;
-		avgTrackCenterDifference = trackCenterDifferences[currentRowIndex-1];	//changed
+		for (uint8_t i = 1; i < currentRowIndex; i++)
+		{
+			avgTrackCenterDifference += trackCenterDifferences[i];
+		}
+		avgTrackCenterDifference /= currentRowIndex;
+		//avgTrackCenterDifference = trackCenterDifferences[currentRowIndex-1];	//changed
 	}
 	
 
@@ -179,9 +179,9 @@ void controlCar() {
 
 	steeringAngle *= (currentConfig->steeringPotentialFactor / 6) * (6 - countStraightTracks);
 
-	float steeringAngleDerivative = ((lastSteeringAngle - steeringAngle) / currentConfig->timePerFrame) * currentConfig->steeringDerivativeFactor;
+	//float steeringAngleDerivative = ((lastSteeringAngle - steeringAngle) /*currentConfig->timePerFrame*/) * currentConfig->steeringDerivativeFactor;
 
-	steeringAngle += steeringAngleDerivative;
+	//steeringAngle += steeringAngleDerivative;
 
 	if (avgTrackCenterDifference < 0) {
 		lastSteeringAngle = -steeringAngle + currentConfig->servoSteeringOffset;
@@ -233,13 +233,14 @@ void defineTasks() {
 
 		if(motorEnabled) {
 			float speed = speedBattery(destinationSpeed);
-			mTimer_SetMotorDuty(speed, speed);
+			mTimer_SetMotorDuty(speed * 1.05f + 0.05f*speed/abs(speed), speed); //Änderung: Motoren Gleich Schnell fahren lassen
 		} else
 			mTimer_SetMotorDuty(0, 0);
 	}, currentConfig->timePerFrame);
 
 	t_batteryLevelMonitor = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		batteryLevel = mAd_Read(ADCInputEnum::kUBatt);
+		printf("Batterie Level: %d\n", (int32_t)(batteryLevel*1000));
 		for (uint8_t i = 1; i < currentConfig->batteryLevelLookupLength; i++)
 		{
 			if (batteryLevel > currentConfig->batteryLevelLookup[i].batteryLevel) {

@@ -50,7 +50,7 @@ $History: $
 // Constantes
 //------------------------------------------------------------
 // FTM0 pour la commande des PWM des moteurs DC
-#define TFC_MOTOR_SWITCHING_FREQUENCY ((float)(20000.0))
+#define TFC_MOTOR_SWITCHING_FREQUENCY ((float)(10000.0)) //TFT: Ursprünglich 20000.0
 #define FTM0_MOD_VALUE (int)((float)(PERIPHERAL_BUS_CLOCK) / TFC_MOTOR_SWITCHING_FREQUENCY)
 #define FTM0_CLOCK PERIPHERAL_BUS_CLOCK
 #define FTM0_CLK_PRESCALE 0
