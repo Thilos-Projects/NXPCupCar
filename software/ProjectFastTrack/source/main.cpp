@@ -147,6 +147,7 @@ void controlCar() {
 				mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
 				countTurnTracks++;
 				trackCenterDifferences[currentRowIndex] = trackCenterDifference;
+				currentRowIndex++;
 				break;
 			} else { // Crossing Strack
 				mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOn);
@@ -161,23 +162,26 @@ void controlCar() {
 	}
 
 	// Control Car
-	float avgTrackCenterDifference = trackCenterDifferences[0];
-	if (currentRowIndex != 0) {
-		for (uint8_t i = 1; i < currentRowIndex; i++)
-		{
-			avgTrackCenterDifference += trackCenterDifferences[i];
-		}
-		avgTrackCenterDifference /= currentRowIndex;
-		//avgTrackCenterDifference = trackCenterDifferences[currentRowIndex-1];	//changed
+	float avgTrackCenterDifference = 0;
+	float weightSumm = 0;
+	for (uint8_t i = 0; i < currentRowIndex; i++)
+	{
+		//printf("trackCenterDifferences[%d]: %d, %d\t", i, (int32_t)(trackCenterDifferences[i]), (int32_t)(currentConfig->rowConfigs[i].weight * 1));
+		avgTrackCenterDifference += trackCenterDifferences[i] * currentConfig->rowConfigs[i].weight;
+		weightSumm += currentConfig->rowConfigs[i].weight;
 	}
+
+	avgTrackCenterDifference /= currentRowIndex * weightSumm;
+	//avgTrackCenterDifference = trackCenterDifferences[currentRowIndex-1];	//changed
 	
+	//printf("avgTrackCenterDifference: %d, %d, %d\n", (int32_t)(avgTrackCenterDifference * 1), currentRowIndex, (int32_t)weightSumm);
 
 	// Steering
 	float steeringAngle = avgTrackCenterDifference;
 	steeringAngle /= 79.0f;
 	steeringAngle *= steeringAngle;
 
-	steeringAngle *= (currentConfig->steeringPotentialFactor / 6) * (6 - countStraightTracks);
+	steeringAngle *= (currentConfig->steeringPotentialFactor / currentConfig->rowConfigLength) * (currentConfig->rowConfigLength - max(0,countStraightTracks - 1));
 
 	//float steeringAngleDerivative = ((lastSteeringAngle - steeringAngle) /*currentConfig->timePerFrame*/) * currentConfig->steeringDerivativeFactor;
 

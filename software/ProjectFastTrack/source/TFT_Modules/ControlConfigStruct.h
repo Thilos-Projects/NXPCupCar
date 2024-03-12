@@ -15,6 +15,7 @@ struct RowConfig {
     uint16_t centerPixel = 158;
     uint16_t minThickness = 0;
     uint8_t maxCenterDifferenceForTurn = 0;
+    float weight = 1.0f;
 };
 
 struct BatteryLevelLookupEntry {
@@ -38,6 +39,8 @@ struct ControlConfig {
     float servoSteeringOffset = 0.0f;
     float steeringPotentialFactor = 0.0f;
     float steeringDerivativeFactor = 0.0f;
+
+    uint8_t steeringHoldframesAfterTurn = 0;
 
     // Speed-Stuff
     uint8_t brakeFrameCount = 0;			//kleiner 255
