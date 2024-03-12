@@ -84,7 +84,6 @@ section Sonstiges
     Prüfung Autonomes Fahren : crit, milestone, p9, 2024-03-15, 0d
     Ender der Vorlesungszeit : done, milestone, p3, 2024-01-28, 1d
 
-    [Vorbehalt] Vorentscheid: crit, milestone, pc1, 2024-04-03, 0d
-    [Vorbehalt] Vorentscheid: crit, milestone, pc1, 2024-04-17, 0d
+    Vorentscheid Eindhoven: crit, milestone, nxp0, 2024-04-17, 0d
 
 ```
