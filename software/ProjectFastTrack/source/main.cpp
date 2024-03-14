@@ -248,7 +248,6 @@ void defineTasks() {
 			}
 			if (batteryLevel < currentConfig->batteryLevelLookup[i].batteryLevel &&
 				currentConfig->batteryLevelLookup[i].disableWhenLower) {
-				motorEnabled = false;
 				localBatDisable = true;
 				break;
 			} else {
