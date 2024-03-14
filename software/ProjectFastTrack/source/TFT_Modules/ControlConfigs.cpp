@@ -86,12 +86,14 @@ void controllConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].batteryLevelCheckInterval = 1000;
     controlConfigs[configIndex].batteryLevelLookupLength = 3;
     controlConfigs[configIndex].batteryLevelLookup = (BatteryLevelLookupEntry*)malloc(sizeof(BatteryLevelLookupEntry) * controlConfigs[configIndex].batteryLevelLookupLength);
-    controlConfigs[configIndex].batteryLevelLookup[0].batteryLevel = 8.5f;
+    controlConfigs[configIndex].batteryLevelLookup[0].batteryLevel = 13.0f;
     controlConfigs[configIndex].batteryLevelLookup[0].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[1].batteryLevel = 7.3f;
+    controlConfigs[configIndex].batteryLevelLookup[1].batteryLevel = 8.5f;
     controlConfigs[configIndex].batteryLevelLookup[1].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[2].batteryLevel = 6.9f;
+    controlConfigs[configIndex].batteryLevelLookup[2].batteryLevel = 7.3f;
     controlConfigs[configIndex].batteryLevelLookup[2].accelerationFactor = 1.0f;
+    controlConfigs[configIndex].batteryLevelLookup[3].batteryLevel = 6.9f;
+    controlConfigs[configIndex].batteryLevelLookup[3].accelerationFactor = 1.0f;
 
 }
 

@@ -217,19 +217,9 @@ void controlCar() {
 
 void defineTasks() {
 	t_testMotorButton = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
-		static bool buttonState = false;
-
-		bool pressed = mSwitch_ReadPushBut(kPushButSW1);
-
-		if(buttonState && !pressed){
-			buttonState = false;
-			motorEnabled = !motorEnabled;
-			if(!motorEnabled)
-				mTimer_SetMotorDuty(0, 0);
-		}
-		if(!buttonState && pressed){
-			buttonState = true;
-		}
+		motorEnabled = mSwitch_ReadSwitch(SwitchEnum::kSw4);
+		if(!motorEnabled)
+			mTimer_SetMotorDuty(0, 0);
 	}, 250, true, false);
 
 	t_cameraAlgorithm = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
@@ -263,7 +253,6 @@ void defineTasks() {
 		switchmode += mSwitch_ReadSwitch(SwitchEnum::kSw1);
 		switchmode += mSwitch_ReadSwitch(SwitchEnum::kSw2) * 2;
 		switchmode += mSwitch_ReadSwitch(SwitchEnum::kSw3) * 4;
-		switchmode += mSwitch_ReadSwitch(SwitchEnum::kSw4) * 8;
 		if(switchmode < controlConfigsLength)
 			currentConfig = &controlConfigs[switchmode];
 	}, 1000);
