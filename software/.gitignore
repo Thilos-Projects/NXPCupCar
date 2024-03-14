@@ -2,3 +2,4 @@
 *.log
 /.mcuxpresso*
 .settings/**
+script.jlink

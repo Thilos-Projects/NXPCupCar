@@ -1,7 +1,0 @@
-ExitOnError 1
-r
-h
-loadfile "C:\Users\tomse\Documents\Studium\Git-Projekte\NXPCupCar\software\ProjectFastTrack\Release\ProjectFastTrack.hex"
-qc
-
-qc
