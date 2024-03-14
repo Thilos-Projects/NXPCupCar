@@ -225,8 +225,9 @@ void defineTasks() {
 
 	t_cameraAlgorithm = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		controlCar();
-
-		if(motorEnabled){// && !batteryDisable) {
+		// TODO
+		// if(motorEnabled && !batteryDisable) {
+		if(motorEnabled){
 			float speed = speedBattery(destinationSpeed);
 			mTimer_SetMotorDuty(speed * 1.05f + 0.05f*speed/abs(speed), speed); //Änderung: Motoren Gleich Schnell fahren lassen
 		} else
