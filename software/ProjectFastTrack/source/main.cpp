@@ -226,7 +226,7 @@ void defineTasks() {
 	t_cameraAlgorithm = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		controlCar();
 
-		if(motorEnabled && !batteryDisable) {
+		if(motorEnabled){// && !batteryDisable) {
 			float speed = speedBattery(destinationSpeed);
 			mTimer_SetMotorDuty(speed * 1.05f + 0.05f*speed/abs(speed), speed); //Änderung: Motoren Gleich Schnell fahren lassen
 		} else
@@ -248,7 +248,7 @@ void defineTasks() {
 			}
 			if (batteryLevel < currentConfig->batteryLevelLookup[i].batteryLevel &&
 				currentConfig->batteryLevelLookup[i].disableWhenLower) {
-				motorEnabled = false;
+				//motorEnabled = false;
 				localBatDisable = true;
 				break;
 			} else {
