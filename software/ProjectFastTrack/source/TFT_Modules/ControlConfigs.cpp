@@ -15,9 +15,9 @@ void controllConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].brakeFrameCount = 3;
     controlConfigs[configIndex].brakeFrameCooldown = 0;
     controlConfigs[configIndex].brakeRowDistance = 2;
-    controlConfigs[configIndex].brakeSpeed = 0.22f;
-    controlConfigs[configIndex].straightSpeed = 0.22f;
-    controlConfigs[configIndex].turnSpeed = 0.22f;
+    controlConfigs[configIndex].brakeSpeed = 0.2f;
+    controlConfigs[configIndex].straightSpeed = 0.2f;
+    controlConfigs[configIndex].turnSpeed = 0.2f;
 
     controlConfigs[configIndex].rowConfigLength = 6;
     controlConfigs[configIndex].rowConfigs = (RowConfig*)malloc(sizeof(RowConfig) * controlConfigs[configIndex].rowConfigLength);
@@ -30,7 +30,7 @@ void controllConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[0].centerPixel = 158;
     controlConfigs[configIndex].rowConfigs[0].minThickness = 4;
     controlConfigs[configIndex].rowConfigs[0].maxCenterDifferenceForTurn = 20;
-    controlConfigs[configIndex].rowConfigs[0].weight = 10.0f;
+    controlConfigs[configIndex].rowConfigs[0].weight = 5.0f;
     // Second Row Config
     controlConfigs[configIndex].rowConfigs[1].row = 118;
     controlConfigs[configIndex].rowConfigs[1].rowClose = 118;
@@ -40,7 +40,7 @@ void controllConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[1].centerPixel= 158;
     controlConfigs[configIndex].rowConfigs[1].minThickness = 4;
     controlConfigs[configIndex].rowConfigs[1].maxCenterDifferenceForTurn = 20;
-    controlConfigs[configIndex].rowConfigs[1].weight = 8.0f;
+    controlConfigs[configIndex].rowConfigs[1].weight = 4.0f;
     // Third Row Config
     controlConfigs[configIndex].rowConfigs[2].row = 96;
     controlConfigs[configIndex].rowConfigs[2].rowClose = 96;
@@ -50,7 +50,7 @@ void controllConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[2].centerPixel= 158;
     controlConfigs[configIndex].rowConfigs[2].minThickness = 3;
     controlConfigs[configIndex].rowConfigs[2].maxCenterDifferenceForTurn = 15;
-    controlConfigs[configIndex].rowConfigs[2].weight = 6.0f;
+    controlConfigs[configIndex].rowConfigs[2].weight = 3.0f;
     // Fourth Row Config
     controlConfigs[configIndex].rowConfigs[3].row = 82;
     controlConfigs[configIndex].rowConfigs[3].rowClose = 77;
@@ -60,7 +60,7 @@ void controllConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[3].centerPixel= 158;
     controlConfigs[configIndex].rowConfigs[3].minThickness = 2;
     controlConfigs[configIndex].rowConfigs[3].maxCenterDifferenceForTurn = 15;
-    controlConfigs[configIndex].rowConfigs[3].weight = 4.0f;
+    controlConfigs[configIndex].rowConfigs[3].weight = 2.0f;
     // Fifth Row Config
     controlConfigs[configIndex].rowConfigs[4].row = 74;
     controlConfigs[configIndex].rowConfigs[4].rowClose = 69;
@@ -70,7 +70,7 @@ void controllConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[4].centerPixel= 158;
     controlConfigs[configIndex].rowConfigs[4].minThickness = 1;
     controlConfigs[configIndex].rowConfigs[4].maxCenterDifferenceForTurn = 10;
-    controlConfigs[configIndex].rowConfigs[4].weight = 2.0f;
+    controlConfigs[configIndex].rowConfigs[4].weight = 1.0f;
     // Sixth Row Config
     controlConfigs[configIndex].rowConfigs[5].row = 58;
     controlConfigs[configIndex].rowConfigs[5].rowClose = 53;
