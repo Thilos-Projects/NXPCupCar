@@ -9,14 +9,14 @@ void controllConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].pixyLedColorB = 0;
     controlConfigs[configIndex].pixyLamps = 0x0101;
     controlConfigs[configIndex].cameraProgram = "video";
-    controlConfigs[configIndex].steeringPotentialFactor = 2.0f;
+    controlConfigs[configIndex].steeringPotentialFactor = 2.1f;
     controlConfigs[configIndex].steeringDerivativeFactor = 0.0f;
     controlConfigs[configIndex].steeringHoldframesAfterTurn = 0;
-    controlConfigs[configIndex].brakeFrameCount = 3;
-    controlConfigs[configIndex].brakeFrameCooldown = 5;
+    controlConfigs[configIndex].brakeFrameCount = 4;
+    controlConfigs[configIndex].brakeFrameCooldown = 10;
     controlConfigs[configIndex].brakeRowDistance = 2;
-    controlConfigs[configIndex].brakeSpeed = -0.1f;
-    controlConfigs[configIndex].straightSpeed = 0.3f;
+    controlConfigs[configIndex].brakeSpeed = -0.15f;
+    controlConfigs[configIndex].straightSpeed = 0.25f;
     controlConfigs[configIndex].turnSpeed = 0.2f;
 
     controlConfigs[configIndex].rowConfigLength = 6;
