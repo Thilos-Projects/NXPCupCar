@@ -21,6 +21,7 @@ struct RowConfig {
 struct BatteryLevelLookupEntry {
     float batteryLevel = 0.0f;
     float accelerationFactor = 1.0f;
+    bool disableWhenLower = false;
 };
 
 struct ControlConfig {

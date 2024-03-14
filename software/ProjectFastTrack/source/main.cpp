@@ -53,6 +53,7 @@ float destinationSpeed = 0.0f;
 bool motorEnabled = false;
 float batteryLevel = 0.0f;
 float batteryAccelerationFactor = 1.0f;
+bool batteryDisable = false;
 
 void Setup() {
 	mCpu_Setup();
@@ -225,7 +226,7 @@ void defineTasks() {
 	t_cameraAlgorithm = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		controlCar();
 
-		if(motorEnabled) {
+		if(motorEnabled && !batteryDisable) {
 			float speed = speedBattery(destinationSpeed);
 			mTimer_SetMotorDuty(speed * 1.05f + 0.05f*speed/abs(speed), speed); //Änderung: Motoren Gleich Schnell fahren lassen
 		} else
@@ -233,6 +234,7 @@ void defineTasks() {
 	}, currentConfig->timePerFrame);
 
 	t_batteryLevelMonitor = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
+		bool localBatDisable = false;
 		batteryLevel = mAd_Read(ADCInputEnum::kUBatt);
 		printf("Batterie Level: %d\n", (int32_t)(batteryLevel*1000));
 		for (uint8_t i = 1; i < currentConfig->batteryLevelLookupLength; i++)
@@ -244,7 +246,17 @@ void defineTasks() {
 				batteryAccelerationFactor = scaler * (previousEntry.accelerationFactor - currentEntry.accelerationFactor) + currentEntry.accelerationFactor;
 				break;
 			}
+			if (batteryLevel < currentConfig->batteryLevelLookup[i].batteryLevel &&
+				currentConfig->batteryLevelLookup[i].disableWhenLower) {
+				motorEnabled = false;
+				localBatDisable = true;
+				break;
+			} else {
+				localBatDisable = false;
+			}
 		}
+		if (!batteryDisable)
+			batteryDisable = localBatDisable;
 		
 	}, currentConfig->batteryLevelCheckInterval);
 

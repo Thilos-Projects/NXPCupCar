@@ -86,14 +86,30 @@ void controllConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].batteryLevelCheckInterval = 1000;
     controlConfigs[configIndex].batteryLevelLookupLength = 3;
     controlConfigs[configIndex].batteryLevelLookup = (BatteryLevelLookupEntry*)malloc(sizeof(BatteryLevelLookupEntry) * controlConfigs[configIndex].batteryLevelLookupLength);
+    // Bigger battery
     controlConfigs[configIndex].batteryLevelLookup[0].batteryLevel = 13.0f;
-    controlConfigs[configIndex].batteryLevelLookup[0].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[1].batteryLevel = 8.5f;
+    controlConfigs[configIndex].batteryLevelLookup[0].accelerationFactor = 0.8f;
+    controlConfigs[configIndex].batteryLevelLookup[1].batteryLevel = 12.5f;
     controlConfigs[configIndex].batteryLevelLookup[1].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[2].batteryLevel = 7.3f;
+    controlConfigs[configIndex].batteryLevelLookup[2].batteryLevel = 12.0f;
     controlConfigs[configIndex].batteryLevelLookup[2].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[3].batteryLevel = 6.9f;
-    controlConfigs[configIndex].batteryLevelLookup[3].accelerationFactor = 1.0f;
+    controlConfigs[configIndex].batteryLevelLookup[3].batteryLevel = 11.5f;
+    controlConfigs[configIndex].batteryLevelLookup[3].accelerationFactor = 1.1f;
+    controlConfigs[configIndex].batteryLevelLookup[4].batteryLevel = 11.0f;
+    controlConfigs[configIndex].batteryLevelLookup[4].accelerationFactor = 1.2f;
+    controlConfigs[configIndex].batteryLevelLookup[5].batteryLevel = 10.0f;
+    controlConfigs[configIndex].batteryLevelLookup[5].accelerationFactor = 1.2f;
+    controlConfigs[configIndex].batteryLevelLookup[5].disableWhenLower = true;
+    // Smaller battery
+    controlConfigs[configIndex].batteryLevelLookup[6].batteryLevel = 9.0f;
+    controlConfigs[configIndex].batteryLevelLookup[6].accelerationFactor = 1.0f;
+    controlConfigs[configIndex].batteryLevelLookup[7].batteryLevel = 8.5f;
+    controlConfigs[configIndex].batteryLevelLookup[7].accelerationFactor = 1.0f;
+    controlConfigs[configIndex].batteryLevelLookup[8].batteryLevel = 7.3f;
+    controlConfigs[configIndex].batteryLevelLookup[8].accelerationFactor = 1.0f;
+    controlConfigs[configIndex].batteryLevelLookup[9].batteryLevel = 6.9f;
+    controlConfigs[configIndex].batteryLevelLookup[9].accelerationFactor = 1.0f;
+    controlConfigs[configIndex].batteryLevelLookup[9].disableWhenLower = true;
 
 }
 
