@@ -233,7 +233,7 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].pixyLamps = 0x0101;
     controlConfigs[configIndex].cameraProgram = "video";
     controlConfigs[configIndex].steeringPotentialFactor = 2.0f;
-    controlConfigs[configIndex].steeringDerivativeFactor = 0.0f;
+    controlConfigs[configIndex].steeringDerivativeFactor = 0.5f;
     controlConfigs[configIndex].steeringHoldframesAfterTurn = 0;
     controlConfigs[configIndex].brakeFrameCount = 3;
     controlConfigs[configIndex].brakeFrameCooldown = 5;

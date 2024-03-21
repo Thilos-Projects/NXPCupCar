@@ -101,9 +101,9 @@ void controlCar() {
 	static float lastSteeringAngle = 0.0f;
 	static uint8_t brakeAppliedFor = 0;
 	static uint8_t brakeCooledDownFor = 0;
-	static int16_t trackCenterDifferences[6];
-	static uint16_t prevTrackCenters[6] = { 158, 158, 158, 158, 158, 158 };
-	static bool trackWidthOverThreshold[6];
+	static int16_t trackCenterDifferences[6]; // Size: Length of Rows
+	static uint16_t prevTrackCenters[6] = { 158, 158, 158, 158, 158, 158 }; // Size: Length of Rows
+	static bool trackWidthOverThreshold[7]; // Size: Length of Rows +1!
 	uint8_t currentRowIndex;
 	uint8_t countStraightTracks = 0;
 	uint8_t countTurnTracks = 0;
@@ -187,34 +187,27 @@ void controlCar() {
 	steeringAngle /= 79.0f;
 	steeringAngle *= steeringAngle;
 
-	steeringAngle *= currentConfig->steeringPotentialFactor;//(currentConfig->steeringPotentialFactor / currentConfig->rowConfigLength) * (currentConfig->rowConfigLength - max(0,countStraightTracks - 1));
-
-	//float steeringAngleDerivative = ((lastSteeringAngle - steeringAngle) /*currentConfig->timePerFrame*/) * currentConfig->steeringDerivativeFactor;
-
-	//steeringAngle += steeringAngleDerivative;
-
 	if (avgTrackCenterDifference < 0) {
-		lastSteeringAngle = -steeringAngle + currentConfig->servoSteeringOffset;
-		if (!steeringDiabled) {
-			mTimer_SetServoDuty(0, -steeringAngle + currentConfig->servoSteeringOffset);
-		} else {
-			mTimer_SetServoDuty(0, 0);
-		}
-		
+		steeringAngle *= -1;
 	}
-	else {
-		lastSteeringAngle = steeringAngle + currentConfig->servoSteeringOffset;
-		if (!steeringDiabled) {
-			mTimer_SetServoDuty(0, steeringAngle + currentConfig->servoSteeringOffset);
-		} else {
-			mTimer_SetServoDuty(0, 0);
-		}
-		
+
+	steeringAngle *= currentConfig->steeringPotentialFactor;
+
+	float steeringAngleDerivative = (lastSteeringAngle - steeringAngle) * currentConfig->steeringDerivativeFactor;
+
+	steeringAngle += steeringAngleDerivative;
+
+	lastSteeringAngle = steeringAngle;
+	if (!steeringDiabled) {
+		mTimer_SetServoDuty(0, steeringAngle + currentConfig->servoSteeringOffset);
+	} else {
+		mTimer_SetServoDuty(0, 0);
 	}
 
 	// Speed
 	uint8_t maxRowForSpeedCalculation = currentRowIndex;
-	for (; maxRowForSpeedCalculation != 0 && trackWidthOverThreshold[maxRowForSpeedCalculation] ; maxRowForSpeedCalculation--);
+	trackWidthOverThreshold[6] = trackWidthOverThreshold[5]; // Prevent NullPointerException
+	for (; maxRowForSpeedCalculation > 1 && trackWidthOverThreshold[maxRowForSpeedCalculation] ; maxRowForSpeedCalculation--);
 	if (maxRowForSpeedCalculation < currentConfig->brakeRowDistance) { // Break or Turn
 		if (brakeAppliedFor < currentConfig->brakeFrameCount && brakeCooledDownFor == currentConfig->brakeFrameCooldown) {
 			destinationSpeed = currentConfig->brakeSpeed;
