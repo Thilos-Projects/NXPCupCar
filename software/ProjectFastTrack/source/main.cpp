@@ -54,6 +54,7 @@ bool motorEnabled = false;
 float batteryLevel = 0.0f;
 float batteryAccelerationFactor = 1.0f;
 bool batteryDisable = false;
+bool steeringDiabled = false;
 
 void Setup() {
 	mCpu_Setup();
@@ -192,11 +193,21 @@ void controlCar() {
 
 	if (avgTrackCenterDifference < 0) {
 		lastSteeringAngle = -steeringAngle + currentConfig->servoSteeringOffset;
-		mTimer_SetServoDuty(0, -steeringAngle + currentConfig->servoSteeringOffset);
+		if (!steeringDiabled) {
+			mTimer_SetServoDuty(0, -steeringAngle + currentConfig->servoSteeringOffset);
+		} else {
+			mTimer_SetServoDuty(0, 0);
+		}
+		
 	}
 	else {
 		lastSteeringAngle = steeringAngle + currentConfig->servoSteeringOffset;
-		mTimer_SetServoDuty(0, steeringAngle + currentConfig->servoSteeringOffset);
+		if (!steeringDiabled) {
+			mTimer_SetServoDuty(0, steeringAngle + currentConfig->servoSteeringOffset);
+		} else {
+			mTimer_SetServoDuty(0, 0);
+		}
+		
 	}
 
 	// Speed
@@ -265,12 +276,24 @@ void defineTasks() {
 	}, currentConfig->batteryLevelCheckInterval);
 
 	t_dipSwitchConfig = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
+		// Load Config
+		static uint8_t lastSwitchmode = 0;
 		uint8_t switchmode = 0;
 		switchmode += mSwitch_ReadSwitch(SwitchEnum::kSw1);
 		switchmode += mSwitch_ReadSwitch(SwitchEnum::kSw2) * 2;
-		switchmode += mSwitch_ReadSwitch(SwitchEnum::kSw3) * 4;
 		if(switchmode < controlConfigsLength)
 			currentConfig = &controlConfigs[switchmode];
+		// Detect config change
+		if (lastSwitchmode != switchmode) {
+			// Update pixy color
+			pixy.setLED(currentConfig->pixyLedColorR, currentConfig->pixyLedColorG, currentConfig->pixyLedColorB);
+			pixy.setLamp((uint8_t)(currentConfig->pixyLamps>>8), (uint8_t)(currentConfig->pixyLamps>>0));
+			// Save last
+			lastSwitchmode = switchmode;
+		}
+
+		// Disable Steering
+		steeringDiabled = !mSwitch_ReadSwitch(SwitchEnum::kSw3);
 	}, 1000);
 }
 
