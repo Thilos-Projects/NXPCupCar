@@ -3,7 +3,7 @@
 
 void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].timePerFrame = 17;
-    controlConfigs[configIndex].servoSteeringOffset = -0.1f;
+    controlConfigs[configIndex].servoSteeringOffset = 0.0f;
     controlConfigs[configIndex].pixyLedColorR = 255;
     controlConfigs[configIndex].pixyLedColorG = 15;
     controlConfigs[configIndex].pixyLedColorB = 15;
@@ -121,7 +121,7 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 
 void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].timePerFrame = 17;
-	controlConfigs[configIndex].servoSteeringOffset = -0.1f;
+	controlConfigs[configIndex].servoSteeringOffset = 0.0f;
 	controlConfigs[configIndex].pixyLedColorR = 63;
 	controlConfigs[configIndex].pixyLedColorG = 255;
 	controlConfigs[configIndex].pixyLedColorB = 63;
@@ -238,7 +238,7 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 
 void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].timePerFrame = 17;
-    controlConfigs[configIndex].servoSteeringOffset = -0.1f;
+    controlConfigs[configIndex].servoSteeringOffset = 0.0f;
     controlConfigs[configIndex].pixyLedColorR = 255;
     controlConfigs[configIndex].pixyLedColorG = 255;
     controlConfigs[configIndex].pixyLedColorB = 31;
