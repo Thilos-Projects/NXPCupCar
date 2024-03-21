@@ -5,8 +5,8 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].timePerFrame = 17;
     controlConfigs[configIndex].servoSteeringOffset = -0.1f;
     controlConfigs[configIndex].pixyLedColorR = 255;
-    controlConfigs[configIndex].pixyLedColorG = 127;
-    controlConfigs[configIndex].pixyLedColorB = 0;
+    controlConfigs[configIndex].pixyLedColorG = 15;
+    controlConfigs[configIndex].pixyLedColorB = 15;
     controlConfigs[configIndex].pixyLamps = 0x0101;
     controlConfigs[configIndex].cameraProgram = "video";
     controlConfigs[configIndex].steeringPotentialFactor = 2.1f;
@@ -122,9 +122,9 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].timePerFrame = 17;
 	controlConfigs[configIndex].servoSteeringOffset = -0.1f;
-	controlConfigs[configIndex].pixyLedColorR = 255;
-	controlConfigs[configIndex].pixyLedColorG = 127;
-	controlConfigs[configIndex].pixyLedColorB = 0;
+	controlConfigs[configIndex].pixyLedColorR = 63;
+	controlConfigs[configIndex].pixyLedColorG = 255;
+	controlConfigs[configIndex].pixyLedColorB = 63;
 	controlConfigs[configIndex].pixyLamps = 0x0101;
 	controlConfigs[configIndex].cameraProgram = "video";
 	controlConfigs[configIndex].steeringPotentialFactor = 2.0f;
@@ -240,8 +240,8 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].timePerFrame = 17;
     controlConfigs[configIndex].servoSteeringOffset = -0.1f;
     controlConfigs[configIndex].pixyLedColorR = 255;
-    controlConfigs[configIndex].pixyLedColorG = 127;
-    controlConfigs[configIndex].pixyLedColorB = 0;
+    controlConfigs[configIndex].pixyLedColorG = 255;
+    controlConfigs[configIndex].pixyLedColorB = 31;
     controlConfigs[configIndex].pixyLamps = 0x0101;
     controlConfigs[configIndex].cameraProgram = "video";
     controlConfigs[configIndex].steeringPotentialFactor = 2.0f;
