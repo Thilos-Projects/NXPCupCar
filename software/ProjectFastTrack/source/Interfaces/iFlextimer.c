@@ -408,14 +408,16 @@ void iFlextimer_SetServoDuty(UInt8 aServoNumber, float aPosition)
 {
 	float aDutyCycle;
 
+	// TFT: 0.8 instead of 1
+
 	// Saturation
-	if (aPosition > 1)
+	if (aPosition > 0.8)
 	{
-		aPosition = 1;
+		aPosition = 0.8;
 	}
-	else if (aPosition < -1)
+	else if (aPosition < -0.8)
 	{
-		aPosition = -1;
+		aPosition = -0.8;
 	}
 
 	// Calcul du duty
