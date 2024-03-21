@@ -154,6 +154,9 @@ void controlCar() {
 				countTurnTracks++;
 				trackCenterDifferences[currentRowIndex] = trackCenterDifference;
 				currentRowIndex++;
+				for (uint8_t resetRowIndex = currentRowIndex; resetRowIndex < currentConfig->rowConfigLength; resetRowIndex++) {
+					prevTrackCenters[resetRowIndex] = 158;
+				}
 				break;
 			} else { // Crossing Strack
 				mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOn);
