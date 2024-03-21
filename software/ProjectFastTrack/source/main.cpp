@@ -101,7 +101,8 @@ void controlCar() {
 	static float lastSteeringAngle = 0.0f;
 	static uint8_t brakeAppliedFor = 0;
 	static uint8_t brakeCooledDownFor = 0;
-	static int16_t trackCenterDifferences[6]; 
+	static int16_t trackCenterDifferences[6];
+	static uint16_t prevTrackCenters[6] = { 158, 158, 158, 158, 158, 158 };
 	static bool trackWidthOverThreshold[6];
 	uint8_t currentRowIndex;
 	uint8_t countStraightTracks = 0;
@@ -124,7 +125,7 @@ void controlCar() {
 			currentRowConfig->edgeThreshold,
 			currentRowConfig->minEdgeWidth,
 			currentRowConfig->maxEdgeWidth,
-			currentRowConfig->centerPixel,
+			prevTrackCenters[currentRowIndex],
 			currentRowConfig->minThickness
 		);
 
@@ -132,9 +133,10 @@ void controlCar() {
 		currentRowAnalysis.getImageRow();
 		currentRowAnalysis.calculateSobelRow();
 		currentRowAnalysis.findBlankArea();
+		prevTrackCenters[currentRowIndex] = currentRowAnalysis.trackCenter;
 
 		// Detect Turn / Crossing / Straight
-		int16_t trackCenterDifference = (int16_t)currentRowAnalysis.trackCenter - (int16_t)currentRowAnalysis.centerPixel;
+		int16_t trackCenterDifference = (int16_t)currentRowAnalysis.trackCenter - 158;
 		trackWidthOverThreshold[currentRowIndex] = currentRowAnalysis.trackWidth > currentRowConfig->maxTrackWidth;
 		if (abs(trackCenterDifference) > currentRowConfig->maxCenterDifferenceForTurn) {
 			// Update Row
@@ -145,7 +147,7 @@ void controlCar() {
 			currentRowAnalysis.calculateSobelRow();
 			currentRowAnalysis.findBlankArea();
 			
-			int16_t trackCenterCloseDifference = (int16_t)currentRowAnalysis.trackCenter - (int16_t)currentRowAnalysis.centerPixel;
+			int16_t trackCenterCloseDifference = (int16_t)currentRowAnalysis.trackCenter - 158;
 
 			if ((trackCenterCloseDifference < 0) == (trackCenterDifference < 0)) { // Turn Track
 				mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);

@@ -27,7 +27,6 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[0].edgeThreshold = 40;
     controlConfigs[configIndex].rowConfigs[0].minEdgeWidth = 0;
     controlConfigs[configIndex].rowConfigs[0].maxEdgeWidth = 12;
-    controlConfigs[configIndex].rowConfigs[0].centerPixel = 158;
     controlConfigs[configIndex].rowConfigs[0].minThickness = 4;
     controlConfigs[configIndex].rowConfigs[0].maxCenterDifferenceForTurn = 20;
     controlConfigs[configIndex].rowConfigs[0].maxTrackWidth = 316;
@@ -38,7 +37,6 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[1].edgeThreshold = 40;
     controlConfigs[configIndex].rowConfigs[1].minEdgeWidth = 0;
     controlConfigs[configIndex].rowConfigs[1].maxEdgeWidth = 5;
-    controlConfigs[configIndex].rowConfigs[1].centerPixel= 158;
     controlConfigs[configIndex].rowConfigs[1].minThickness = 4;
     controlConfigs[configIndex].rowConfigs[1].maxCenterDifferenceForTurn = 20;
     controlConfigs[configIndex].rowConfigs[1].maxTrackWidth = 316;
@@ -49,7 +47,6 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[2].edgeThreshold = 40;
     controlConfigs[configIndex].rowConfigs[2].minEdgeWidth = 0;
     controlConfigs[configIndex].rowConfigs[2].maxEdgeWidth = 5;
-    controlConfigs[configIndex].rowConfigs[2].centerPixel= 158;
     controlConfigs[configIndex].rowConfigs[2].minThickness = 3;
     controlConfigs[configIndex].rowConfigs[2].maxCenterDifferenceForTurn = 15;
     controlConfigs[configIndex].rowConfigs[2].maxTrackWidth = 316;
@@ -60,7 +57,6 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[3].edgeThreshold = 40;
     controlConfigs[configIndex].rowConfigs[3].minEdgeWidth = 0;
     controlConfigs[configIndex].rowConfigs[3].maxEdgeWidth = 4;
-    controlConfigs[configIndex].rowConfigs[3].centerPixel= 158;
     controlConfigs[configIndex].rowConfigs[3].minThickness = 2;
     controlConfigs[configIndex].rowConfigs[3].maxCenterDifferenceForTurn = 15;
     controlConfigs[configIndex].rowConfigs[3].maxTrackWidth = 316;
@@ -71,7 +67,6 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[4].edgeThreshold = 40;
     controlConfigs[configIndex].rowConfigs[4].minEdgeWidth = 0;
     controlConfigs[configIndex].rowConfigs[4].maxEdgeWidth = 4;
-    controlConfigs[configIndex].rowConfigs[4].centerPixel= 158;
     controlConfigs[configIndex].rowConfigs[4].minThickness = 1;
     controlConfigs[configIndex].rowConfigs[4].maxCenterDifferenceForTurn = 10;
     controlConfigs[configIndex].rowConfigs[4].maxTrackWidth = 316;
@@ -82,7 +77,6 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[5].edgeThreshold = 40;
     controlConfigs[configIndex].rowConfigs[5].minEdgeWidth = 0;
     controlConfigs[configIndex].rowConfigs[5].maxEdgeWidth = 3;
-    controlConfigs[configIndex].rowConfigs[5].centerPixel= 158;
     controlConfigs[configIndex].rowConfigs[5].minThickness = 0;
     controlConfigs[configIndex].rowConfigs[5].maxCenterDifferenceForTurn = 10;
     controlConfigs[configIndex].rowConfigs[5].maxTrackWidth = 316;
@@ -145,7 +139,6 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].rowConfigs[0].edgeThreshold = 40;
 	controlConfigs[configIndex].rowConfigs[0].minEdgeWidth = 0;
 	controlConfigs[configIndex].rowConfigs[0].maxEdgeWidth = 12;
-	controlConfigs[configIndex].rowConfigs[0].centerPixel = 158;
 	controlConfigs[configIndex].rowConfigs[0].minThickness = 4;
 	controlConfigs[configIndex].rowConfigs[0].maxCenterDifferenceForTurn = 20;
     controlConfigs[configIndex].rowConfigs[0].maxTrackWidth = 316;
@@ -156,7 +149,6 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].rowConfigs[1].edgeThreshold = 40;
 	controlConfigs[configIndex].rowConfigs[1].minEdgeWidth = 0;
 	controlConfigs[configIndex].rowConfigs[1].maxEdgeWidth = 5;
-	controlConfigs[configIndex].rowConfigs[1].centerPixel= 158;
 	controlConfigs[configIndex].rowConfigs[1].minThickness = 4;
 	controlConfigs[configIndex].rowConfigs[1].maxCenterDifferenceForTurn = 20;
     controlConfigs[configIndex].rowConfigs[1].maxTrackWidth = 316;
@@ -167,7 +159,6 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].rowConfigs[2].edgeThreshold = 40;
 	controlConfigs[configIndex].rowConfigs[2].minEdgeWidth = 0;
 	controlConfigs[configIndex].rowConfigs[2].maxEdgeWidth = 5;
-	controlConfigs[configIndex].rowConfigs[2].centerPixel= 158;
 	controlConfigs[configIndex].rowConfigs[2].minThickness = 3;
 	controlConfigs[configIndex].rowConfigs[2].maxCenterDifferenceForTurn = 15;
     controlConfigs[configIndex].rowConfigs[2].maxTrackWidth = 316;
@@ -178,7 +169,6 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].rowConfigs[3].edgeThreshold = 40;
 	controlConfigs[configIndex].rowConfigs[3].minEdgeWidth = 0;
 	controlConfigs[configIndex].rowConfigs[3].maxEdgeWidth = 4;
-	controlConfigs[configIndex].rowConfigs[3].centerPixel= 158;
 	controlConfigs[configIndex].rowConfigs[3].minThickness = 2;
 	controlConfigs[configIndex].rowConfigs[3].maxCenterDifferenceForTurn = 15;
     controlConfigs[configIndex].rowConfigs[3].maxTrackWidth = 316;
@@ -189,7 +179,6 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].rowConfigs[4].edgeThreshold = 40;
 	controlConfigs[configIndex].rowConfigs[4].minEdgeWidth = 0;
 	controlConfigs[configIndex].rowConfigs[4].maxEdgeWidth = 4;
-	controlConfigs[configIndex].rowConfigs[4].centerPixel= 158;
 	controlConfigs[configIndex].rowConfigs[4].minThickness = 1;
 	controlConfigs[configIndex].rowConfigs[4].maxCenterDifferenceForTurn = 10;
     controlConfigs[configIndex].rowConfigs[4].maxTrackWidth = 316;
@@ -200,7 +189,6 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].rowConfigs[5].edgeThreshold = 40;
 	controlConfigs[configIndex].rowConfigs[5].minEdgeWidth = 0;
 	controlConfigs[configIndex].rowConfigs[5].maxEdgeWidth = 3;
-	controlConfigs[configIndex].rowConfigs[5].centerPixel= 158;
 	controlConfigs[configIndex].rowConfigs[5].minThickness = 0;
 	controlConfigs[configIndex].rowConfigs[5].maxCenterDifferenceForTurn = 10;
     controlConfigs[configIndex].rowConfigs[5].maxTrackWidth = 316;
@@ -262,7 +250,6 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[0].edgeThreshold = 40;
     controlConfigs[configIndex].rowConfigs[0].minEdgeWidth = 0;
     controlConfigs[configIndex].rowConfigs[0].maxEdgeWidth = 12;
-    controlConfigs[configIndex].rowConfigs[0].centerPixel = 158;
     controlConfigs[configIndex].rowConfigs[0].minThickness = 4;
     controlConfigs[configIndex].rowConfigs[0].maxCenterDifferenceForTurn = 20;
     controlConfigs[configIndex].rowConfigs[0].maxTrackWidth = 316;
@@ -273,7 +260,6 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[1].edgeThreshold = 40;
     controlConfigs[configIndex].rowConfigs[1].minEdgeWidth = 0;
     controlConfigs[configIndex].rowConfigs[1].maxEdgeWidth = 5;
-    controlConfigs[configIndex].rowConfigs[1].centerPixel= 158;
     controlConfigs[configIndex].rowConfigs[1].minThickness = 4;
     controlConfigs[configIndex].rowConfigs[1].maxCenterDifferenceForTurn = 20;
     controlConfigs[configIndex].rowConfigs[1].maxTrackWidth = 316;
@@ -284,7 +270,6 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[2].edgeThreshold = 40;
     controlConfigs[configIndex].rowConfigs[2].minEdgeWidth = 0;
     controlConfigs[configIndex].rowConfigs[2].maxEdgeWidth = 5;
-    controlConfigs[configIndex].rowConfigs[2].centerPixel= 158;
     controlConfigs[configIndex].rowConfigs[2].minThickness = 3;
     controlConfigs[configIndex].rowConfigs[2].maxCenterDifferenceForTurn = 15;
     controlConfigs[configIndex].rowConfigs[2].maxTrackWidth = 316;
@@ -295,7 +280,6 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[3].edgeThreshold = 40;
     controlConfigs[configIndex].rowConfigs[3].minEdgeWidth = 0;
     controlConfigs[configIndex].rowConfigs[3].maxEdgeWidth = 4;
-    controlConfigs[configIndex].rowConfigs[3].centerPixel= 158;
     controlConfigs[configIndex].rowConfigs[3].minThickness = 2;
     controlConfigs[configIndex].rowConfigs[3].maxCenterDifferenceForTurn = 15;
     controlConfigs[configIndex].rowConfigs[3].maxTrackWidth = 316;
@@ -306,7 +290,6 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[4].edgeThreshold = 40;
     controlConfigs[configIndex].rowConfigs[4].minEdgeWidth = 0;
     controlConfigs[configIndex].rowConfigs[4].maxEdgeWidth = 4;
-    controlConfigs[configIndex].rowConfigs[4].centerPixel= 158;
     controlConfigs[configIndex].rowConfigs[4].minThickness = 1;
     controlConfigs[configIndex].rowConfigs[4].maxCenterDifferenceForTurn = 10;
     controlConfigs[configIndex].rowConfigs[4].maxTrackWidth = 316;
@@ -317,7 +300,6 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[5].edgeThreshold = 40;
     controlConfigs[configIndex].rowConfigs[5].minEdgeWidth = 0;
     controlConfigs[configIndex].rowConfigs[5].maxEdgeWidth = 3;
-    controlConfigs[configIndex].rowConfigs[5].centerPixel= 158;
     controlConfigs[configIndex].rowConfigs[5].minThickness = 0;
     controlConfigs[configIndex].rowConfigs[5].maxCenterDifferenceForTurn = 10;
     controlConfigs[configIndex].rowConfigs[5].maxTrackWidth = 316;
