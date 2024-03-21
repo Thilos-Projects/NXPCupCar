@@ -100,7 +100,8 @@ void controlCar() {
 	static float lastSteeringAngle = 0.0f;
 	static uint8_t brakeAppliedFor = 0;
 	static uint8_t brakeCooledDownFor = 0;
-	int16_t trackCenterDifferences[6]; 
+	static int16_t trackCenterDifferences[6]; 
+	static bool trackWidthOverThreshold[6];
 	uint8_t currentRowIndex;
 	uint8_t countStraightTracks = 0;
 	uint8_t countTurnTracks = 0;
@@ -133,6 +134,7 @@ void controlCar() {
 
 		// Detect Turn / Crossing / Straight
 		int16_t trackCenterDifference = (int16_t)currentRowAnalysis.trackCenter - (int16_t)currentRowAnalysis.centerPixel;
+		trackWidthOverThreshold[currentRowIndex] = currentRowAnalysis.trackWidth > currentRowConfig->maxTrackWidth;
 		if (abs(trackCenterDifference) > currentRowConfig->maxCenterDifferenceForTurn) {
 			// Update Row
 			currentRowAnalysis.row = currentRowConfig->rowClose;
@@ -198,7 +200,9 @@ void controlCar() {
 	}
 
 	// Speed
-	if (currentRowIndex < currentConfig->brakeRowDistance) { // Break or Turn
+	uint8_t maxRowForSpeedCalculation = currentRowIndex;
+	for (; maxRowForSpeedCalculation != 0 && trackWidthOverThreshold[maxRowForSpeedCalculation] ; maxRowForSpeedCalculation--);
+	if (maxRowForSpeedCalculation < currentConfig->brakeRowDistance) { // Break or Turn
 		if (brakeAppliedFor < currentConfig->brakeFrameCount && brakeCooledDownFor == currentConfig->brakeFrameCooldown) {
 			destinationSpeed = currentConfig->brakeSpeed;
 			brakeAppliedFor++;

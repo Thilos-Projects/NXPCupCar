@@ -15,6 +15,7 @@ struct RowConfig {
     uint16_t centerPixel = 158;
     uint16_t minThickness = 0;
     uint8_t maxCenterDifferenceForTurn = 0;
+    uint16_t maxTrackWidth = 316;
     float weight = 1.0f;
 };
 
