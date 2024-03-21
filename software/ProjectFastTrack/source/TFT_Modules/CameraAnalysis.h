@@ -41,7 +41,7 @@ namespace CameraAnalysis {
 
 		void findBlankArea();
 
-		void Setup(Pixy2SPI_SS* pixy, uint16_t row, uint16_t edgeThreshold, 	uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t pixelMitte, uint16_t minThickness);
+		void Setup(Pixy2SPI_SS* pixy, uint16_t row, uint16_t edgeThreshold, uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t pixelMitte, uint16_t minThickness);
 
 		//----------------------Print-------------------
 		void printImageRow();
