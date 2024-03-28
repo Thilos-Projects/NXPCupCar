@@ -18,6 +18,14 @@ struct RowConfig {
     float weight = 1.0f;
 };
 
+struct ColumnConfig {
+    uint16_t column = 158;
+    uint16_t edgeThreshold = 0;
+    uint8_t minEdgeWidth = 0;
+    uint8_t maxEdgeWidth = 0;
+    uint16_t minThickness = 0;
+};
+
 struct BatteryLevelLookupEntry {
     float batteryLevel = 0.0f;
     float accelerationFactor = 1.0f;
@@ -35,6 +43,7 @@ struct ControlConfig {
     // Camera-Stuff
     uint8_t rowConfigLength = 0;
     RowConfig* rowConfigs;
+    ColumnConfig columnConfig;
 
     // Steering-Stuff
     float servoSteeringOffset = 0.0f;

@@ -82,6 +82,13 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[5].maxTrackWidth = 316;
     controlConfigs[configIndex].rowConfigs[5].weight = 1.0f;
 
+    // Column Config
+    controlConfigs[configIndex].columnConfig.column = 158;
+    controlConfigs[configIndex].columnConfig.edgeThreshold = 20;
+    controlConfigs[configIndex].columnConfig.minEdgeWidth = 0;
+    controlConfigs[configIndex].columnConfig.maxEdgeWidth = 0;
+    controlConfigs[configIndex].columnConfig.minThickness = 0;
+
     // Battery - SORTED!
     controlConfigs[configIndex].batteryLevelCheckInterval = 1000;
     controlConfigs[configIndex].batteryLevelLookupLength = 10;
@@ -194,6 +201,13 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[5].maxTrackWidth = 316;
 	controlConfigs[configIndex].rowConfigs[5].weight = 1.0f;
 
+    // Column Config
+    controlConfigs[configIndex].columnConfig.column = 158;
+    controlConfigs[configIndex].columnConfig.edgeThreshold = 20;
+    controlConfigs[configIndex].columnConfig.minEdgeWidth = 0;
+    controlConfigs[configIndex].columnConfig.maxEdgeWidth = 0;
+    controlConfigs[configIndex].columnConfig.minThickness = 0;
+
 	// Battery - SORTED!
 	controlConfigs[configIndex].batteryLevelCheckInterval = 1000;
 	controlConfigs[configIndex].batteryLevelLookupLength = 10;
@@ -304,6 +318,13 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].rowConfigs[5].maxCenterDifferenceForTurn = 10;
     controlConfigs[configIndex].rowConfigs[5].maxTrackWidth = 316;
     controlConfigs[configIndex].rowConfigs[5].weight = 1.0f;
+
+    // Column Config
+    controlConfigs[configIndex].columnConfig.column = 158;
+    controlConfigs[configIndex].columnConfig.edgeThreshold = 20;
+    controlConfigs[configIndex].columnConfig.minEdgeWidth = 0;
+    controlConfigs[configIndex].columnConfig.maxEdgeWidth = 0;
+    controlConfigs[configIndex].columnConfig.minThickness = 0;
 
     // Battery - SORTED!
     controlConfigs[configIndex].batteryLevelCheckInterval = 1000;

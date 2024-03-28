@@ -197,3 +197,95 @@ void CameraAnalysis::SingleRowAnalysis::printImageRow(){
 void CameraAnalysis::SingleRowAnalysis::printSobleRow(){
 	printArray(rowSobel, 314);
 }
+
+// Column STUFF
+
+
+void CameraAnalysis::SingleColumnAnalysis::Setup(Pixy2SPI_SS* pixy, uint16_t column, uint16_t edgeThreshold,
+		uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t minThickness) {
+	this->pixy = pixy;
+	this->column = column;
+	this->edgeThreshold = edgeThreshold;
+	this->minEdgeWidth = minEdgeWidth;
+	this->maxEdgeWidth = maxEdgeWidth;
+	this->minThickness = minThickness;
+}
+void CameraAnalysis::SingleColumnAnalysis::getImageColumn(){
+	pixy->video.getGrayRect(column, 1, column + 1, 204+1, 1, 1, columnDataBuffer + 0, false);
+}
+void CameraAnalysis::SingleColumnAnalysis::calculateSobel(){
+	for(int i = 0; i < 204; i++)
+		columnSobel[i] = (((int16_t)(*(columnDataBuffer+i))) * 2 + ((int16_t)(*(columnDataBuffer+i+2))) * -2);
+}
+
+
+bool CameraAnalysis::SingleColumnAnalysis::detectObstacle(uint8_t start) {
+	// 44 // 54 // 110 //
+
+	// TODO: Move this stuff to setup
+	uint8_t minDiffObstacleTop = 5;
+	uint8_t maxDiffObstacleTop = 15;
+	uint8_t minDiffObstacleFront = 60;
+	uint8_t maxDiffObstacleFront = 100;
+
+	uint8_t startPosition = min(40, start);
+	uint8_t endPosition = 176;
+	uint8_t foundInThreshold = 0;
+	uint8_t sobelInThreshold[206];
+	for (uint8_t i = startPosition; i < endPosition; i++) {
+		if(columnSobel[i] < -edgeThreshold || edgeThreshold < columnSobel[i]) {
+			sobelInThreshold[foundInThreshold] = i;
+			foundInThreshold++;
+		}
+	}
+	
+	uint8_t firstEdge = 0, secondEdge = 0, thirdEdge = 0;
+	bool foundObstacle = false;
+	// Search first
+	for (uint8_t i1 = 0; i1 < foundInThreshold; i1++) {
+		// Search second
+		for (uint8_t i2 = i1 + 1; i2 < foundInThreshold; i2++) {
+			// Is over max?
+			if (sobelInThreshold[i2] > sobelInThreshold[i1] + maxDiffObstacleTop)
+				break;
+			// Is second valid?
+			if (sobelInThreshold[i2] >= sobelInThreshold[i1] + minDiffObstacleTop) {
+					// Search third
+					for (uint8_t i3 = i2 + 1; i3 < foundInThreshold; i3++) {
+						// Is over max?
+						if (sobelInThreshold[i3] > sobelInThreshold[i2] + maxDiffObstacleFront)
+							break;
+						// Is third valid?
+						if (sobelInThreshold[i3] >= sobelInThreshold[i2] + minDiffObstacleFront) {
+							firstEdge = sobelInThreshold[i1];
+							secondEdge = sobelInThreshold[i2];
+							thirdEdge = sobelInThreshold[i3];
+							foundObstacle = true;
+							break;
+						}
+					}
+					if (foundObstacle)
+						break;
+				}
+		}
+		if (foundObstacle)
+			break;
+	}
+
+	return foundObstacle;
+
+}
+
+//----------------------Print-------------------
+void CameraAnalysis::SingleColumnAnalysis::printImageColumn(){
+	printArray(columnDataBuffer, 204);
+}
+void CameraAnalysis::SingleColumnAnalysis::printSobleColumn(){
+	printArray(columnSobel, 202);
+}
+void CameraAnalysis::SingleColumnAnalysis::printLines(){
+	printf("%d", 1);
+	for(int i = 2; i < 204 +1; i++)
+		printf(",\t%d", i);
+	printf("\n");
+}

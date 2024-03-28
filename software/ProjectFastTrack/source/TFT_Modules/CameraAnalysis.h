@@ -47,6 +47,35 @@ namespace CameraAnalysis {
 		void printImageRow();
 		void printSobleRow();
 	};
+	
+	struct SingleColumnAnalysis{
+
+		//Kamera Abfrage + Sobel
+		uint8_t columnDataBuffer[206];
+		int16_t columnSobel[204];
+
+		Pixy2SPI_SS* pixy;
+		uint16_t column;					
+
+		void getImageColumn();
+		void calculateSobel();
+		//Stop Kamera Abfrage + Sobel
+
+
+		uint16_t edgeThreshold; 		//current 20
+		uint8_t minEdgeWidth;			//current 0
+		uint8_t maxEdgeWidth;			//current 6
+		uint16_t minThickness;			//current 158
+
+		void Setup(Pixy2SPI_SS* pixy, uint16_t column, uint16_t edgeThreshold, uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t minThickness);
+
+		bool detectObstacle(uint8_t start);
+
+		//----------------------Print-------------------
+		void printImageColumn();
+		void printSobleColumn();
+		void printLines();
+	};
 }
 
 #endif /* TFT_MODULES_CAMERAANALYSIS_H_ */

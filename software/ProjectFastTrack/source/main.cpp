@@ -98,6 +98,7 @@ float speedBattery(float destAcceleration) { // Speed Berry with Destination Exc
 void controlCar() {
 	// Setup
 	static CameraAnalysis::SingleRowAnalysis currentRowAnalysis;
+	static CameraAnalysis::SingleColumnAnalysis columnAnalysis;
 	static float lastSteeringAngle = 0.0f;
 	static uint8_t brakeAppliedFor = 0;
 	static uint8_t brakeCooledDownFor = 0;
@@ -108,6 +109,7 @@ void controlCar() {
 	uint8_t countStraightTracks = 0;
 	uint8_t countTurnTracks = 0;
 	uint8_t countCrossingTracks = 0;
+	uint8_t lastRow = 0;
 
 	mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOff);
 	mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOff);
@@ -168,7 +170,29 @@ void controlCar() {
 			countStraightTracks++;
 			trackCenterDifferences[currentRowIndex] = trackCenterDifference;
 		}
+		
+		lastRow = currentRowConfig->row;
 	}
+
+	if (lastRow != 0) {
+		// Column detection
+		// TODO: Should not always run (only when trying to detect cube)
+		columnAnalysis.Setup(&pixy, currentConfig->columnConfig.column, currentConfig->columnConfig.edgeThreshold,
+			currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
+		columnAnalysis.getImageColumn();
+		columnAnalysis.calculateSobel();
+		bool foundObstacle = columnAnalysis.detectObstacle(lastRow);
+		
+
+		if (foundObstacle) {
+			mLeds_Write(LedMaskEnum::kMaskLed4, LedStateEnum::kLedOn);
+			// printf("Found %d %d %d\n", firstEdge, secondEdge, thirdEdge);
+			mTimer_SetMotorDuty(0, 0);
+			mTimer_SetServoDuty(0, 0);
+			while(true);
+		}
+	}
+
 
 	// Control Car
 	float avgTrackCenterDifference = 0;
