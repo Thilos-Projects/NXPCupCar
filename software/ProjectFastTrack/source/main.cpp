@@ -135,7 +135,7 @@ void controlCar() {
 	uint8_t countCrossingTracks = 0;
 	uint8_t lastRow = 0;
 
-	mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOff);
+	//mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOff);
 	mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOff);
 	mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOff);
 	mLeds_Write(LedMaskEnum::kMaskLed4, LedStateEnum::kLedOff);
@@ -176,7 +176,6 @@ void controlCar() {
 			int16_t trackCenterCloseDifference = (int16_t)currentRowAnalysis.trackCenter - 158;
 
 			if ((trackCenterCloseDifference < 0) == (trackCenterDifference < 0)) { // Turn Track
-				mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
 				countTurnTracks++;
 				trackCenterDifferences[currentRowIndex] = trackCenterDifference;
 				currentRowIndex++;
@@ -231,6 +230,9 @@ void controlCar() {
 	//avgTrackCenterDifference = trackCenterDifferences[currentRowIndex-1];	//changed
 	
 	//printf("avgTrackCenterDifference: %d, %d, %d\n", (int32_t)(avgTrackCenterDifference * 1), currentRowIndex, (int32_t)weightSumm);
+	
+	float leftSpeed, rightSpeed;
+	MotorControl::getSpeed(&leftSpeed, &rightSpeed);
 
 	// Steering
 	float steeringAngle = avgTrackCenterDifference;
@@ -241,7 +243,16 @@ void controlCar() {
 		steeringAngle *= -1;
 	}
 
-	steeringAngle *= currentConfig->steeringPotentialFactor;
+	/*float steeringAngleFactor = currentConfig->steeringPotentialFactor;
+	steeringAngleFactor += (((leftSpeed + rightSpeed) / 2) / currentConfig->steeringPotentialFactorSpeedIncrements) * currentConfig->steeringPotentialFactorPerSpeed;
+
+	steeringAngle *= steeringAngleFactor;*/
+
+	if (leftSpeed > 25 || rightSpeed > 25) {
+		steeringAngle *= 2.2f;
+	} else {
+		steeringAngle *= 1.8f;
+	}
 
 	float steeringAngleDerivative = (lastSteeringAngle - steeringAngle) * currentConfig->steeringDerivativeFactor;
 
@@ -262,8 +273,6 @@ void controlCar() {
 		trackWidthOverThreshold[6] = trackWidthOverThreshold[5]; // Prevent NullPointerException
 		for (; maxRowForSpeedCalculation > 1 && trackWidthOverThreshold[maxRowForSpeedCalculation] ; maxRowForSpeedCalculation--);
 		if (maxRowForSpeedCalculation < currentConfig->brakeRowDistance) { // Break or Turn
-			float leftSpeed, rightSpeed;
-			MotorControl::getSpeed(&leftSpeed, &rightSpeed);
 			if (brakeAppliedFor < currentConfig->brakeFrameCount && (leftSpeed > currentConfig->brakeCooldownSpeed || rightSpeed > currentConfig->brakeCooldownSpeed)) {
 				destinationSpeed = currentConfig->brakeSpeed;
 				brakeAppliedFor++;
@@ -275,6 +284,12 @@ void controlCar() {
 			brakeAppliedFor = 0;
 			destinationSpeed = currentConfig->straightSpeed;
 		}
+	}
+
+	if (leftSpeed > currentConfig->brakeCooldownSpeed || rightSpeed > currentConfig->brakeCooldownSpeed) {
+		mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
+	} else {
+		mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOff);
 	}
 }
 

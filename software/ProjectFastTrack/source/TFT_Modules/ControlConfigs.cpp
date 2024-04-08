@@ -244,12 +244,14 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].pixyLedColorB = 31;
     controlConfigs[configIndex].pixyLamps = 0x0101;
     controlConfigs[configIndex].cameraProgram = "video";
-    controlConfigs[configIndex].steeringPotentialFactor = 2.0f;
-    controlConfigs[configIndex].steeringDerivativeFactor = 0.5f;
+    controlConfigs[configIndex].steeringPotentialFactor = 1.6f;
+    controlConfigs[configIndex].steeringPotentialFactorPerSpeed = 0.4f;
+    controlConfigs[configIndex].steeringPotentialFactorSpeedIncrements = 35;
+    controlConfigs[configIndex].steeringDerivativeFactor = 0.0f;
     controlConfigs[configIndex].steeringHoldframesAfterTurn = 0;
-    controlConfigs[configIndex].brakeFrameCount = 3;
-    controlConfigs[configIndex].brakeRowDistance = 4;
-    controlConfigs[configIndex].brakeSpeed = -0.0f;
+    controlConfigs[configIndex].brakeFrameCount = 4;
+    controlConfigs[configIndex].brakeRowDistance = 3;
+    controlConfigs[configIndex].brakeSpeed = -0.5f;
     controlConfigs[configIndex].straightSpeed = 0.3f;
     controlConfigs[configIndex].turnSpeed = 0.2f;
 

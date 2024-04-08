@@ -56,6 +56,8 @@ struct ControlConfig {
     // Steering-Stuff
     float servoSteeringOffset = 0.0f;
     float steeringPotentialFactor = 0.0f;
+    float steeringPotentialFactorPerSpeed = 0.0f;
+    uint8_t steeringPotentialFactorSpeedIncrements = 1;
     float steeringDerivativeFactor = 0.0f;
 
     uint8_t steeringHoldframesAfterTurn = 0;
@@ -64,7 +66,7 @@ struct ControlConfig {
     uint8_t brakeFrameCount = 0;			//kleiner 255
     uint8_t brakeRowDistance = 0;
     uint8_t stopBrakeFrameCount = 0;
-    uint8_t brakeCooldownSpeed = 20;
+    uint8_t brakeCooldownSpeed = 25;
     float brakeSpeed = 0.0f;
     float straightSpeed = 0.0f;
     float turnSpeed = 0.0f;
