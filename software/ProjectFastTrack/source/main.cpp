@@ -125,7 +125,6 @@ void controlCar() {
 	static CameraAnalysis::SingleColumnAnalysis columnAnalysis;
 	static float lastSteeringAngle = 0.0f;
 	static uint8_t brakeAppliedFor = 0;
-	static uint8_t brakeCooledDownFor = 0;
 	static int16_t trackCenterDifferences[6]; // Size: Length of Rows
 	static uint16_t prevTrackCenters[6] = { 158, 158, 158, 158, 158, 158 }; // Size: Length of Rows
 	static bool trackWidthOverThreshold[7]; // Size: Length of Rows +1!
@@ -263,18 +262,17 @@ void controlCar() {
 		trackWidthOverThreshold[6] = trackWidthOverThreshold[5]; // Prevent NullPointerException
 		for (; maxRowForSpeedCalculation > 1 && trackWidthOverThreshold[maxRowForSpeedCalculation] ; maxRowForSpeedCalculation--);
 		if (maxRowForSpeedCalculation < currentConfig->brakeRowDistance) { // Break or Turn
-			if (brakeAppliedFor < currentConfig->brakeFrameCount && brakeCooledDownFor == currentConfig->brakeFrameCooldown) {
+			float leftSpeed, rightSpeed;
+			MotorControl::getSpeed(&leftSpeed, &rightSpeed);
+			if (brakeAppliedFor < currentConfig->brakeFrameCount && (leftSpeed > currentConfig->brakeCooldownSpeed || rightSpeed > currentConfig->brakeCooldownSpeed)) {
 				destinationSpeed = currentConfig->brakeSpeed;
 				brakeAppliedFor++;
 			} else {
 				destinationSpeed = currentConfig->turnSpeed;
-				brakeCooledDownFor = 0;
 			}
+
 		} else { // Straight
 			brakeAppliedFor = 0;
-			brakeCooledDownFor++;
-			if(brakeCooledDownFor > currentConfig->brakeFrameCooldown)
-				brakeCooledDownFor = currentConfig->brakeFrameCooldown;
 			destinationSpeed = currentConfig->straightSpeed;
 		}
 	}

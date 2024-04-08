@@ -62,9 +62,9 @@ struct ControlConfig {
 
     // Speed-Stuff
     uint8_t brakeFrameCount = 0;			//kleiner 255
-    uint8_t brakeFrameCooldown = 0;			//kleiner 255
     uint8_t brakeRowDistance = 0;
     uint8_t stopBrakeFrameCount = 0;
+    uint8_t brakeCooldownSpeed = 20;
     float brakeSpeed = 0.0f;
     float straightSpeed = 0.0f;
     float turnSpeed = 0.0f;
