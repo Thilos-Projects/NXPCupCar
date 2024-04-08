@@ -175,10 +175,8 @@ void CameraAnalysis::SingleRowAnalysis::findBlankArea() {
 	uint16_t rightEdge = getEdgeWithThickness(false, centerPixel, rowSobel, edgeThreshold, minEdgeWidth, maxEdgeWidth, minThickness);
 
 	if(rightEdge <= leftEdge){
-		mLeds_Write(LedMaskEnum::kMaskLed4, LedStateEnum::kLedOn);
-		mTimer_SetMotorDuty(0, 0);
-		mTimer_SetServoDuty(0, 0);
-		while(true);
+		// TODO: Error - Don't care :D
+		// mLeds_Write(LedMaskEnum::kMaskLed4, LedStateEnum::kLedOn);
 	}
 
 	trackWidth = rightEdge - leftEdge;

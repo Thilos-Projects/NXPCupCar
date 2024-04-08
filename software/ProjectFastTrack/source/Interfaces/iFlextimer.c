@@ -290,6 +290,7 @@ void iFlextimer_GetSpeed(float *aSpeedMotLeft, float *aSpeedMotRight)
 	*aSpeedMotRight = sSpeedRight;
 }
 
+/*
 //------------------------------------------------------------
 // Interrupt routine FTM1
 //------------------------------------------------------------
@@ -398,6 +399,7 @@ void FTM1_IRQHandler(void)
 		sOverFlowCounterR = 0;
 	}
 }
+*/
 
 //---------------------------------------------------------------------------
 // Modifie la position du servo

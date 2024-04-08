@@ -30,6 +30,7 @@ extern "C"
 #include <TFT_Modules/Scheduler.h>
 #include <TFT_Modules/CameraAnalysis.h>
 #include "TFT_Modules/ControlConfigStruct.h"
+#include "ThilosAddons/MotorControl.h"
 
 uint8_t controlConfigsLength;
 ControlConfig controlConfigs[10];
@@ -45,6 +46,7 @@ Scheduler::taskHandle* t_testMotorButton;
 Scheduler::taskHandle* t_cameraAlgorithm;
 Scheduler::taskHandle* t_batteryLevelMonitor;
 Scheduler::taskHandle* t_dipSwitchConfig;
+Scheduler::taskHandle* t_spedRead;
 
 //Bennenungen für Programmstruktur
 void pixySetup();
@@ -76,6 +78,8 @@ void Setup() {
 	pixySetup();
 
 	Scheduler::Setup();
+
+	MotorControl::Setup();
 
 	//Motor Setup (Motor Enable)
 	mTimer_EnableHBridge();
@@ -246,9 +250,9 @@ void controlCar() {
 
 	lastSteeringAngle = steeringAngle;
 	if (!steeringDiabled) {
-		mTimer_SetServoDuty(0, steeringAngle + currentConfig->servoSteeringOffset);
+		MotorControl::setServo(steeringAngle + currentConfig->servoSteeringOffset);
 	} else {
-		mTimer_SetServoDuty(0, 0);
+		MotorControl::setServo(0);
 	}
 
 	// Speed
@@ -281,7 +285,7 @@ void defineTasks() {
 	t_testMotorButton = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		motorEnabled = mSwitch_ReadSwitch(SwitchEnum::kSw4);
 		if(!motorEnabled)
-			mTimer_SetMotorDuty(0, 0);
+			MotorControl::setSpeed(0, 0);
 	}, 250, true, false);
 
 	t_cameraAlgorithm = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
@@ -290,9 +294,9 @@ void defineTasks() {
 		// if(motorEnabled && !batteryDisable) {
 		if(motorEnabled){
 			float speed = speedBattery(destinationSpeed);
-			mTimer_SetMotorDuty(speed * 1.05f + 0.05f*speed/abs(speed), speed); //Änderung: Motoren Gleich Schnell fahren lassen
+			MotorControl::setSpeed(speed * 1.05f + 0.05f*speed/abs(speed), speed); //Änderung: Motoren Gleich Schnell fahren lassen
 		} else
-			mTimer_SetMotorDuty(0, 0);
+			MotorControl::setSpeed(0, 0);
 	}, currentConfig->timePerFrame);
 
 	t_batteryLevelMonitor = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
@@ -341,6 +345,12 @@ void defineTasks() {
 		// Disable Steering
 		steeringDiabled = !mSwitch_ReadSwitch(SwitchEnum::kSw3);
 	}, 1000);
+
+	t_spedRead = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
+		float a,b;
+		MotorControl::getSpeed(&a, &b);
+		printf("Speed %d, %d\n", (int32_t)(a*100), (int32_t)(b*100));
+	}, 500, true, true);
 }
 
 int main(){
