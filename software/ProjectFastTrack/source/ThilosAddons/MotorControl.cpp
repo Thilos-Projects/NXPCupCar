@@ -111,8 +111,17 @@ void MotorControl::Setup(){
 	FTM0->PWMLOAD |= FTM_PWMLOAD_LDOK_MASK;
 }
 void MotorControl::setServo(float angle){
-	if (angle > 1) angle = 1;
-	else if (angle < -1) angle = -1;
+	// TFT: 0.8 instead of 1
+
+	// Saturation
+	if (angle > 0.8)
+	{
+		angle = 0.8;
+	}
+	else if (angle < -0.8)
+	{
+		angle = -0.8;
+	}
 
 	float aDutyCycle = (((angle + 1.0) / 2) * (SERVO_MAX_DUTY_CYCLE - SERVO_MIN_DUTY_CYCLE)) + SERVO_MIN_DUTY_CYCLE;
 
