@@ -95,6 +95,26 @@ float speedBattery(float destAcceleration) { // Speed Berry with Destination Exc
 	return destAcceleration * batteryAccelerationFactor;
 }
 
+/**
+ * stop false to reset
+ * @return true if applicable
+*/
+bool stopCar(bool stop) {
+	static uint8_t stopBrakeAppliedFor = 0;
+
+	if (stop) {
+		if (stopBrakeAppliedFor < currentConfig->stopBrakeFrameCount) {
+			stopBrakeAppliedFor++;
+			destinationSpeed = currentConfig->stopBrakeSpeed;
+		} else {
+			destinationSpeed = 0.0f;
+		}
+	} else {
+		stopBrakeAppliedFor = false;
+	}
+	return stop;
+}
+
 void controlCar() {
 	// Setup
 	static CameraAnalysis::SingleRowAnalysis currentRowAnalysis;
@@ -105,6 +125,7 @@ void controlCar() {
 	static int16_t trackCenterDifferences[6]; // Size: Length of Rows
 	static uint16_t prevTrackCenters[6] = { 158, 158, 158, 158, 158, 158 }; // Size: Length of Rows
 	static bool trackWidthOverThreshold[7]; // Size: Length of Rows +1!
+	static bool stop = false;
 	uint8_t currentRowIndex;
 	uint8_t countStraightTracks = 0;
 	uint8_t countTurnTracks = 0;
@@ -174,25 +195,24 @@ void controlCar() {
 		lastRow = currentRowConfig->row;
 	}
 
-	if (lastRow != 0) {
-		// Column detection
-		// TODO: Should not always run (only when trying to detect cube)
-		columnAnalysis.Setup(&pixy, currentConfig->columnConfig.column, currentConfig->columnConfig.edgeThreshold,
-			currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
-		columnAnalysis.getImageColumn();
-		columnAnalysis.calculateSobel();
-		bool foundObstacle = columnAnalysis.detectObstacle(lastRow);
-		
-
-		if (foundObstacle) {
-			mLeds_Write(LedMaskEnum::kMaskLed4, LedStateEnum::kLedOn);
-			// printf("Found %d %d %d\n", firstEdge, secondEdge, thirdEdge);
-			mTimer_SetMotorDuty(0, 0);
-			mTimer_SetServoDuty(0, 0);
-			while(true);
+	// Obstacle Detection
+	if (currentConfig->obstacleDetection){
+		if (lastRow != 0) {
+			// Column detection
+			// TODO: Should not always run (only when trying to detect cube)
+			columnAnalysis.Setup(&pixy, currentConfig->columnConfig.column, currentConfig->columnConfig.edgeThreshold,
+				currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
+			columnAnalysis.getImageColumn();
+			columnAnalysis.calculateSobel();
+			bool foundObstacle = columnAnalysis.detectObstacle(lastRow);
+			
+			if (foundObstacle) {
+				mLeds_Write(LedMaskEnum::kMaskLed4, LedStateEnum::kLedOn);
+				// printf("Found %d %d %d\n", firstEdge, secondEdge, thirdEdge);
+				stop = true;
+			}
 		}
 	}
-
 
 	// Control Car
 	float avgTrackCenterDifference = 0;
@@ -232,23 +252,27 @@ void controlCar() {
 	}
 
 	// Speed
-	uint8_t maxRowForSpeedCalculation = currentRowIndex;
-	trackWidthOverThreshold[6] = trackWidthOverThreshold[5]; // Prevent NullPointerException
-	for (; maxRowForSpeedCalculation > 1 && trackWidthOverThreshold[maxRowForSpeedCalculation] ; maxRowForSpeedCalculation--);
-	if (maxRowForSpeedCalculation < currentConfig->brakeRowDistance) { // Break or Turn
-		if (brakeAppliedFor < currentConfig->brakeFrameCount && brakeCooledDownFor == currentConfig->brakeFrameCooldown) {
-			destinationSpeed = currentConfig->brakeSpeed;
-			brakeAppliedFor++;
-		} else {
-			destinationSpeed = currentConfig->turnSpeed;
-			brakeCooledDownFor = 0;
+	if (stop) {
+		stopCar(stop);
+	} else { // Normal Speed Control
+		uint8_t maxRowForSpeedCalculation = currentRowIndex;
+		trackWidthOverThreshold[6] = trackWidthOverThreshold[5]; // Prevent NullPointerException
+		for (; maxRowForSpeedCalculation > 1 && trackWidthOverThreshold[maxRowForSpeedCalculation] ; maxRowForSpeedCalculation--);
+		if (maxRowForSpeedCalculation < currentConfig->brakeRowDistance) { // Break or Turn
+			if (brakeAppliedFor < currentConfig->brakeFrameCount && brakeCooledDownFor == currentConfig->brakeFrameCooldown) {
+				destinationSpeed = currentConfig->brakeSpeed;
+				brakeAppliedFor++;
+			} else {
+				destinationSpeed = currentConfig->turnSpeed;
+				brakeCooledDownFor = 0;
+			}
+		} else { // Straight
+			brakeAppliedFor = 0;
+			brakeCooledDownFor++;
+			if(brakeCooledDownFor > currentConfig->brakeFrameCooldown)
+				brakeCooledDownFor = currentConfig->brakeFrameCooldown;
+			destinationSpeed = currentConfig->straightSpeed;
 		}
-	} else { // Straight
-		brakeAppliedFor = 0;
-		brakeCooledDownFor++;
-		if(brakeCooledDownFor > currentConfig->brakeFrameCooldown)
-			brakeCooledDownFor = currentConfig->brakeFrameCooldown;
-		destinationSpeed = currentConfig->straightSpeed;
 	}
 }
 

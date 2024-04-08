@@ -45,6 +45,14 @@ struct ControlConfig {
     RowConfig* rowConfigs;
     ColumnConfig columnConfig;
 
+    // Finish Line Detection
+    bool finishLineDetection = false;
+    uint8_t configAfterFinishLineDetected;
+
+    // Obstacle Detection
+    bool obstacleDetection = false;
+    uint8_t configAfterObstacleDetected;
+
     // Steering-Stuff
     float servoSteeringOffset = 0.0f;
     float steeringPotentialFactor = 0.0f;
@@ -56,9 +64,11 @@ struct ControlConfig {
     uint8_t brakeFrameCount = 0;			//kleiner 255
     uint8_t brakeFrameCooldown = 0;			//kleiner 255
     uint8_t brakeRowDistance = 0;
+    uint8_t stopBrakeFrameCount = 0;
     float brakeSpeed = 0.0f;
     float straightSpeed = 0.0f;
     float turnSpeed = 0.0f;
+    float stopBrakeSpeed = 0.0f;
 
     // Speed-Battery-Control
     uint16_t batteryLevelCheckInterval = 1000;
