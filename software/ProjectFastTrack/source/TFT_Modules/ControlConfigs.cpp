@@ -359,6 +359,10 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 void loadControlConfigs(uint8_t* controlConfigsLength, ControlConfig* controlConfigs) {
     *controlConfigsLength = 3;
 
+    for (uint8_t i = 0; i < *controlConfigsLength; i++) {
+        controlConfigs[i] = ControlConfig();
+    }
+
     safeConfig(0, controlConfigs);
     middleConfig(1, controlConfigs);
     fastConfig(2, controlConfigs);
