@@ -349,7 +349,7 @@ void defineTasks() {
 	t_spedRead = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		float a,b;
 		MotorControl::getSpeed(&a, &b);
-		printf("Speed %d, %d\n", (int32_t)(a*100), (int32_t)(b*100));
+		printf("Speed %d, %d\n", (int32_t)(a*1), (int32_t)(b*1));
 	}, 500, true, true);
 }
 

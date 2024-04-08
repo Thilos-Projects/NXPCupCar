@@ -36,7 +36,7 @@ float motorLPWMSpeed = 0.0f;
 float motorRPWMSpeed = 0.0f;
 
 void MotorControl::Setup(){
-	Scheduler::getTaskHandle([](Scheduler::taskHandle* self){MotorControl::Update();}, 50);
+	Scheduler::getTaskHandle([](Scheduler::taskHandle* self){MotorControl::Update();}, 10);
 	Scheduler::getTaskHandle([](Scheduler::taskHandle* self){MotorControl::doSpeedCalc();}, 500);
 
 	istGeschwindigkeitL = 0;
@@ -128,21 +128,12 @@ void MotorControl::setSpeed(float left, float right){
 }
 
 void MotorControl::doSpeedCalc(){
-	static uint32_t lastTime;
 	static uint32_t lastCounterL, lastCounterR;
-	uint32_t time = Scheduler::getClock();
-	float deltaTime = time - lastTime;
-	istGeschwindigkeitL = ((float)(counterL-lastCounterL)) / deltaTime;
-	istGeschwindigkeitR = ((float)(counterR-lastCounterR)) / deltaTime;
-
-	if(motorLPWMSpeed < 0)
-		istGeschwindigkeitL = -istGeschwindigkeitL;
-	if(motorRPWMSpeed < 0)
-		istGeschwindigkeitR = -istGeschwindigkeitR;
+	istGeschwindigkeitL = ((float)(counterL-lastCounterL));
+	istGeschwindigkeitR = ((float)(counterR-lastCounterR));
 
 	lastCounterL = counterL;
 	lastCounterR = counterR;
-	lastTime = time;
 }
 //alle 10 ms oder so
 void MotorControl::Update(){
