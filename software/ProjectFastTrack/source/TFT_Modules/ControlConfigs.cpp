@@ -13,7 +13,6 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].steeringDerivativeFactor = 0.0f;
     controlConfigs[configIndex].steeringHoldframesAfterTurn = 0;
     controlConfigs[configIndex].brakeFrameCount = 4;
-    controlConfigs[configIndex].brakeFrameCooldown = 10;
     controlConfigs[configIndex].brakeRowDistance = 2;
     controlConfigs[configIndex].brakeSpeed = -0.15f;
     controlConfigs[configIndex].straightSpeed = 0.25f;
@@ -132,7 +131,6 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].steeringDerivativeFactor = 0.0f;
 	controlConfigs[configIndex].steeringHoldframesAfterTurn = 0;
 	controlConfigs[configIndex].brakeFrameCount = 3;
-	controlConfigs[configIndex].brakeFrameCooldown = 0;
 	controlConfigs[configIndex].brakeRowDistance = 2;
 	controlConfigs[configIndex].brakeSpeed = 0.2f;
 	controlConfigs[configIndex].straightSpeed = 0.2f;
@@ -250,7 +248,6 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].steeringDerivativeFactor = 0.5f;
     controlConfigs[configIndex].steeringHoldframesAfterTurn = 0;
     controlConfigs[configIndex].brakeFrameCount = 3;
-    controlConfigs[configIndex].brakeFrameCooldown = 5;
     controlConfigs[configIndex].brakeRowDistance = 4;
     controlConfigs[configIndex].brakeSpeed = -0.0f;
     controlConfigs[configIndex].straightSpeed = 0.3f;
