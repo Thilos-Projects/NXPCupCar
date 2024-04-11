@@ -135,11 +135,6 @@ void controlCar() {
 	uint8_t countCrossingTracks = 0;
 	uint8_t lastRow = 0;
 
-	//mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOff);
-	mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOff);
-	mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOff);
-	mLeds_Write(LedMaskEnum::kMaskLed4, LedStateEnum::kLedOff);
-
 	// Loop
 	for (currentRowIndex = 0; currentRowIndex < currentConfig->rowConfigLength; currentRowIndex++)
 	{
@@ -184,12 +179,10 @@ void controlCar() {
 				}
 				break;
 			} else { // Crossing Strack
-				mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOn);
 				countCrossingTracks++;
 				trackCenterDifferences[currentRowIndex] = (trackCenterCloseDifference + trackCenterDifference) / 2;
 			}
 		} else { // Straight Track
-			mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOn);
 			countStraightTracks++;
 			trackCenterDifferences[currentRowIndex] = trackCenterDifference;
 		}
@@ -209,7 +202,6 @@ void controlCar() {
 			bool foundObstacle = columnAnalysis.detectObstacle(lastRow);
 			
 			if (foundObstacle) {
-				mLeds_Write(LedMaskEnum::kMaskLed4, LedStateEnum::kLedOn);
 				// printf("Found %d %d %d\n", firstEdge, secondEdge, thirdEdge);
 				stop = true;
 			}
@@ -233,6 +225,7 @@ void controlCar() {
 	
 	float leftSpeed, rightSpeed;
 	MotorControl::getSpeed(&leftSpeed, &rightSpeed);
+	float currentSpeed = max(leftSpeed, rightSpeed);
 
 	// Steering
 	float steeringAngle = avgTrackCenterDifference;
@@ -273,8 +266,17 @@ void controlCar() {
 		trackWidthOverThreshold[6] = trackWidthOverThreshold[5]; // Prevent NullPointerException
 		for (; maxRowForSpeedCalculation > 1 && trackWidthOverThreshold[maxRowForSpeedCalculation] ; maxRowForSpeedCalculation--);
 		if (maxRowForSpeedCalculation < currentConfig->brakeRowDistance) { // Break or Turn
-			if (brakeAppliedFor < currentConfig->brakeFrameCount && (leftSpeed > currentConfig->brakeCooldownSpeed || rightSpeed > currentConfig->brakeCooldownSpeed)) {
-				destinationSpeed = currentConfig->brakeSpeed;
+			//breakAppliedFor
+
+			BreakSpeedLookupEntry* chosenEntry = &currentConfig->breakSpeedLookupEntrys[0];
+			int i = 0;
+			for(i = 0; i < currentConfig->breakSpeedLookupEntryCount; i++) {
+				chosenEntry = &currentConfig->breakSpeedLookupEntrys[i];
+				if(currentConfig->breakSpeedLookupEntrys[i].lowerSpeed >= currentSpeed) break;
+			}
+
+			if (brakeAppliedFor < chosenEntry->frameCount) {
+				destinationSpeed = chosenEntry->breakSpeed;
 				brakeAppliedFor++;
 			} else {
 				destinationSpeed = currentConfig->turnSpeed;
@@ -285,22 +287,10 @@ void controlCar() {
 			destinationSpeed = currentConfig->straightSpeed;
 		}
 	}
-
-	if (leftSpeed > currentConfig->brakeCooldownSpeed || rightSpeed > currentConfig->brakeCooldownSpeed) {
-		mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
-	} else {
-		mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOff);
-	}
 }
 
 
 void defineTasks() {
-	t_testMotorButton = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
-		motorEnabled = mSwitch_ReadSwitch(SwitchEnum::kSw4);
-		if(!motorEnabled)
-			MotorControl::setSpeed(0, 0);
-	}, 250, true, false);
-
 	t_cameraAlgorithm = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		controlCar();
 		// TODO
@@ -357,6 +347,10 @@ void defineTasks() {
 
 		// Disable Steering
 		steeringDiabled = !mSwitch_ReadSwitch(SwitchEnum::kSw3);
+
+		motorEnabled = mSwitch_ReadSwitch(SwitchEnum::kSw4);
+		if(!motorEnabled)
+			MotorControl::setSpeed(0, 0);
 	}, 1000);
 
 	t_spedRead = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){

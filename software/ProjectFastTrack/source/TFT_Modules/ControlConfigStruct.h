@@ -32,6 +32,12 @@ struct BatteryLevelLookupEntry {
     bool disableWhenLower = false;
 };
 
+struct BreakSpeedLookupEntry {
+    float lowerSpeed = 0.0f;
+    uint8_t frameCount = 0;
+    float breakSpeed = -0.5f;
+};
+
 struct ControlConfig {
     uint16_t timePerFrame = 17;
 
@@ -63,14 +69,14 @@ struct ControlConfig {
     uint8_t steeringHoldframesAfterTurn = 0;
 
     // Speed-Stuff
-    uint8_t brakeFrameCount = 0;			//kleiner 255
     uint8_t brakeRowDistance = 0;
     uint8_t stopBrakeFrameCount = 0;
-    uint8_t brakeCooldownSpeed = 25;
-    float brakeSpeed = 0.0f;
     float straightSpeed = 0.0f;
     float turnSpeed = 0.0f;
     float stopBrakeSpeed = 0.0f;
+    uint8_t breakSpeedLookupEntryCount = 0;
+    BreakSpeedLookupEntry* breakSpeedLookupEntrys;
+
 
     // Speed-Battery-Control
     uint16_t batteryLevelCheckInterval = 1000;
