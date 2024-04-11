@@ -287,3 +287,98 @@ void CameraAnalysis::SingleColumnAnalysis::printLines(){
 		printf(",\t%d", i);
 	printf("\n");
 }
+
+//Partial Colum Stuff
+
+void CameraAnalysis::PartialColumnAnalysis::Setup(Pixy2SPI_SS* pixy, uint16_t column, uint16_t startHeight, uint16_t endHeight, uint16_t edgeThreshold, uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t minThickness) {
+	this->pixy = pixy;
+	this->column = column;
+	this->startHeight = startHeight;
+	this->endHeight = endHeight;
+	this->edgeThreshold = edgeThreshold;
+	this->minEdgeWidth = minEdgeWidth;
+	this->maxEdgeWidth = maxEdgeWidth;
+	this->minThickness = minThickness;
+}
+void CameraAnalysis::PartialColumnAnalysis::getImageColumn(){
+	pixy->video.getGrayRect(column, startHeight, column+1, endHeight, 1, 1, columnDataBuffer + 0, false);
+}
+void CameraAnalysis::PartialColumnAnalysis::calculateSobel(){
+	for(int i = 0; i < endHeight - startHeight - 2; i++)
+		columnSobel[i] = (((int16_t)(*(columnDataBuffer+i))) * 2 + ((int16_t)(*(columnDataBuffer+i+2))) * -2);
+}
+
+bool CameraAnalysis::PartialColumnAnalysis::detectFinischline(){
+	const uint8_t threshold = 20;
+	const uint8_t minWidth = 0;
+	const uint8_t maxWidth = 6;
+	const uint8_t minThicknes = 0;
+	const uint8_t maxThicknes = 40;
+
+	uint8_t firstPos = 0;
+	uint8_t secondPos = 0;
+	uint8_t state = 0;
+	uint16_t counter = 0;
+
+	for(int i = 0; i < endHeight - startHeight - 2 && secondPos == 0; i++){
+		switch(state){
+		case 0: {
+			if(columnSobel[i] > threshold){
+				state = 1;
+				counter++;
+			}
+		} break;
+		case 1: {
+			if(columnSobel[i] > threshold){
+				counter++;
+			}else{
+				if(counter < minWidth || counter > maxWidth) {
+					state = 0;
+					counter = 0;
+				} else {
+					state = 2;
+					firstPos = i;
+					counter = 0;
+				}
+			}
+		}break;
+		case 2: {
+			if(columnSobel[i] > threshold){
+				state = 3;
+				counter++;
+			}
+		} break;
+		case 3: {
+			if(columnSobel[i] > threshold){
+				counter++;
+			}else{
+				if(counter < minWidth || counter > maxWidth) {
+					state = 2;
+					counter = 0;
+				} else {
+					if(i-firstPos < minThicknes || i-firstPos > maxThicknes){
+						state = 2;
+						counter = 0;
+						firstPos = i;
+					}
+					else{
+						secondPos = i;
+						state = 4;
+					}
+				}
+			}
+		}break;
+		default : break;
+		}
+	}
+
+	return secondPos != 0;
+}
+
+//----------------------Print-------------------
+void CameraAnalysis::PartialColumnAnalysis::printImageColumn(){
+	printArray(columnDataBuffer, 316);
+}
+void CameraAnalysis::PartialColumnAnalysis::printSobleColumn(){
+	printArray(columnSobel, 314);
+}

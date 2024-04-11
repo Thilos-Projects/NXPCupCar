@@ -2,7 +2,7 @@
 #include "ControlConfigStruct.h"
 
 void makeStandartRowConfic(RowConfig** configs, uint8_t* configLength){
-	*configLength = 6;
+	*configLength = 5;
 	*configs = (RowConfig*)malloc(sizeof(RowConfig) * *configLength);
 
 	((*configs)[0]).row = 150;
@@ -54,16 +54,6 @@ void makeStandartRowConfic(RowConfig** configs, uint8_t* configLength){
 	((*configs)[4]).maxCenterDifferenceForTurn = 10;
 	((*configs)[4]).maxTrackWidth = 316;
 	((*configs)[4]).weight = 1.0f;
-	// Sixth Row Config
-	((*configs)[5]).row = 58;
-	((*configs)[5]).rowClose = 53;
-	((*configs)[5]).edgeThreshold = 40;
-	((*configs)[5]).minEdgeWidth = 0;
-	((*configs)[5]).maxEdgeWidth = 3;
-	((*configs)[5]).minThickness = 0;
-	((*configs)[5]).maxCenterDifferenceForTurn = 10;
-	((*configs)[5]).maxTrackWidth = 316;
-	((*configs)[5]).weight = 1.0f;
 }
 
 void makeStandartBreakSpeedConfig(BreakSpeedLookupEntry** configs, uint8_t* configLength){

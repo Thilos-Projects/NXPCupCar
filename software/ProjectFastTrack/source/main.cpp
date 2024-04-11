@@ -83,6 +83,14 @@ void Setup() {
 
 	//Motor Setup (Motor Enable)
 	mTimer_EnableHBridge();
+
+	// Load Config
+	uint8_t switchmode = 0;
+	switchmode += mSwitch_ReadSwitch(SwitchEnum::kSw1);
+	switchmode += mSwitch_ReadSwitch(SwitchEnum::kSw2) * 2;
+	currentConfig = &controlConfigs[switchmode];
+	pixy.setLED(currentConfig->pixyLedColorR, currentConfig->pixyLedColorG, currentConfig->pixyLedColorB);
+	pixy.setLamp((uint8_t)(currentConfig->pixyLamps>>8), (uint8_t)(currentConfig->pixyLamps>>0));
 }
 
 void pixySetup(){
@@ -123,6 +131,7 @@ void controlCar() {
 	// Setup
 	static CameraAnalysis::SingleRowAnalysis currentRowAnalysis;
 	static CameraAnalysis::SingleColumnAnalysis columnAnalysis;
+	static CameraAnalysis::PartialColumnAnalysis partColumnAnalysis;
 	static float lastSteeringAngle = 0.0f;
 	static uint8_t brakeAppliedFor = 0;
 	static int16_t trackCenterDifferences[6]; // Size: Length of Rows
@@ -189,6 +198,20 @@ void controlCar() {
 		
 		lastRow = currentRowConfig->row;
 	}
+
+	partColumnAnalysis.Setup(&pixy, 185, 120, 180, currentConfig->columnConfig.edgeThreshold,
+		currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
+	partColumnAnalysis.getImageColumn();
+	partColumnAnalysis.calculateSobel();
+	if(partColumnAnalysis.detectFinischline())
+		mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
+
+	partColumnAnalysis.Setup(&pixy, 131, 120, 180, currentConfig->columnConfig.edgeThreshold,
+		currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
+	partColumnAnalysis.getImageColumn();
+	partColumnAnalysis.calculateSobel();
+	if(partColumnAnalysis.detectFinischline())
+		mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
 
 	// Obstacle Detection
 	if (currentConfig->obstacleDetection){
@@ -329,22 +352,6 @@ void defineTasks() {
 	}, currentConfig->batteryLevelCheckInterval);
 
 	t_dipSwitchConfig = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
-		// Load Config
-		static uint8_t lastSwitchmode = 0;
-		uint8_t switchmode = 0;
-		switchmode += mSwitch_ReadSwitch(SwitchEnum::kSw1);
-		switchmode += mSwitch_ReadSwitch(SwitchEnum::kSw2) * 2;
-		if(switchmode < controlConfigsLength)
-			currentConfig = &controlConfigs[switchmode];
-		// Detect config change
-		if (lastSwitchmode != switchmode) {
-			// Update pixy color
-			pixy.setLED(currentConfig->pixyLedColorR, currentConfig->pixyLedColorG, currentConfig->pixyLedColorB);
-			pixy.setLamp((uint8_t)(currentConfig->pixyLamps>>8), (uint8_t)(currentConfig->pixyLamps>>0));
-			// Save last
-			lastSwitchmode = switchmode;
-		}
-
 		// Disable Steering
 		steeringDiabled = !mSwitch_ReadSwitch(SwitchEnum::kSw3);
 
