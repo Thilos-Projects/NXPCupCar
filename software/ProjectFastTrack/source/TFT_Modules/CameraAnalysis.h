@@ -99,7 +99,7 @@ namespace CameraAnalysis {
 
 		void Setup(Pixy2SPI_SS* pixy, uint16_t column, uint16_t startHeight, uint16_t endHeight, uint16_t edgeThreshold, uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t minThickness);
 
-		bool detectFinischline();
+		bool detectFinishline();
 
 		//----------------------Print-------------------
 		void printImageColumn();

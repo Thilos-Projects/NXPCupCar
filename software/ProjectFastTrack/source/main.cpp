@@ -203,14 +203,14 @@ void controlCar() {
 		currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
 	partColumnAnalysis.getImageColumn();
 	partColumnAnalysis.calculateSobel();
-	if(partColumnAnalysis.detectFinischline())
+	if(partColumnAnalysis.detectFinishline())
 		mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
 
 	partColumnAnalysis.Setup(&pixy, 131, 120, 180, currentConfig->columnConfig.edgeThreshold,
 		currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
 	partColumnAnalysis.getImageColumn();
 	partColumnAnalysis.calculateSobel();
-	if(partColumnAnalysis.detectFinischline())
+	if(partColumnAnalysis.detectFinishline())
 		mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
 
 	// Obstacle Detection

@@ -77,7 +77,6 @@ struct ControlConfig {
     uint8_t breakSpeedLookupEntryCount = 0;
     BreakSpeedLookupEntry* breakSpeedLookupEntrys;
 
-
     // Speed-Battery-Control
     uint16_t batteryLevelCheckInterval = 1000;
     uint8_t batteryLevelLookupLength = 0;

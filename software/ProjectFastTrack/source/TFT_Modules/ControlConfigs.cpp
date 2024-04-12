@@ -1,7 +1,7 @@
 #include "ControlConfigs.h"
 #include "ControlConfigStruct.h"
 
-void makeStandartRowConfic(RowConfig** configs, uint8_t* configLength){
+void makeStandardRowConfig(RowConfig** configs, uint8_t* configLength){
 	*configLength = 5;
 	*configs = (RowConfig*)malloc(sizeof(RowConfig) * *configLength);
 
@@ -56,7 +56,7 @@ void makeStandartRowConfic(RowConfig** configs, uint8_t* configLength){
 	((*configs)[4]).weight = 1.0f;
 }
 
-void makeStandartBreakSpeedConfig(BreakSpeedLookupEntry** configs, uint8_t* configLength){
+void makeStandardBreakSpeedConfig(BreakSpeedLookupEntry** configs, uint8_t* configLength){
 	*configLength = 5;
 	*configs = (BreakSpeedLookupEntry*)malloc(sizeof(BreakSpeedLookupEntry) * *configLength);
 
@@ -98,9 +98,9 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].straightSpeed = 0.3f;
 	controlConfigs[configIndex].turnSpeed = 0.2f;
 
-	makeStandartBreakSpeedConfig(&controlConfigs[configIndex].breakSpeedLookupEntrys, &controlConfigs[configIndex].breakSpeedLookupEntryCount);
+	makeStandardBreakSpeedConfig(&controlConfigs[configIndex].breakSpeedLookupEntrys, &controlConfigs[configIndex].breakSpeedLookupEntryCount);
 
-	makeStandartRowConfic(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
+	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
 	// Column Config
 	controlConfigs[configIndex].columnConfig.column = 158;
@@ -154,9 +154,9 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].straightSpeed = 0.2f;
 	controlConfigs[configIndex].turnSpeed = 0.2f;
 
-	makeStandartBreakSpeedConfig(&controlConfigs[configIndex].breakSpeedLookupEntrys, &controlConfigs[configIndex].breakSpeedLookupEntryCount);
+	makeStandardBreakSpeedConfig(&controlConfigs[configIndex].breakSpeedLookupEntrys, &controlConfigs[configIndex].breakSpeedLookupEntryCount);
 
-	makeStandartRowConfic(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
+	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
     // Column Config
     controlConfigs[configIndex].columnConfig.column = 158;
@@ -212,9 +212,9 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].straightSpeed = 0.3f;
     controlConfigs[configIndex].turnSpeed = 0.2f;
 
-	makeStandartBreakSpeedConfig(&controlConfigs[configIndex].breakSpeedLookupEntrys, &controlConfigs[configIndex].breakSpeedLookupEntryCount);
+	makeStandardBreakSpeedConfig(&controlConfigs[configIndex].breakSpeedLookupEntrys, &controlConfigs[configIndex].breakSpeedLookupEntryCount);
 
-	makeStandartRowConfic(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
+	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
     // Column Config
     controlConfigs[configIndex].columnConfig.column = 158;
