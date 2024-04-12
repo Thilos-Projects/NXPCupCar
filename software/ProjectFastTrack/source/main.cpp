@@ -199,43 +199,28 @@ void controlCar() {
 		lastRow = currentRowConfig->row;
 	}
 
-	if (currentConfig->finishLineDetection) {
+	if (currentConfig->finishLineDetection && Scheduler::getMillis() > currentConfig->startFinishLineDetectionAfter) {
 		static bool finishLineDetectedLeft = false, finishLineDetectedRight = false, finishLineDetectedCenter = false;
 		static uint8_t secondPosLeft = 0, secondPosRight = 0, secondPosCenter = 0;
 
-		// TODO: Move to config
-		uint8_t offsetLeft = 35, offsetRight = 35;
-
 		// TODO: Refactor: Duplication left <> right
 		// Left - 131
-		partColumnAnalysis.Setup(&pixy, prevTrackCenters[0] - offsetLeft, 120, 207, currentConfig->columnConfig.edgeThreshold,
+		partColumnAnalysis.Setup(&pixy, prevTrackCenters[0] - currentConfig->finishLineLeftOffset, 120, 207, currentConfig->columnConfig.edgeThreshold,
 			currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
 		partColumnAnalysis.getImageColumn();
 		partColumnAnalysis.calculateSobel();
 		finishLineDetectedLeft = partColumnAnalysis.detectFinishline();
 		secondPosLeft = partColumnAnalysis.secondPos;
-		if(finishLineDetectedLeft) {
-			mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOn);
-		} else {
-			mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOff);
-		}
 
 		// Right - 190
-		partColumnAnalysis.Setup(&pixy, prevTrackCenters[0] + offsetRight, 120, 207, currentConfig->columnConfig.edgeThreshold,
+		partColumnAnalysis.Setup(&pixy, prevTrackCenters[0] + currentConfig->finishLineRightOffset, 120, 207, currentConfig->columnConfig.edgeThreshold,
 			currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
 		partColumnAnalysis.getImageColumn();
 		partColumnAnalysis.calculateSobel();
 		finishLineDetectedRight = partColumnAnalysis.detectFinishline();
 		secondPosRight = partColumnAnalysis.secondPos;
-		if(finishLineDetectedRight) {
-			mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
-		} else {
-			mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOff);
-		}
 
-		printf("Centers:\t%d\t%d\t%d\n", prevTrackCenters[0] - offsetLeft, prevTrackCenters[0], prevTrackCenters[0] + offsetRight);
-
-		// TODO: Validate if real finish line
+		// Validate if real finish line
 		if (finishLineDetectedLeft && finishLineDetectedRight) {
 			// Center
 			partColumnAnalysis.Setup(&pixy, prevTrackCenters[0], 120, 207, currentConfig->columnConfig.edgeThreshold,
@@ -250,14 +235,6 @@ void controlCar() {
 			} else {
 				mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOff);
 			}
-
-			/*uint16_t finishLineDiff = (uint16_t)abs((int16_t)secondPosLeft - (int16_t)secondPosRight);
-			printf("Finish Line Diff: %d\n", finishLineDiff);
-			if(finishLineDiff < 10) {
-				mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOn);
-			} else {
-				mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOff);
-			}*/
 		} else {
 			mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOff);
 		}
