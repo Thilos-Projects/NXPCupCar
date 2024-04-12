@@ -52,11 +52,13 @@ struct ControlConfig {
     ColumnConfig columnConfig;
 
     // Finish Line Detection
-    bool finishLineDetection = false;
+    bool finishLineDetection = true;
+    // TODO: Value is unused
     uint8_t configAfterFinishLineDetected;
 
     // Obstacle Detection
     bool obstacleDetection = false;
+    // TODO: Value is unused
     uint8_t configAfterObstacleDetected;
 
     // Steering-Stuff

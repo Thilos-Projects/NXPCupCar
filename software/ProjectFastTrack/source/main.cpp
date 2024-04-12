@@ -199,25 +199,74 @@ void controlCar() {
 		lastRow = currentRowConfig->row;
 	}
 
-	partColumnAnalysis.Setup(&pixy, 185, 120, 180, currentConfig->columnConfig.edgeThreshold,
-		currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
-	partColumnAnalysis.getImageColumn();
-	partColumnAnalysis.calculateSobel();
-	if(partColumnAnalysis.detectFinishline())
-		mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
+	if (currentConfig->finishLineDetection) {
+		static bool finishLineDetectedLeft = false, finishLineDetectedRight = false, finishLineDetectedCenter = false;
+		static uint8_t secondPosLeft = 0, secondPosRight = 0, secondPosCenter = 0;
 
-	partColumnAnalysis.Setup(&pixy, 131, 120, 180, currentConfig->columnConfig.edgeThreshold,
-		currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
-	partColumnAnalysis.getImageColumn();
-	partColumnAnalysis.calculateSobel();
-	if(partColumnAnalysis.detectFinishline())
-		mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
+		// TODO: Move to config
+		uint8_t offsetLeft = 35, offsetRight = 35;
+
+		// TODO: Refactor: Duplication left <> right
+		// Left - 131
+		partColumnAnalysis.Setup(&pixy, prevTrackCenters[0] - offsetLeft, 120, 207, currentConfig->columnConfig.edgeThreshold,
+			currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
+		partColumnAnalysis.getImageColumn();
+		partColumnAnalysis.calculateSobel();
+		finishLineDetectedLeft = partColumnAnalysis.detectFinishline();
+		secondPosLeft = partColumnAnalysis.secondPos;
+		if(finishLineDetectedLeft) {
+			mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOn);
+		} else {
+			mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOff);
+		}
+
+		// Right - 190
+		partColumnAnalysis.Setup(&pixy, prevTrackCenters[0] + offsetRight, 120, 207, currentConfig->columnConfig.edgeThreshold,
+			currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
+		partColumnAnalysis.getImageColumn();
+		partColumnAnalysis.calculateSobel();
+		finishLineDetectedRight = partColumnAnalysis.detectFinishline();
+		secondPosRight = partColumnAnalysis.secondPos;
+		if(finishLineDetectedRight) {
+			mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
+		} else {
+			mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOff);
+		}
+
+		printf("Centers:\t%d\t%d\t%d\n", prevTrackCenters[0] - offsetLeft, prevTrackCenters[0], prevTrackCenters[0] + offsetRight);
+
+		// TODO: Validate if real finish line
+		if (finishLineDetectedLeft && finishLineDetectedRight) {
+			// Center
+			partColumnAnalysis.Setup(&pixy, prevTrackCenters[0], 120, 207, currentConfig->columnConfig.edgeThreshold,
+				currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
+			partColumnAnalysis.getImageColumn();
+			partColumnAnalysis.calculateSobel();
+			finishLineDetectedCenter = partColumnAnalysis.detectFinishline();
+			secondPosCenter = partColumnAnalysis.secondPos;
+
+			if (!finishLineDetectedCenter) {
+				mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOn);
+			} else {
+				mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOff);
+			}
+
+			/*uint16_t finishLineDiff = (uint16_t)abs((int16_t)secondPosLeft - (int16_t)secondPosRight);
+			printf("Finish Line Diff: %d\n", finishLineDiff);
+			if(finishLineDiff < 10) {
+				mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOn);
+			} else {
+				mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOff);
+			}*/
+		} else {
+			mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOff);
+		}
+	}
 
 	// Obstacle Detection
 	if (currentConfig->obstacleDetection){
 		if (lastRow != 0) {
 			// Column detection
-			// TODO: Should not always run (only when trying to detect cube)
 			columnAnalysis.Setup(&pixy, currentConfig->columnConfig.column, currentConfig->columnConfig.edgeThreshold,
 				currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
 			columnAnalysis.getImageColumn();

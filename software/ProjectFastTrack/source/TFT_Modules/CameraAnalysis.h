@@ -92,10 +92,11 @@ namespace CameraAnalysis {
 		uint8_t maxEdgeWidth;			//current 6
 		uint16_t minThickness;			//current 158
 
+		uint8_t firstPos = 0, secondPos = 0;
+
 		void getImageColumn();
 		void calculateSobel();
 		//Stop Kamera Abfrage + Sobel
-
 
 		void Setup(Pixy2SPI_SS* pixy, uint16_t column, uint16_t startHeight, uint16_t endHeight, uint16_t edgeThreshold, uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t minThickness);
 
