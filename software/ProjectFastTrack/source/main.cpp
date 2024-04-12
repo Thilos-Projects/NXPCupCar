@@ -138,6 +138,9 @@ void controlCar() {
 	static uint16_t prevTrackCenters[6] = { 158, 158, 158, 158, 158, 158 }; // Size: Length of Rows
 	static bool trackWidthOverThreshold[7]; // Size: Length of Rows +1!
 	static bool stop = false;
+	static bool switchConfig = false;
+	static uint8_t switchConfigToIndex;
+	static uint32_t switchConfigAfterTime = 0;
 	uint8_t currentRowIndex;
 	uint8_t countStraightTracks = 0;
 	uint8_t countTurnTracks = 0;
@@ -199,6 +202,7 @@ void controlCar() {
 		lastRow = currentRowConfig->row;
 	}
 
+	// Finish Line detection
 	if (currentConfig->finishLineDetection && Scheduler::getMillis() > currentConfig->startFinishLineDetectionAfter) {
 		static bool finishLineDetectedLeft = false, finishLineDetectedRight = false, finishLineDetectedCenter = false;
 		static uint8_t secondPosLeft = 0, secondPosRight = 0, secondPosCenter = 0;
@@ -230,7 +234,12 @@ void controlCar() {
 			finishLineDetectedCenter = partColumnAnalysis.detectFinishline();
 			secondPosCenter = partColumnAnalysis.secondPos;
 
-			if (!finishLineDetectedCenter) {
+			if (!finishLineDetectedCenter) { // FINISH!
+				if (currentConfig->switchConfigAfterFinishLineDetection) {
+					switchConfig = true;
+					switchConfigToIndex = currentConfig->configAfterFinishLineDetected;
+					switchConfigAfterTime = Scheduler::getMillis() + currentConfig->switchConfigAfterFinishLineTimeout;
+				}
 				mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOn);
 			} else {
 				mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOff);
@@ -335,6 +344,12 @@ void controlCar() {
 			brakeAppliedFor = 0;
 			destinationSpeed = currentConfig->straightSpeed;
 		}
+	}
+
+	// Switch Config?
+	if (switchConfig && Scheduler::getMillis() > switchConfigAfterTime) {
+		currentConfig = &controlConfigs[switchConfigToIndex];
+		switchConfig = false;
 	}
 }
 

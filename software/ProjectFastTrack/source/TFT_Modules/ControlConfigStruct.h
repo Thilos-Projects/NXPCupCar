@@ -52,11 +52,10 @@ struct ControlConfig {
     ColumnConfig columnConfig;
 
     // Finish Line Detection
-    bool finishLineDetection = true;
-    // TODO: Value is unused
+    bool finishLineDetection = false;
     bool switchConfigAfterFinishLineDetection = false;
-    // TODO: Value is unused
     uint8_t configAfterFinishLineDetected;
+    uint16_t switchConfigAfterFinishLineTimeout = 0;
     uint16_t startFinishLineDetectionAfter = 10000;
     uint8_t finishLineLeftOffset = 35, finishLineRightOffset = 35;
 
