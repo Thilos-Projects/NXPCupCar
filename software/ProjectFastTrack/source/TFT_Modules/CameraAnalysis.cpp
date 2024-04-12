@@ -234,15 +234,30 @@ bool CameraAnalysis::SingleColumnAnalysis::detectObstacle(uint8_t start) {
 	uint8_t minDiffObstacleFront = 60;
 	uint8_t maxDiffObstacleFront = 100;
 
-	uint8_t startPosition = min(40, start);
-	uint8_t endPosition = 176;
+	uint8_t startPosition = 40;
+	uint8_t endPosition = 200;
 	uint8_t foundInThreshold = 0;
 	uint8_t sobelInThreshold[206];
+	uint8_t foundLength = 0;
+	int16_t lastSobel = 0;
 	for (uint8_t i = startPosition; i < endPosition; i++) {
 		if(columnSobel[i] < -edgeThreshold || edgeThreshold < columnSobel[i]) {
-			sobelInThreshold[foundInThreshold] = i;
-			foundInThreshold++;
+			if (lastSobel != 0 && (lastSobel > 0) != (columnSobel[i] > 0)) {
+				if (foundLength > minEdgeWidth && foundLength < maxEdgeWidth) {
+					sobelInThreshold[foundInThreshold] = i;
+					foundInThreshold++;
+				}
+				foundLength = 0;
+			}
+			foundLength++;
+		} else {
+			if (foundLength > minEdgeWidth && foundLength < maxEdgeWidth) {
+				sobelInThreshold[foundInThreshold] = i;
+				foundInThreshold++;
+			}
+			foundLength = 0;
 		}
+		lastSobel = columnSobel[i];
 	}
 	
 	uint8_t firstEdge = 0, secondEdge = 0, thirdEdge = 0;

@@ -115,6 +115,7 @@ bool stopCar(bool stop) {
 	static uint8_t stopBrakeAppliedFor = 0;
 
 	if (stop) {
+		mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOn);
 		if (stopBrakeAppliedFor < currentConfig->stopBrakeFrameCount) {
 			stopBrakeAppliedFor++;
 			destinationSpeed = currentConfig->stopBrakeSpeed;
@@ -122,6 +123,7 @@ bool stopCar(bool stop) {
 			destinationSpeed = 0.0f;
 		}
 	} else {
+		mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOff);
 		stopBrakeAppliedFor = false;
 	}
 	return stop;
@@ -253,15 +255,22 @@ void controlCar() {
 	if (currentConfig->obstacleDetection){
 		if (lastRow != 0) {
 			// Column detection
-			columnAnalysis.Setup(&pixy, currentConfig->columnConfig.column, currentConfig->columnConfig.edgeThreshold,
+			columnAnalysis.Setup(&pixy, prevTrackCenters[0], currentConfig->columnConfig.edgeThreshold,
 				currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
 			columnAnalysis.getImageColumn();
 			columnAnalysis.calculateSobel();
 			bool foundObstacle = columnAnalysis.detectObstacle(lastRow);
+
+			columnAnalysis.printLines();
+			columnAnalysis.printSobleColumn();
 			
 			if (foundObstacle) {
 				// printf("Found %d %d %d\n", firstEdge, secondEdge, thirdEdge);
 				stop = true;
+				
+				mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
+			} else {
+				mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOff);
 			}
 		}
 	}

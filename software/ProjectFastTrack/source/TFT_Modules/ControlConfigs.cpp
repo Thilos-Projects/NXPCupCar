@@ -109,6 +109,12 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].columnConfig.maxEdgeWidth = 0;
 	controlConfigs[configIndex].columnConfig.minThickness = 0;
 
+	// Finish Line Config
+    controlConfigs[configIndex].finishLineDetection = true;
+    controlConfigs[configIndex].switchConfigAfterFinishLineDetection = true;
+    controlConfigs[configIndex].configAfterFinishLineDetected = 3;
+    controlConfigs[configIndex].switchConfigAfterFinishLineTimeout = 200;
+
 	// Battery - SORTED!
 	controlConfigs[configIndex].batteryLevelCheckInterval = 1000;
 	controlConfigs[configIndex].batteryLevelLookupLength = 10;
@@ -164,6 +170,12 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].columnConfig.minEdgeWidth = 0;
     controlConfigs[configIndex].columnConfig.maxEdgeWidth = 0;
     controlConfigs[configIndex].columnConfig.minThickness = 0;
+
+	// Finish Line Config
+    controlConfigs[configIndex].finishLineDetection = true;
+    controlConfigs[configIndex].switchConfigAfterFinishLineDetection = true;
+    controlConfigs[configIndex].configAfterFinishLineDetected = 3;
+    controlConfigs[configIndex].switchConfigAfterFinishLineTimeout = 200;
 
 	// Battery - SORTED!
 	controlConfigs[configIndex].batteryLevelCheckInterval = 1000;
@@ -227,7 +239,7 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].finishLineDetection = true;
     controlConfigs[configIndex].switchConfigAfterFinishLineDetection = true;
     controlConfigs[configIndex].configAfterFinishLineDetected = 3;
-    controlConfigs[configIndex].switchConfigAfterFinishLineTimeout = 500;
+    controlConfigs[configIndex].switchConfigAfterFinishLineTimeout = 200;
 
     // Battery - SORTED!
     controlConfigs[configIndex].batteryLevelCheckInterval = 1000;
@@ -235,13 +247,13 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].batteryLevelLookup = (BatteryLevelLookupEntry*)malloc(sizeof(BatteryLevelLookupEntry) * controlConfigs[configIndex].batteryLevelLookupLength);
     // Bigger battery
     controlConfigs[configIndex].batteryLevelLookup[0].batteryLevel = 13.0f;
-    controlConfigs[configIndex].batteryLevelLookup[0].accelerationFactor = 1.0f;
+    controlConfigs[configIndex].batteryLevelLookup[0].accelerationFactor = 0.85f;
     controlConfigs[configIndex].batteryLevelLookup[1].batteryLevel = 12.5f;
-    controlConfigs[configIndex].batteryLevelLookup[1].accelerationFactor = 1.0f;
+    controlConfigs[configIndex].batteryLevelLookup[1].accelerationFactor = 0.85f;
     controlConfigs[configIndex].batteryLevelLookup[2].batteryLevel = 12.0f;
-    controlConfigs[configIndex].batteryLevelLookup[2].accelerationFactor = 1.0f;
+    controlConfigs[configIndex].batteryLevelLookup[2].accelerationFactor = 0.90f;
     controlConfigs[configIndex].batteryLevelLookup[3].batteryLevel = 11.5f;
-    controlConfigs[configIndex].batteryLevelLookup[3].accelerationFactor = 1.0f;
+    controlConfigs[configIndex].batteryLevelLookup[3].accelerationFactor = 0.95f;
     controlConfigs[configIndex].batteryLevelLookup[4].batteryLevel = 11.0f;
     controlConfigs[configIndex].batteryLevelLookup[4].accelerationFactor = 1.0f;
     controlConfigs[configIndex].batteryLevelLookup[5].batteryLevel = 10.0f;
@@ -273,8 +285,10 @@ void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlCo
     controlConfigs[configIndex].steeringDerivativeFactor = 0.0f;
     controlConfigs[configIndex].steeringHoldframesAfterTurn = 0;
     controlConfigs[configIndex].brakeRowDistance = 2;
-    controlConfigs[configIndex].straightSpeed = 0.18f;
-    controlConfigs[configIndex].turnSpeed = 0.18f;
+    controlConfigs[configIndex].straightSpeed = 0.19f;
+    controlConfigs[configIndex].turnSpeed = 0.19f;
+    controlConfigs[configIndex].stopBrakeFrameCount = 3;
+    controlConfigs[configIndex].stopBrakeSpeed = -0.2f;
 
 	makeStandardBreakSpeedConfig(&controlConfigs[configIndex].breakSpeedLookupEntrys, &controlConfigs[configIndex].breakSpeedLookupEntryCount);
 
@@ -283,8 +297,8 @@ void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlCo
     // Column Config
     controlConfigs[configIndex].columnConfig.column = 158;
     controlConfigs[configIndex].columnConfig.edgeThreshold = 20;
-    controlConfigs[configIndex].columnConfig.minEdgeWidth = 0;
-    controlConfigs[configIndex].columnConfig.maxEdgeWidth = 0;
+    controlConfigs[configIndex].columnConfig.minEdgeWidth = 1;
+    controlConfigs[configIndex].columnConfig.maxEdgeWidth = 10;
     controlConfigs[configIndex].columnConfig.minThickness = 0;
 
 	// Obstacle Detection
