@@ -303,6 +303,7 @@ void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlCo
 
 	// Obstacle Detection
 	controlConfigs[configIndex].obstacleDetection = true;
+	controlConfigs[configIndex].minObstacleRow = 140;
 
     // Battery - SORTED!
     controlConfigs[configIndex].batteryLevelCheckInterval = 1000;

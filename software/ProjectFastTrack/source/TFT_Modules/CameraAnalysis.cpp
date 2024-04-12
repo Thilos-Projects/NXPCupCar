@@ -293,6 +293,10 @@ bool CameraAnalysis::SingleColumnAnalysis::detectObstacle(uint8_t start) {
 			break;
 	}
 
+	if (foundObstacle) {
+		obstacleBottomEdge = thirdEdge;
+	}
+
 	return foundObstacle;
 
 }

@@ -61,10 +61,7 @@ struct ControlConfig {
 
     // Obstacle Detection
     bool obstacleDetection = false;
-    // TODO: Value is unused
-    bool switchConfigAfterObstacleDetection = false;
-    // TODO: Value is unused
-    uint8_t configAfterObstacleDetected;
+    uint8_t minObstacleRow = 0;
 
     // Steering-Stuff
     float servoSteeringOffset = 0.0f;

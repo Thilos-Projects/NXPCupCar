@@ -266,7 +266,9 @@ void controlCar() {
 			
 			if (foundObstacle) {
 				// printf("Found %d %d %d\n", firstEdge, secondEdge, thirdEdge);
-				stop = true;
+				if (columnAnalysis.obstacleBottomEdge > currentConfig->minObstacleRow) {
+					stop = true;
+				}
 				
 				mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
 			} else {
