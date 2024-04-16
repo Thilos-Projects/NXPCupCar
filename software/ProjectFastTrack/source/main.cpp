@@ -113,18 +113,25 @@ float speedBattery(float destAcceleration) { // Speed Berry with Destination Exc
  * stop false to reset
  * @return true if applicable
 */
-bool stopCar(bool stop) {
+bool stopCar(bool stop, float currentSpeed) {
 	static uint8_t stopBrakeAppliedFor = 0;
 
 	if (stop) {
 		mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOn);
-		if (stopBrakeAppliedFor < currentConfig->stopBrakeFrameCount) {
+		BreakSpeedLookupEntry* chosenEntry = &currentConfig->breakSpeedLookupEntrys[0];
+		int i = 0;
+		for(i = 0; i < currentConfig->breakSpeedLookupEntryCount; i++) {
+			chosenEntry = &currentConfig->breakSpeedLookupEntrys[i];
+			if(currentConfig->breakSpeedLookupEntrys[i].lowerSpeed >= currentSpeed) break;
+		}
+
+		if (stopBrakeAppliedFor < chosenEntry->frameCount) {
+			destinationSpeed = chosenEntry->breakSpeed;
 			stopBrakeAppliedFor++;
-			destinationSpeed = currentConfig->stopBrakeSpeed;
 		} else {
 			destinationSpeed = 0.0f;
-			// TODO: Stop Task
 		}
+		
 	} else {
 		mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOff);
 		stopBrakeAppliedFor = false;
@@ -332,7 +339,7 @@ void controlCar() {
 
 	// Speed
 	if (stop) {
-		stopCar(stop);
+		stopCar(stop, currentSpeed);
 	} else { // Normal Speed Control
 		uint8_t maxRowForSpeedCalculation = currentRowIndex;
 		trackWidthOverThreshold[6] = trackWidthOverThreshold[5]; // Prevent NullPointerException

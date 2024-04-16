@@ -291,6 +291,9 @@ void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlCo
     controlConfigs[configIndex].stopBrakeSpeed = -0.2f;
 
 	makeStandardBreakSpeedConfig(&controlConfigs[configIndex].breakSpeedLookupEntrys, &controlConfigs[configIndex].breakSpeedLookupEntryCount);
+	// controlConfigs[configIndex].breakSpeedLookupEntrys[2].breakSpeed = 0.0f;
+	// controlConfigs[configIndex].breakSpeedLookupEntrys[3].breakSpeed = -0.1f;
+	// controlConfigs[configIndex].breakSpeedLookupEntrys[4].breakSpeed = -0.2f;
 
 	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
@@ -304,7 +307,7 @@ void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlCo
 	// Obstacle Detection
 	controlConfigs[configIndex].obstacleDetection = true;
 	// TODO: Calibrate
-	// controlConfigs[configIndex].minObstacleRow = 140;
+	controlConfigs[configIndex].minObstacleRow = 120;
 
     // Battery - SORTED!
     controlConfigs[configIndex].batteryLevelCheckInterval = 1000;
