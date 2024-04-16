@@ -228,9 +228,9 @@ void CameraAnalysis::SingleColumnAnalysis::calculateSobel(){
 bool CameraAnalysis::SingleColumnAnalysis::detectObstacle(uint8_t start) {
 	// 44 // 54 // 110 //
 
-	// TODO: Move this stuff to setup
+	// TODO: Move this stuff to Config
 	uint8_t minDiffObstacleTop = 5;
-	uint8_t maxDiffObstacleTop = 15;
+	uint8_t maxDiffObstacleTop = 20;
 	uint8_t minDiffObstacleFront = 60;
 	uint8_t maxDiffObstacleFront = 100;
 
@@ -285,8 +285,10 @@ bool CameraAnalysis::SingleColumnAnalysis::detectObstacle(uint8_t start) {
 							break;
 						}
 					}
-					if (foundObstacle)
+					if (foundObstacle) {
+						printf("Found %d %d %d\n", firstEdge, secondEdge, thirdEdge);
 						break;
+					}
 				}
 		}
 		if (foundObstacle)

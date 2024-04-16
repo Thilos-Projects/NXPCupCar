@@ -83,7 +83,7 @@ void makeStandardBreakSpeedConfig(BreakSpeedLookupEntry** configs, uint8_t* conf
 
 void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].timePerFrame = 17;
-	controlConfigs[configIndex].servoSteeringOffset = 0.0f;
+	controlConfigs[configIndex].servoSteeringOffset = -0.045f;
 	controlConfigs[configIndex].pixyLedColorR = 255;
 	controlConfigs[configIndex].pixyLedColorG = 255;
 	controlConfigs[configIndex].pixyLedColorB = 31;
@@ -103,11 +103,11 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
 	// Column Config
-	controlConfigs[configIndex].columnConfig.column = 158;
-	controlConfigs[configIndex].columnConfig.edgeThreshold = 20;
-	controlConfigs[configIndex].columnConfig.minEdgeWidth = 0;
-	controlConfigs[configIndex].columnConfig.maxEdgeWidth = 0;
-	controlConfigs[configIndex].columnConfig.minThickness = 0;
+    controlConfigs[configIndex].columnConfig.column = 158;
+    controlConfigs[configIndex].columnConfig.edgeThreshold = 18;
+    controlConfigs[configIndex].columnConfig.minEdgeWidth = 0;
+    controlConfigs[configIndex].columnConfig.maxEdgeWidth = 10;
+    controlConfigs[configIndex].columnConfig.minThickness = 0;
 
 	// Finish Line Config
     controlConfigs[configIndex].finishLineDetection = true;
@@ -147,7 +147,7 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 
 void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].timePerFrame = 17;
-	controlConfigs[configIndex].servoSteeringOffset = 0.0f;
+	controlConfigs[configIndex].servoSteeringOffset = -0.045f;
 	controlConfigs[configIndex].pixyLedColorR = 63;
 	controlConfigs[configIndex].pixyLedColorG = 255;
 	controlConfigs[configIndex].pixyLedColorB = 63;
@@ -166,9 +166,9 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 
     // Column Config
     controlConfigs[configIndex].columnConfig.column = 158;
-    controlConfigs[configIndex].columnConfig.edgeThreshold = 20;
+    controlConfigs[configIndex].columnConfig.edgeThreshold = 18;
     controlConfigs[configIndex].columnConfig.minEdgeWidth = 0;
-    controlConfigs[configIndex].columnConfig.maxEdgeWidth = 0;
+    controlConfigs[configIndex].columnConfig.maxEdgeWidth = 10;
     controlConfigs[configIndex].columnConfig.minThickness = 0;
 
 	// Finish Line Config
@@ -209,7 +209,7 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 
 void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].timePerFrame = 17;
-    controlConfigs[configIndex].servoSteeringOffset = 0.0f;
+    controlConfigs[configIndex].servoSteeringOffset = -0.045f;
     controlConfigs[configIndex].pixyLedColorR = 255;
     controlConfigs[configIndex].pixyLedColorG = 255;
     controlConfigs[configIndex].pixyLedColorB = 31;
@@ -230,9 +230,9 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 
     // Column Config
     controlConfigs[configIndex].columnConfig.column = 158;
-    controlConfigs[configIndex].columnConfig.edgeThreshold = 20;
+    controlConfigs[configIndex].columnConfig.edgeThreshold = 18;
     controlConfigs[configIndex].columnConfig.minEdgeWidth = 0;
-    controlConfigs[configIndex].columnConfig.maxEdgeWidth = 0;
+    controlConfigs[configIndex].columnConfig.maxEdgeWidth = 10;
     controlConfigs[configIndex].columnConfig.minThickness = 0;
 
 	// Finish Line Config
@@ -273,7 +273,7 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 
 void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].timePerFrame = 17;
-    controlConfigs[configIndex].servoSteeringOffset = 0.0f;
+    controlConfigs[configIndex].servoSteeringOffset = -0.045f;
     controlConfigs[configIndex].pixyLedColorR = 255;
     controlConfigs[configIndex].pixyLedColorG = 255;
     controlConfigs[configIndex].pixyLedColorB = 31;
@@ -296,14 +296,15 @@ void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlCo
 
     // Column Config
     controlConfigs[configIndex].columnConfig.column = 158;
-    controlConfigs[configIndex].columnConfig.edgeThreshold = 20;
-    controlConfigs[configIndex].columnConfig.minEdgeWidth = 1;
+    controlConfigs[configIndex].columnConfig.edgeThreshold = 18;
+    controlConfigs[configIndex].columnConfig.minEdgeWidth = 0;
     controlConfigs[configIndex].columnConfig.maxEdgeWidth = 10;
     controlConfigs[configIndex].columnConfig.minThickness = 0;
 
 	// Obstacle Detection
 	controlConfigs[configIndex].obstacleDetection = true;
-	controlConfigs[configIndex].minObstacleRow = 140;
+	// TODO: Calibrate
+	// controlConfigs[configIndex].minObstacleRow = 140;
 
     // Battery - SORTED!
     controlConfigs[configIndex].batteryLevelCheckInterval = 1000;
@@ -335,6 +336,16 @@ void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlCo
     controlConfigs[configIndex].batteryLevelLookup[9].disableWhenLower = true;
 }
 
+void safeConfigWithoutFinishLineDetection(uint8_t configIndex, ControlConfig* controlConfigs) {
+	safeConfig(configIndex, controlConfigs);
+    controlConfigs[configIndex].finishLineDetection = false;
+};
+
+void middleConfigWithoutFinishLineDetection(uint8_t configIndex, ControlConfig* controlConfigs) {
+	safeConfig(configIndex, controlConfigs);
+    controlConfigs[configIndex].finishLineDetection = false;
+};
+
 void loadControlConfigs(uint8_t* controlConfigsLength, ControlConfig* controlConfigs) {
     *controlConfigsLength = 4;
 
@@ -344,7 +355,9 @@ void loadControlConfigs(uint8_t* controlConfigsLength, ControlConfig* controlCon
 
     safeConfig(0, controlConfigs);
     middleConfig(1, controlConfigs);
-    fastConfig(2, controlConfigs);
+	safeConfigWithoutFinishLineDetection(2, controlConfigs);
+	middleConfigWithoutFinishLineDetection(3, controlConfigs);
+    // fastConfig(2, controlConfigs);
 
-    middleConfigObstacleDetection(3, controlConfigs);
+    // middleConfigObstacleDetection(3, controlConfigs);
 }

@@ -121,6 +121,7 @@ bool stopCar(bool stop) {
 			destinationSpeed = currentConfig->stopBrakeSpeed;
 		} else {
 			destinationSpeed = 0.0f;
+			// TODO: Stop Task
 		}
 	} else {
 		mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOff);
@@ -261,11 +262,11 @@ void controlCar() {
 			columnAnalysis.calculateSobel();
 			bool foundObstacle = columnAnalysis.detectObstacle(lastRow);
 
+			// TODO: Comment Debug
 			columnAnalysis.printLines();
 			columnAnalysis.printSobleColumn();
 			
 			if (foundObstacle) {
-				// printf("Found %d %d %d\n", firstEdge, secondEdge, thirdEdge);
 				if (columnAnalysis.obstacleBottomEdge > currentConfig->minObstacleRow) {
 					stop = true;
 				}
