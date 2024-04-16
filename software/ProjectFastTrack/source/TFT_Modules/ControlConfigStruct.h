@@ -56,7 +56,7 @@ struct ControlConfig {
     bool switchConfigAfterFinishLineDetection = false;
     uint8_t configAfterFinishLineDetected;
     uint16_t switchConfigAfterFinishLineTimeout = 0;
-    uint16_t startFinishLineDetectionAfter = 10000;
+    uint16_t startFinishLineDetectionAfter = 5000;
     uint8_t finishLineLeftOffset = 35, finishLineRightOffset = 35;
 
     // Obstacle Detection

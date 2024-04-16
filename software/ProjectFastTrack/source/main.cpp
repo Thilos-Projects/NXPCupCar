@@ -47,6 +47,7 @@ Scheduler::taskHandle* t_cameraAlgorithm;
 Scheduler::taskHandle* t_batteryLevelMonitor;
 Scheduler::taskHandle* t_dipSwitchConfig;
 Scheduler::taskHandle* t_spedRead;
+Scheduler::taskHandle* t_finishLineGrace;
 
 //Bennenungen für Programmstruktur
 void pixySetup();
@@ -57,6 +58,7 @@ float batteryLevel = 0.0f;
 float batteryAccelerationFactor = 1.0f;
 bool batteryDisable = false;
 bool steeringDiabled = false;
+bool finishLineGraceTimer = false;
 
 void Setup() {
 	mCpu_Setup();
@@ -206,7 +208,7 @@ void controlCar() {
 	}
 
 	// Finish Line detection
-	if (currentConfig->finishLineDetection && Scheduler::getMillis() > currentConfig->startFinishLineDetectionAfter) {
+	if (currentConfig->finishLineDetection && finishLineGraceTimer) {
 		static bool finishLineDetectedLeft = false, finishLineDetectedRight = false, finishLineDetectedCenter = false;
 		static uint8_t secondPosLeft = 0, secondPosRight = 0, secondPosCenter = 0;
 
@@ -411,6 +413,8 @@ void defineTasks() {
 		motorEnabled = mSwitch_ReadSwitch(SwitchEnum::kSw4);
 		if(!motorEnabled)
 			MotorControl::setSpeed(0, 0);
+		else
+			Scheduler::SetActive(t_finishLineGrace);
 	}, 1000);
 
 	t_spedRead = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
@@ -418,6 +422,12 @@ void defineTasks() {
 		MotorControl::getSpeed(&a, &b);
 		printf("Speed %d, %d\n", (int32_t)(a*1), (int32_t)(b*1));
 	}, 500, true, true);
+
+	finishLineGraceTimer = false;
+	t_finishLineGrace = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
+		finishLineGraceTimer = true;
+		mLeds_Write(LedMaskEnum::kMaskLed4, LedStateEnum::kLedOff);
+	}, currentConfig->startFinishLineDetectionAfter, false, false);
 }
 
 int main(){
@@ -428,6 +438,8 @@ int main(){
 
 	Setup();
 	defineTasks();
+
+	mLeds_Write(LedMaskEnum::kMaskLed4, LedStateEnum::kLedOn);
 
 	for(UInt32 i = 0; true; i++){
 		Scheduler::Update();

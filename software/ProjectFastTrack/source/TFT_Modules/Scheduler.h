@@ -46,6 +46,8 @@ namespace Scheduler{
 	//aktueller clockzyklus in millisekunden
 	float getMillis();
 
+	void SetActive(taskHandle* task, bool active = true, bool = false);
+
 	//periodischer aufruf zum ausführen der tasks
 	void Update();
 
