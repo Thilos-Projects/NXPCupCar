@@ -342,7 +342,7 @@ void safeConfigWithoutFinishLineDetection(uint8_t configIndex, ControlConfig* co
 };
 
 void middleConfigWithoutFinishLineDetection(uint8_t configIndex, ControlConfig* controlConfigs) {
-	safeConfig(configIndex, controlConfigs);
+	middleConfig(configIndex, controlConfigs);
     controlConfigs[configIndex].finishLineDetection = false;
 };
 
