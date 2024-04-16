@@ -112,7 +112,7 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	// Finish Line Config
     controlConfigs[configIndex].finishLineDetection = true;
     controlConfigs[configIndex].switchConfigAfterFinishLineDetection = true;
-    controlConfigs[configIndex].configAfterFinishLineDetected = 3;
+    controlConfigs[configIndex].configAfterFinishLineDetected = 4;
     controlConfigs[configIndex].switchConfigAfterFinishLineTimeout = 200;
 
 	// Battery - SORTED!
@@ -174,7 +174,7 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	// Finish Line Config
     controlConfigs[configIndex].finishLineDetection = true;
     controlConfigs[configIndex].switchConfigAfterFinishLineDetection = true;
-    controlConfigs[configIndex].configAfterFinishLineDetected = 3;
+    controlConfigs[configIndex].configAfterFinishLineDetected = 4;
     controlConfigs[configIndex].switchConfigAfterFinishLineTimeout = 200;
 
 	// Battery - SORTED!
@@ -238,7 +238,7 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	// Finish Line Config
     controlConfigs[configIndex].finishLineDetection = true;
     controlConfigs[configIndex].switchConfigAfterFinishLineDetection = true;
-    controlConfigs[configIndex].configAfterFinishLineDetected = 3;
+    controlConfigs[configIndex].configAfterFinishLineDetected = 4;
     controlConfigs[configIndex].switchConfigAfterFinishLineTimeout = 200;
 
     // Battery - SORTED!
@@ -359,5 +359,5 @@ void loadControlConfigs(uint8_t* controlConfigsLength, ControlConfig* controlCon
 	middleConfigWithoutFinishLineDetection(3, controlConfigs);
     // fastConfig(2, controlConfigs);
 
-    // middleConfigObstacleDetection(3, controlConfigs);
+    middleConfigObstacleDetection(4, controlConfigs);
 }
