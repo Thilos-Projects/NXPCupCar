@@ -157,7 +157,7 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].steeringDerivativeFactor = 0.0f;
 	controlConfigs[configIndex].steeringHoldframesAfterTurn = 0;
 	controlConfigs[configIndex].brakeRowDistance = 2;
-	controlConfigs[configIndex].straightSpeed = 0.2f;
+	controlConfigs[configIndex].straightSpeed = 0.23f;
 	controlConfigs[configIndex].turnSpeed = 0.2f;
 
 	makeStandardBreakSpeedConfig(&controlConfigs[configIndex].breakSpeedLookupEntrys, &controlConfigs[configIndex].breakSpeedLookupEntryCount);
