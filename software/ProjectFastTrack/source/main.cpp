@@ -381,7 +381,7 @@ void defineTasks() {
 		// TODO
 		// if(motorEnabled && !batteryDisable) {
 		if(motorEnabled){
-			
+			float speed = speedBattery(destinationSpeed);
 			MotorControl::setSpeed(speed * 1.05f + 0.05f*speed/abs(speed), speed); //Änderung: Motoren Gleich Schnell fahren lassen
 			float speedMultiplierLeft = mAd_Read(ADCInputEnum::kPot1) + 2;
 			float speedMultiplierRight = mAd_Read(ADCInputEnum::kPot2) + 2;
