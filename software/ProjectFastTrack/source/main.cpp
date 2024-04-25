@@ -320,11 +320,7 @@ void controlCar() {
 
 	steeringAngle *= steeringAngleFactor;*/
 
-	if (leftSpeed > 25 || rightSpeed > 25) {
-		steeringAngle *= 2.2f;
-	} else {
-		steeringAngle *= 1.8f;
-	}
+	float steeringAngleFactor = currentConfig->steeringPotentialFactor;
 
 	float steeringAngleDerivative = (lastSteeringAngle - steeringAngle) * currentConfig->steeringDerivativeFactor;
 
@@ -345,7 +341,6 @@ void controlCar() {
 		trackWidthOverThreshold[6] = trackWidthOverThreshold[5]; // Prevent NullPointerException
 		for (; maxRowForSpeedCalculation > 1 && trackWidthOverThreshold[maxRowForSpeedCalculation] ; maxRowForSpeedCalculation--);
 		if (maxRowForSpeedCalculation < currentConfig->brakeRowDistance) { // Break or Turn
-			//breakAppliedFor
 
 			BreakSpeedLookupEntry* chosenEntry = &currentConfig->breakSpeedLookupEntrys[0];
 			int i = 0;
@@ -381,12 +376,25 @@ void defineTasks() {
 		// TODO
 		// if(motorEnabled && !batteryDisable) {
 		if(motorEnabled){
+
 			float speed = speedBattery(destinationSpeed);
-			MotorControl::setSpeed(speed * 1.05f + 0.05f*speed/abs(speed), speed); //Änderung: Motoren Gleich Schnell fahren lassen
+
+			// TODO: Not use Potis!?
 			float speedMultiplierLeft = mAd_Read(ADCInputEnum::kPot1) + 2;
 			float speedMultiplierRight = mAd_Read(ADCInputEnum::kPot2) + 2;
 			// printf("SL: %d\tSR: %d", (int32_t)(speedMultiplierLeft * 1000000.0f), (int32_t)(speedMultiplierRight * 1000000.0f));
-			MotorControl::setSpeed(speed * speedMultiplierLeft, speed * speedMultiplierRight); //Änderung: Motoren Gleich Schnell fahren lassen
+			
+			float leftSpeed, rightSpeed;
+			MotorControl::getSpeed(&leftSpeed, &rightSpeed);
+			float currentSpeed = max(leftSpeed, rightSpeed);
+
+			// TODO: Make this value configurable
+			if (currentSpeed < 21 && destinationSpeed > 0.0f) {
+				// TODO: Make this value(s) configurable
+				MotorControl::setSpeed(1.0f, 1.0f);
+			} else {
+				MotorControl::setSpeed(speed * speedMultiplierLeft, speed * speedMultiplierRight); //Änderung: Motoren Gleich Schnell fahren lassen
+			}
 		} else
 			MotorControl::setSpeed(0, 0);
 	}, currentConfig->timePerFrame);

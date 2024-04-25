@@ -220,7 +220,7 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].steeringPotentialFactorSpeedIncrements = 35;
     controlConfigs[configIndex].steeringDerivativeFactor = 0.3f;
     controlConfigs[configIndex].steeringHoldframesAfterTurn = 0;
-    controlConfigs[configIndex].brakeRowDistance = 2;
+    controlConfigs[configIndex].brakeRowDistance = 3;
     controlConfigs[configIndex].straightSpeed = 0.3f;
     controlConfigs[configIndex].turnSpeed = 0.2f;
 
