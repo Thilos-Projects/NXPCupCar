@@ -81,9 +81,34 @@ void makeStandardBreakSpeedConfig(BreakSpeedLookupEntry** configs, uint8_t* conf
 	((*configs) + 4)->breakSpeed = -0.5f;
 }
 
+void makeStandardAccelerationSpeedConfig(AccelearteSpeedLookupEntry** configs, uint8_t* configLength){
+	*configLength = 5;
+	*configs = (AccelearteSpeedLookupEntry*)malloc(sizeof(AccelearteSpeedLookupEntry) * *configLength);
+
+	((*configs) + 0)->lowerSpeed = 20;
+	((*configs) + 0)->frameCount = 15;
+	((*configs) + 0)->accelerationSpeed = 1.0f;
+
+	((*configs) + 1)->lowerSpeed = 25;
+	((*configs) + 1)->frameCount = 15;
+	((*configs) + 1)->accelerationSpeed = 1.0f;
+
+	((*configs) + 2)->lowerSpeed = 30;
+	((*configs) + 2)->frameCount = 15;
+	((*configs) + 2)->accelerationSpeed = 0.8f;
+
+	((*configs) + 3)->lowerSpeed = 40;
+	((*configs) + 3)->frameCount = 15;
+	((*configs) + 3)->accelerationSpeed = 0.6f;
+
+	((*configs) + 4)->lowerSpeed = 60;
+	((*configs) + 4)->frameCount = 0;
+	((*configs) + 4)->accelerationSpeed = 0.3f;
+}
+
 void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].timePerFrame = 17;
-	controlConfigs[configIndex].servoSteeringOffset = -0.045f;
+	controlConfigs[configIndex].servoSteeringOffset = 0.0f;
 	controlConfigs[configIndex].pixyLedColorR = 255;
 	controlConfigs[configIndex].pixyLedColorG = 255;
 	controlConfigs[configIndex].pixyLedColorB = 31;
@@ -99,6 +124,7 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].turnSpeed = 0.2f;
 
 	makeStandardBreakSpeedConfig(&controlConfigs[configIndex].breakSpeedLookupEntrys, &controlConfigs[configIndex].breakSpeedLookupEntryCount);
+	makeStandardAccelerationSpeedConfig(&controlConfigs[configIndex].accelerateSpeedLookupEntries, &controlConfigs[configIndex].accelerateSpeedLookupEntryCount);
 
 	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
@@ -147,7 +173,7 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 
 void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].timePerFrame = 17;
-	controlConfigs[configIndex].servoSteeringOffset = -0.045f;
+	controlConfigs[configIndex].servoSteeringOffset = 0.0f;
 	controlConfigs[configIndex].pixyLedColorR = 63;
 	controlConfigs[configIndex].pixyLedColorG = 255;
 	controlConfigs[configIndex].pixyLedColorB = 63;
@@ -161,6 +187,7 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].turnSpeed = 0.2f;
 
 	makeStandardBreakSpeedConfig(&controlConfigs[configIndex].breakSpeedLookupEntrys, &controlConfigs[configIndex].breakSpeedLookupEntryCount);
+	makeStandardAccelerationSpeedConfig(&controlConfigs[configIndex].accelerateSpeedLookupEntries, &controlConfigs[configIndex].accelerateSpeedLookupEntryCount);
 
 	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
@@ -209,7 +236,7 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 
 void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].timePerFrame = 17;
-    controlConfigs[configIndex].servoSteeringOffset = -0.045f;
+    controlConfigs[configIndex].servoSteeringOffset = 0.0f;
     controlConfigs[configIndex].pixyLedColorR = 255;
     controlConfigs[configIndex].pixyLedColorG = 255;
     controlConfigs[configIndex].pixyLedColorB = 31;
@@ -221,10 +248,11 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].steeringDerivativeFactor = 0.0f;
     controlConfigs[configIndex].steeringHoldframesAfterTurn = 0;
     controlConfigs[configIndex].brakeRowDistance = 2;
-    controlConfigs[configIndex].straightSpeed = 0.3f;
-    controlConfigs[configIndex].turnSpeed = 0.2f;
+    controlConfigs[configIndex].straightSpeed = 0.35f;
+    controlConfigs[configIndex].turnSpeed = 0.25f;
 
 	makeStandardBreakSpeedConfig(&controlConfigs[configIndex].breakSpeedLookupEntrys, &controlConfigs[configIndex].breakSpeedLookupEntryCount);
+	makeStandardAccelerationSpeedConfig(&controlConfigs[configIndex].accelerateSpeedLookupEntries, &controlConfigs[configIndex].accelerateSpeedLookupEntryCount);
 
 	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
@@ -273,7 +301,7 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 
 void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].timePerFrame = 17;
-    controlConfigs[configIndex].servoSteeringOffset = -0.045f;
+    controlConfigs[configIndex].servoSteeringOffset = 0.0f;
     controlConfigs[configIndex].pixyLedColorR = 255;
     controlConfigs[configIndex].pixyLedColorG = 255;
     controlConfigs[configIndex].pixyLedColorB = 31;
@@ -288,12 +316,9 @@ void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlCo
     controlConfigs[configIndex].straightSpeed = 0.19f;
     controlConfigs[configIndex].turnSpeed = 0.19f;
     controlConfigs[configIndex].stopBrakeFrameCount = 3;
-    controlConfigs[configIndex].stopBrakeSpeed = -0.2f;
 
 	makeStandardBreakSpeedConfig(&controlConfigs[configIndex].breakSpeedLookupEntrys, &controlConfigs[configIndex].breakSpeedLookupEntryCount);
-	// controlConfigs[configIndex].breakSpeedLookupEntrys[2].breakSpeed = 0.0f;
-	// controlConfigs[configIndex].breakSpeedLookupEntrys[3].breakSpeed = -0.1f;
-	// controlConfigs[configIndex].breakSpeedLookupEntrys[4].breakSpeed = -0.2f;
+	makeStandardAccelerationSpeedConfig(&controlConfigs[configIndex].accelerateSpeedLookupEntries, &controlConfigs[configIndex].accelerateSpeedLookupEntryCount);
 
 	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 

@@ -146,6 +146,7 @@ void controlCar() {
 	static CameraAnalysis::PartialColumnAnalysis partColumnAnalysis;
 	static float lastSteeringAngle = 0.0f;
 	static uint8_t brakeAppliedFor = 0;
+	static uint8_t accelerationAppliedFor = 0;
 	static int16_t trackCenterDifferences[6]; // Size: Length of Rows
 	static uint16_t prevTrackCenters[6] = { 158, 158, 158, 158, 158, 158 }; // Size: Length of Rows
 	static bool trackWidthOverThreshold[7]; // Size: Length of Rows +1!
@@ -345,7 +346,7 @@ void controlCar() {
 		trackWidthOverThreshold[6] = trackWidthOverThreshold[5]; // Prevent NullPointerException
 		for (; maxRowForSpeedCalculation > 1 && trackWidthOverThreshold[maxRowForSpeedCalculation] ; maxRowForSpeedCalculation--);
 		if (maxRowForSpeedCalculation < currentConfig->brakeRowDistance) { // Break or Turn
-			//breakAppliedFor
+			accelerationAppliedFor = 0;
 
 			BreakSpeedLookupEntry* chosenEntry = &currentConfig->breakSpeedLookupEntrys[0];
 			int i = 0;
@@ -363,7 +364,50 @@ void controlCar() {
 
 		} else { // Straight
 			brakeAppliedFor = 0;
-			destinationSpeed = currentConfig->straightSpeed;
+
+			AccelearteSpeedLookupEntry* chosenEntry = &currentConfig->accelerateSpeedLookupEntries[0];
+			int i = 0;
+			for(i = 0; i < currentConfig->accelerateSpeedLookupEntryCount; i++) {
+				chosenEntry = &currentConfig->accelerateSpeedLookupEntries[i];
+				if(currentConfig->accelerateSpeedLookupEntries[i].lowerSpeed >= currentSpeed) break;
+			}
+			
+			/*
+			mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOff);
+			mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOff);
+			mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOff);
+
+			switch (i) {
+				case 0:
+					mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
+					break;
+				case 1:
+					mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOn);
+					break;
+				case 2:
+					mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOn);
+					break;
+				case 3:
+					mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
+					mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOn);
+					break;
+				case 4:
+					mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOn);
+					mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOn);
+					break;
+				default:
+					break;
+			}
+			*/
+
+			if (accelerationAppliedFor < chosenEntry->frameCount) {
+				// TODO
+				destinationSpeed = chosenEntry->accelerationSpeed;
+				accelerationAppliedFor++;
+			} else {
+				// TODO
+				destinationSpeed = currentConfig->straightSpeed;
+			}
 		}
 	}
 
@@ -382,7 +426,10 @@ void defineTasks() {
 		// if(motorEnabled && !batteryDisable) {
 		if(motorEnabled){
 			float speed = speedBattery(destinationSpeed);
-			MotorControl::setSpeed(speed * 1.05f + 0.05f*speed/abs(speed), speed); //Änderung: Motoren Gleich Schnell fahren lassen
+			float speedMultiplierLeft = mAd_Read(ADCInputEnum::kPot1) + 2;
+			float speedMultiplierRight = mAd_Read(ADCInputEnum::kPot2) + 2;
+			// printf("SL: %d\tSR: %d", (int32_t)(speedMultiplierLeft * 1000000.0f), (int32_t)(speedMultiplierRight * 1000000.0f));
+			MotorControl::setSpeed(speed * speedMultiplierLeft, speed * speedMultiplierRight); //Änderung: Motoren Gleich Schnell fahren lassen
 		} else
 			MotorControl::setSpeed(0, 0);
 	}, currentConfig->timePerFrame);

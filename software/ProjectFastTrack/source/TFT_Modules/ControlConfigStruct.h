@@ -38,6 +38,12 @@ struct BreakSpeedLookupEntry {
     float breakSpeed = -0.5f;
 };
 
+struct AccelearteSpeedLookupEntry {
+    float lowerSpeed = 0.0f;
+    uint8_t frameCount = 0;
+    float accelerationSpeed = 0.5f;
+};
+
 struct ControlConfig {
     uint16_t timePerFrame = 17;
 
@@ -64,7 +70,7 @@ struct ControlConfig {
     uint8_t minObstacleRow = 0;
 
     // Steering-Stuff
-    float servoSteeringOffset = 0.0f;
+    float servoSteeringOffset = 0.0f; // Negative: Left / Postive: Right
     float steeringPotentialFactor = 0.0f;
     float steeringPotentialFactorPerSpeed = 0.0f;
     uint8_t steeringPotentialFactorSpeedIncrements = 1;
@@ -77,9 +83,10 @@ struct ControlConfig {
     uint8_t stopBrakeFrameCount = 0;
     float straightSpeed = 0.0f;
     float turnSpeed = 0.0f;
-    float stopBrakeSpeed = 0.0f;
     uint8_t breakSpeedLookupEntryCount = 0;
     BreakSpeedLookupEntry* breakSpeedLookupEntrys;
+    uint8_t accelerateSpeedLookupEntryCount = 0;
+    AccelearteSpeedLookupEntry* accelerateSpeedLookupEntries;
 
     // Speed-Battery-Control
     uint16_t batteryLevelCheckInterval = 1000;
