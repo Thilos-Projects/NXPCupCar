@@ -381,8 +381,12 @@ void defineTasks() {
 		// TODO
 		// if(motorEnabled && !batteryDisable) {
 		if(motorEnabled){
-			float speed = speedBattery(destinationSpeed);
+			
 			MotorControl::setSpeed(speed * 1.05f + 0.05f*speed/abs(speed), speed); //Änderung: Motoren Gleich Schnell fahren lassen
+			float speedMultiplierLeft = mAd_Read(ADCInputEnum::kPot1) + 2;
+			float speedMultiplierRight = mAd_Read(ADCInputEnum::kPot2) + 2;
+			// printf("SL: %d\tSR: %d", (int32_t)(speedMultiplierLeft * 1000000.0f), (int32_t)(speedMultiplierRight * 1000000.0f));
+			MotorControl::setSpeed(speed * speedMultiplierLeft, speed * speedMultiplierRight); //Änderung: Motoren Gleich Schnell fahren lassen
 		} else
 			MotorControl::setSpeed(0, 0);
 	}, currentConfig->timePerFrame);
