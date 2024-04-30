@@ -260,7 +260,7 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].straightSpeed = 22.0f;
     controlConfigs[configIndex].turnSpeed = 11.0f;
 	controlConfigs[configIndex].speedDerivate = 0.2f;
-	controlConfigs[configIndex].slowdownAcceleration = 0.1f;
+	controlConfigs[configIndex].slowdownAcceleration = 0.15f;
 
 	createDefaultBrakeConfig(&controlConfigs[configIndex].brakeLookupEntries, &controlConfigs[configIndex].brakeLookupEntryCount);
 	createDefaultAccelerationConfig(&controlConfigs[configIndex].acceleatationLookupEntries, &controlConfigs[configIndex].acceleatationLookupEntryCount);
@@ -323,11 +323,11 @@ void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlCo
     controlConfigs[configIndex].steeringPotentialFactorSpeedIncrements = 35;
     controlConfigs[configIndex].steeringDerivativeFactor = 0.0f;
     controlConfigs[configIndex].steeringHoldframesAfterTurn = 0;
-    controlConfigs[configIndex].brakeRowDistance = 2;
-    controlConfigs[configIndex].straightSpeed = 0.19f;
-    controlConfigs[configIndex].turnSpeed = 0.19f;
-    controlConfigs[configIndex].stopBrakeFrameCount = 3;
-    controlConfigs[configIndex].stopBrakeSpeed = -0.2f;
+    controlConfigs[configIndex].brakeRowDistance = 3;
+    controlConfigs[configIndex].straightSpeed = 10.0f;
+    controlConfigs[configIndex].turnSpeed = 10.0f;
+	controlConfigs[configIndex].speedDerivate = 0.2f;
+	controlConfigs[configIndex].slowdownAcceleration = 0.1f;
 
 	createDefaultBrakeConfig(&controlConfigs[configIndex].brakeLookupEntries, &controlConfigs[configIndex].brakeLookupEntryCount);
 	createDefaultAccelerationConfig(&controlConfigs[configIndex].acceleatationLookupEntries, &controlConfigs[configIndex].acceleatationLookupEntryCount);
