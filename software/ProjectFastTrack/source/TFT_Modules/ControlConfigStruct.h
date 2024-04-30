@@ -75,8 +75,6 @@ struct ControlConfig {
     uint8_t steeringPotentialFactorSpeedIncrements = 1;
     float steeringDerivativeFactor = 0.0f;
 
-    uint8_t steeringHoldframesAfterTurn = 0;
-
     // Speed v2
     uint8_t brakeRowDistance = 0;
     float straightSpeed = 0.0f;
@@ -87,14 +85,6 @@ struct ControlConfig {
     uint8_t acceleatationLookupEntryCount = 0;
     AccelerationLookupEntry* acceleatationLookupEntries;
     float speedDerivate = 0.0f;
-    // TODO: Can we remove this? // Speed-Stuff
-    uint8_t stopBrakeFrameCount = 0;
-    float stopBrakeSpeed = 0.0f;
-
-    // TODO: REMOVE // Speed-Battery-Control
-    uint16_t batteryLevelCheckInterval = 1000;
-    uint8_t batteryLevelLookupLength = 0;
-    BatteryLevelLookupEntry* batteryLevelLookup; // From top down (first entry highest voltage)
 };
 
 #endif

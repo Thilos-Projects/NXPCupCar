@@ -116,7 +116,6 @@ void createDefaultAccelerationConfig(AccelerationLookupEntry** configs, uint8_t*
 }
 
 void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
-	controlConfigs[configIndex].timePerFrame = 17;
 	controlConfigs[configIndex].servoSteeringOffset = -0.0f;
 	controlConfigs[configIndex].pixyLedColorR = 255;
 	controlConfigs[configIndex].pixyLedColorG = 255;
@@ -127,7 +126,6 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].steeringPotentialFactorPerSpeed = 0.4f;
 	controlConfigs[configIndex].steeringPotentialFactorSpeedIncrements = 35;
 	controlConfigs[configIndex].steeringDerivativeFactor = 0.0f;
-	controlConfigs[configIndex].steeringHoldframesAfterTurn = 0;
 	controlConfigs[configIndex].brakeRowDistance = 1;
 	controlConfigs[configIndex].straightSpeed = 0.3f;
 	controlConfigs[configIndex].turnSpeed = 0.2f;
@@ -149,39 +147,9 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].switchConfigAfterFinishLineDetection = true;
     controlConfigs[configIndex].configAfterFinishLineDetected = 4;
     controlConfigs[configIndex].switchConfigAfterFinishLineTimeout = 200;
-
-	// Battery - SORTED!
-	controlConfigs[configIndex].batteryLevelCheckInterval = 1000;
-	controlConfigs[configIndex].batteryLevelLookupLength = 10;
-	controlConfigs[configIndex].batteryLevelLookup = (BatteryLevelLookupEntry*)malloc(sizeof(BatteryLevelLookupEntry) * controlConfigs[configIndex].batteryLevelLookupLength);
-	// Bigger battery
-	controlConfigs[configIndex].batteryLevelLookup[0].batteryLevel = 13.0f;
-	controlConfigs[configIndex].batteryLevelLookup[0].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[1].batteryLevel = 12.5f;
-	controlConfigs[configIndex].batteryLevelLookup[1].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[2].batteryLevel = 12.0f;
-	controlConfigs[configIndex].batteryLevelLookup[2].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[3].batteryLevel = 11.5f;
-	controlConfigs[configIndex].batteryLevelLookup[3].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[4].batteryLevel = 11.0f;
-	controlConfigs[configIndex].batteryLevelLookup[4].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[5].batteryLevel = 10.0f;
-	controlConfigs[configIndex].batteryLevelLookup[5].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[5].disableWhenLower = true;
-	// Smaller battery
-	controlConfigs[configIndex].batteryLevelLookup[6].batteryLevel = 9.0f;
-	controlConfigs[configIndex].batteryLevelLookup[6].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[7].batteryLevel = 8.5f;
-	controlConfigs[configIndex].batteryLevelLookup[7].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[8].batteryLevel = 7.3f;
-	controlConfigs[configIndex].batteryLevelLookup[8].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[9].batteryLevel = 6.9f;
-	controlConfigs[configIndex].batteryLevelLookup[9].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[9].disableWhenLower = true;
 }
 
 void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
-	controlConfigs[configIndex].timePerFrame = 17;
 	controlConfigs[configIndex].servoSteeringOffset = -0.0f;
 	controlConfigs[configIndex].pixyLedColorR = 63;
 	controlConfigs[configIndex].pixyLedColorG = 255;
@@ -190,7 +158,6 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].cameraProgram = "video";
 	controlConfigs[configIndex].steeringPotentialFactor = 2.0f;
 	controlConfigs[configIndex].steeringDerivativeFactor = 0.0f;
-	controlConfigs[configIndex].steeringHoldframesAfterTurn = 0;
 	controlConfigs[configIndex].brakeRowDistance = 2;
 	controlConfigs[configIndex].straightSpeed = 0.23f;
 	controlConfigs[configIndex].turnSpeed = 0.2f;
@@ -212,39 +179,9 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].switchConfigAfterFinishLineDetection = true;
     controlConfigs[configIndex].configAfterFinishLineDetected = 4;
     controlConfigs[configIndex].switchConfigAfterFinishLineTimeout = 200;
-
-	// Battery - SORTED!
-	controlConfigs[configIndex].batteryLevelCheckInterval = 1000;
-	controlConfigs[configIndex].batteryLevelLookupLength = 10;
-	controlConfigs[configIndex].batteryLevelLookup = (BatteryLevelLookupEntry*)malloc(sizeof(BatteryLevelLookupEntry) * controlConfigs[configIndex].batteryLevelLookupLength);
-	// Bigger battery
-	controlConfigs[configIndex].batteryLevelLookup[0].batteryLevel = 13.0f;
-	controlConfigs[configIndex].batteryLevelLookup[0].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[1].batteryLevel = 12.5f;
-	controlConfigs[configIndex].batteryLevelLookup[1].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[2].batteryLevel = 12.0f;
-	controlConfigs[configIndex].batteryLevelLookup[2].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[3].batteryLevel = 11.5f;
-	controlConfigs[configIndex].batteryLevelLookup[3].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[4].batteryLevel = 11.0f;
-	controlConfigs[configIndex].batteryLevelLookup[4].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[5].batteryLevel = 10.0f;
-	controlConfigs[configIndex].batteryLevelLookup[5].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[5].disableWhenLower = true;
-	// Smaller battery
-	controlConfigs[configIndex].batteryLevelLookup[6].batteryLevel = 9.0f;
-	controlConfigs[configIndex].batteryLevelLookup[6].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[7].batteryLevel = 8.5f;
-	controlConfigs[configIndex].batteryLevelLookup[7].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[8].batteryLevel = 7.3f;
-	controlConfigs[configIndex].batteryLevelLookup[8].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[9].batteryLevel = 6.9f;
-	controlConfigs[configIndex].batteryLevelLookup[9].accelerationFactor = 1.0f;
-	controlConfigs[configIndex].batteryLevelLookup[9].disableWhenLower = true;
 }
 
 void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
-    controlConfigs[configIndex].timePerFrame = 17;
     controlConfigs[configIndex].servoSteeringOffset = -0.0f;
     controlConfigs[configIndex].pixyLedColorR = 255;
     controlConfigs[configIndex].pixyLedColorG = 255;
@@ -255,7 +192,6 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].steeringPotentialFactorPerSpeed = 0.4f;
     controlConfigs[configIndex].steeringPotentialFactorSpeedIncrements = 35;
     controlConfigs[configIndex].steeringDerivativeFactor = 0.3f;
-    controlConfigs[configIndex].steeringHoldframesAfterTurn = 0;
     controlConfigs[configIndex].brakeRowDistance = 3;
     controlConfigs[configIndex].straightSpeed = 22.0f;
     controlConfigs[configIndex].turnSpeed = 11.0f;
@@ -279,39 +215,9 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].switchConfigAfterFinishLineDetection = true;
     controlConfigs[configIndex].configAfterFinishLineDetected = 4;
     controlConfigs[configIndex].switchConfigAfterFinishLineTimeout = 200;
-
-    // Battery - SORTED!
-    controlConfigs[configIndex].batteryLevelCheckInterval = 1000;
-    controlConfigs[configIndex].batteryLevelLookupLength = 10;
-    controlConfigs[configIndex].batteryLevelLookup = (BatteryLevelLookupEntry*)malloc(sizeof(BatteryLevelLookupEntry) * controlConfigs[configIndex].batteryLevelLookupLength);
-    // Bigger battery
-    controlConfigs[configIndex].batteryLevelLookup[0].batteryLevel = 13.0f;
-    controlConfigs[configIndex].batteryLevelLookup[0].accelerationFactor = 0.85f;
-    controlConfigs[configIndex].batteryLevelLookup[1].batteryLevel = 12.5f;
-    controlConfigs[configIndex].batteryLevelLookup[1].accelerationFactor = 0.85f;
-    controlConfigs[configIndex].batteryLevelLookup[2].batteryLevel = 12.0f;
-    controlConfigs[configIndex].batteryLevelLookup[2].accelerationFactor = 0.90f;
-    controlConfigs[configIndex].batteryLevelLookup[3].batteryLevel = 11.5f;
-    controlConfigs[configIndex].batteryLevelLookup[3].accelerationFactor = 0.95f;
-    controlConfigs[configIndex].batteryLevelLookup[4].batteryLevel = 11.0f;
-    controlConfigs[configIndex].batteryLevelLookup[4].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[5].batteryLevel = 10.0f;
-    controlConfigs[configIndex].batteryLevelLookup[5].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[5].disableWhenLower = true;
-    // Smaller battery
-    controlConfigs[configIndex].batteryLevelLookup[6].batteryLevel = 9.0f;
-    controlConfigs[configIndex].batteryLevelLookup[6].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[7].batteryLevel = 8.5f;
-    controlConfigs[configIndex].batteryLevelLookup[7].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[8].batteryLevel = 7.3f;
-    controlConfigs[configIndex].batteryLevelLookup[8].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[9].batteryLevel = 6.9f;
-    controlConfigs[configIndex].batteryLevelLookup[9].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[9].disableWhenLower = true;
 }
 
 void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlConfigs){
-    controlConfigs[configIndex].timePerFrame = 17;
     controlConfigs[configIndex].servoSteeringOffset = -0.0f;
     controlConfigs[configIndex].pixyLedColorR = 255;
     controlConfigs[configIndex].pixyLedColorG = 255;
@@ -322,7 +228,6 @@ void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlCo
     controlConfigs[configIndex].steeringPotentialFactorPerSpeed = 0.4f;
     controlConfigs[configIndex].steeringPotentialFactorSpeedIncrements = 35;
     controlConfigs[configIndex].steeringDerivativeFactor = 0.0f;
-    controlConfigs[configIndex].steeringHoldframesAfterTurn = 0;
     controlConfigs[configIndex].brakeRowDistance = 3;
     controlConfigs[configIndex].straightSpeed = 10.0f;
     controlConfigs[configIndex].turnSpeed = 10.0f;
@@ -348,35 +253,6 @@ void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlCo
 	controlConfigs[configIndex].obstacleDetection = true;
 	// TODO: Calibrate
 	controlConfigs[configIndex].minObstacleRow = 130;
-
-    // Battery - SORTED!
-    controlConfigs[configIndex].batteryLevelCheckInterval = 1000;
-    controlConfigs[configIndex].batteryLevelLookupLength = 10;
-    controlConfigs[configIndex].batteryLevelLookup = (BatteryLevelLookupEntry*)malloc(sizeof(BatteryLevelLookupEntry) * controlConfigs[configIndex].batteryLevelLookupLength);
-    // Bigger battery
-    controlConfigs[configIndex].batteryLevelLookup[0].batteryLevel = 13.0f;
-    controlConfigs[configIndex].batteryLevelLookup[0].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[1].batteryLevel = 12.5f;
-    controlConfigs[configIndex].batteryLevelLookup[1].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[2].batteryLevel = 12.0f;
-    controlConfigs[configIndex].batteryLevelLookup[2].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[3].batteryLevel = 11.5f;
-    controlConfigs[configIndex].batteryLevelLookup[3].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[4].batteryLevel = 11.0f;
-    controlConfigs[configIndex].batteryLevelLookup[4].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[5].batteryLevel = 10.0f;
-    controlConfigs[configIndex].batteryLevelLookup[5].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[5].disableWhenLower = true;
-    // Smaller battery
-    controlConfigs[configIndex].batteryLevelLookup[6].batteryLevel = 9.0f;
-    controlConfigs[configIndex].batteryLevelLookup[6].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[7].batteryLevel = 8.5f;
-    controlConfigs[configIndex].batteryLevelLookup[7].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[8].batteryLevel = 7.3f;
-    controlConfigs[configIndex].batteryLevelLookup[8].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[9].batteryLevel = 6.9f;
-    controlConfigs[configIndex].batteryLevelLookup[9].accelerationFactor = 1.0f;
-    controlConfigs[configIndex].batteryLevelLookup[9].disableWhenLower = true;
 }
 
 void safeConfigWithoutFinishLineDetection(uint8_t configIndex, ControlConfig* controlConfigs) {

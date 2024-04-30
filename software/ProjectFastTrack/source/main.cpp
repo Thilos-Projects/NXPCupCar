@@ -44,7 +44,6 @@ Pixy2SPI_SS pixy;
 //Task Definitionen
 Scheduler::taskHandle* t_testMotorButton;
 Scheduler::taskHandle* t_cameraAlgorithm;
-Scheduler::taskHandle* t_batteryLevelMonitor;
 Scheduler::taskHandle* t_dipSwitchConfig;
 Scheduler::taskHandle* t_spedRead;
 Scheduler::taskHandle* t_finishLineGrace;
@@ -54,9 +53,6 @@ void pixySetup();
 
 float destinationSpeed = 0.0f;
 bool motorEnabled = false;
-float batteryLevel = 0.0f;
-float batteryAccelerationFactor = 1.0f;
-bool batteryDisable = false;
 bool steeringDiabled = false;
 bool finishLineGraceTimer = false;
 bool allowActiveBrake = false;
@@ -104,40 +100,6 @@ void pixySetup(){
 	pixy.setLED(currentConfig->pixyLedColorR, currentConfig->pixyLedColorG, currentConfig->pixyLedColorB);
 	pixy.setLamp((uint8_t)(currentConfig->pixyLamps>>8), (uint8_t)(currentConfig->pixyLamps>>0));
 	pixy.changeProg(currentConfig->cameraProgram);
-}
-
-float speedBattery(float destAcceleration) { // Speed Berry with Destination Excel
-	return destAcceleration * batteryAccelerationFactor;
-}
-
-/**
- * stop false to reset
- * @return true if applicable
-*/
-bool stopCar(bool stop, float currentSpeed) {
-	static uint8_t stopBrakeAppliedFor = 0;
-
-	if (stop) {
-		mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOn);
-		BrakeLookupEntry* chosenEntry = &currentConfig->brakeLookupEntries[0];
-		int i = 0;
-		for(i = 0; i < currentConfig->brakeLookupEntryCount; i++) {
-			chosenEntry = &currentConfig->brakeLookupEntries[i];
-			if(currentConfig->brakeLookupEntries[i].minSpeedDifference >= currentSpeed) break;
-		}
-
-		if (stopBrakeAppliedFor < chosenEntry->frameCount) {
-			destinationSpeed = chosenEntry->acceleration;
-			stopBrakeAppliedFor++;
-		} else {
-			destinationSpeed = 0.0f;
-		}
-		
-	} else {
-		mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOff);
-		stopBrakeAppliedFor = false;
-	}
-	return stop;
 }
 
 void controlCar() {
@@ -336,8 +298,6 @@ void controlCar() {
 
 	// Speed
 	if (stop) {
-		// TODO: REPLACE - Test if this still works!?
-		// stopCar(stop, currentSpeed);
 		allowActiveBrake = true;
 		destinationSpeed = 0.0f;
 	} else { // Normal Speed Control
@@ -361,11 +321,11 @@ void controlCar() {
 	}
 }
 
-float lookupBreakAcceleration(float currentSpeed, float destinationSpeed) {
-	static uint8_t brakingFor = 0;
+float lookupBrakeAcceleration(float currentSpeed, float destinationSpeed) {
+	static uint8_t brakeAppliedFor = 0;
 	float difference = destinationSpeed - currentSpeed; // positiv -> BESCHLEUNIGEN // negativ -> BREMSEN
 	if (difference >= 0) {
-		brakingFor = 0;
+		brakeAppliedFor = 0;
 
 		AccelerationLookupEntry* chosen1 = &currentConfig->acceleatationLookupEntries[0];
 		AccelerationLookupEntry* chosen2 = &currentConfig->acceleatationLookupEntries[0];
@@ -410,7 +370,7 @@ float lookupBreakAcceleration(float currentSpeed, float destinationSpeed) {
 		float acceleration = chosen1->acceleration + (factor * diffAcc);
 
 		// Set to 0 after X frames to prevent rolling back
-		if (brakingFor > frameCount) {
+		if (brakeAppliedFor > frameCount) {
 			mLeds_Write(LedMaskEnum::kMaskLed1, kLedOn);
 			mLeds_Write(LedMaskEnum::kMaskLed2, kLedOn);
 			return 0.0f;
@@ -419,7 +379,7 @@ float lookupBreakAcceleration(float currentSpeed, float destinationSpeed) {
 		mLeds_Write(LedMaskEnum::kMaskLed1, kLedOff);
 		mLeds_Write(LedMaskEnum::kMaskLed2, kLedOn);
 
-		brakingFor++;
+		brakeAppliedFor++;
 		return acceleration;
 	} else {
 		if (destinationSpeed > 0.0f) {
@@ -442,7 +402,7 @@ void controlMotor() {
 		MotorControl::getSpeed(&currentSpeedLeft, &currentSpeedRight);
 		float currentSpeed = max(currentSpeedLeft, currentSpeedRight);
 
-		float acceleration = lookupBreakAcceleration(currentSpeed, destinationSpeed);
+		float acceleration = lookupBrakeAcceleration(currentSpeed, destinationSpeed);
 
 		// Derivate
 		if (acceleration >= 0.0f) {
@@ -468,32 +428,6 @@ void defineTasks() {
 		controlCar();
 		controlMotor();
 	}, currentConfig->timePerFrame);
-
-	t_batteryLevelMonitor = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
-		bool localBatDisable = false;
-		batteryLevel = mAd_Read(ADCInputEnum::kUBatt);
-		printf("Batterie Level: %d\n", (int32_t)(batteryLevel*1000));
-		for (uint8_t i = 1; i < currentConfig->batteryLevelLookupLength; i++)
-		{
-			if (batteryLevel > currentConfig->batteryLevelLookup[i].batteryLevel) {
-				BatteryLevelLookupEntry currentEntry = currentConfig->batteryLevelLookup[i];
-				BatteryLevelLookupEntry previousEntry = currentConfig->batteryLevelLookup[i - 1];
-				float scaler = (batteryLevel - currentEntry.batteryLevel) / (previousEntry.batteryLevel - currentEntry.batteryLevel);
-				batteryAccelerationFactor = scaler * (previousEntry.accelerationFactor - currentEntry.accelerationFactor) + currentEntry.accelerationFactor;
-				break;
-			}
-			if (batteryLevel < currentConfig->batteryLevelLookup[i].batteryLevel &&
-				currentConfig->batteryLevelLookup[i].disableWhenLower) {
-				localBatDisable = true;
-				break;
-			} else {
-				localBatDisable = false;
-			}
-		}
-		if (!batteryDisable)
-			batteryDisable = localBatDisable;
-		
-	}, currentConfig->batteryLevelCheckInterval);
 
 	t_dipSwitchConfig = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		// Disable Steering
