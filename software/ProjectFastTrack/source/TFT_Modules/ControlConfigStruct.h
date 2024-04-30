@@ -32,9 +32,8 @@ struct BatteryLevelLookupEntry {
     bool disableWhenLower = false;
 };
 
-struct BreakLookupEntry {
+struct BrakeLookupEntry {
     float minSpeedDifference = 0.0f;
-    // TODO: Remove frameCount
     uint8_t frameCount = 0;
     float acceleration = -0.0f;
 };
@@ -82,12 +81,11 @@ struct ControlConfig {
     uint8_t brakeRowDistance = 0;
     float straightSpeed = 0.0f;
     float turnSpeed = 0.0f;
-    float minAcceleration = 0.0f;
-    uint8_t breakLookupEntryCount = 0;
-    BreakLookupEntry* breakLookupEntries;
+    float slowdownAcceleration = 0.0f;
+    uint8_t brakeLookupEntryCount = 0;
+    BrakeLookupEntry* brakeLookupEntries;
     uint8_t acceleatationLookupEntryCount = 0;
     AccelerationLookupEntry* acceleatationLookupEntries;
-    uint8_t maxBrakeFrameCount = 5;
     float speedDerivate = 0.0f;
     // TODO: Can we remove this? // Speed-Stuff
     uint8_t stopBrakeFrameCount = 0;

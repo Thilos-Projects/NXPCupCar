@@ -56,29 +56,36 @@ void makeStandardRowConfig(RowConfig** configs, uint8_t* configLength){
 	((*configs)[4]).weight = 1.0f;
 }
 
-void createDefaultBreakConfig(BreakLookupEntry** configs, uint8_t* configLength){
+void createDefaultBrakeConfig(BrakeLookupEntry** configs, uint8_t* configLength){
 	*configLength = 7;
-	*configs = (BreakLookupEntry*)malloc(sizeof(BreakLookupEntry) * *configLength);
+	*configs = (BrakeLookupEntry*)malloc(sizeof(BrakeLookupEntry) * *configLength);
 
 	((*configs) + 0)->minSpeedDifference = -0.0f;
+	((*configs) + 0)->frameCount = 5;
 	((*configs) + 0)->acceleration = -0.0f;
 
 	((*configs) + 1)->minSpeedDifference = -3.0f;
+	((*configs) + 0)->frameCount = 5;
 	((*configs) + 1)->acceleration = -0.2f;
 
 	((*configs) + 2)->minSpeedDifference = -6.0f;
+	((*configs) + 0)->frameCount = 10;
 	((*configs) + 2)->acceleration = -0.3f;
 
 	((*configs) + 3)->minSpeedDifference = -10.0f;
-	((*configs) + 3)->acceleration = -0.4f;
+	((*configs) + 0)->frameCount = 10;
+	((*configs) + 3)->acceleration = -0.7f;
 
 	((*configs) + 4)->minSpeedDifference = -15.0f;
-	((*configs) + 4)->acceleration = -0.5f;
+	((*configs) + 0)->frameCount = 10;
+	((*configs) + 4)->acceleration = -0.7f;
 
 	((*configs) + 5)->minSpeedDifference = -20.0f;
-	((*configs) + 5)->acceleration = -0.5f;
+	((*configs) + 0)->frameCount = 15;
+	((*configs) + 5)->acceleration = -1.0f;
 
 	((*configs) + 6)->minSpeedDifference = -30.0f;
+	((*configs) + 0)->frameCount = 20;
 	((*configs) + 6)->acceleration = -1.0f;
 }
 
@@ -87,10 +94,10 @@ void createDefaultAccelerationConfig(AccelerationLookupEntry** configs, uint8_t*
 	*configs = (AccelerationLookupEntry*)malloc(sizeof(AccelerationLookupEntry) * *configLength);
 
 	((*configs) + 0)->minSpeedDifference = 0.0f;
-	((*configs) + 0)->acceleration = 0.1f;
+	((*configs) + 0)->acceleration = 0.2f;
 
 	((*configs) + 1)->minSpeedDifference = 3.0f;
-	((*configs) + 1)->acceleration = 0.1f;
+	((*configs) + 1)->acceleration = 0.2f;
 
 	((*configs) + 2)->minSpeedDifference = 6.0f;
 	((*configs) + 2)->acceleration = 0.2f;
@@ -125,7 +132,7 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].straightSpeed = 0.3f;
 	controlConfigs[configIndex].turnSpeed = 0.2f;
 
-	createDefaultBreakConfig(&controlConfigs[configIndex].breakLookupEntries, &controlConfigs[configIndex].breakLookupEntryCount);
+	createDefaultBrakeConfig(&controlConfigs[configIndex].brakeLookupEntries, &controlConfigs[configIndex].brakeLookupEntryCount);
 	createDefaultAccelerationConfig(&controlConfigs[configIndex].acceleatationLookupEntries, &controlConfigs[configIndex].acceleatationLookupEntryCount);
 
 	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
@@ -188,7 +195,7 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].straightSpeed = 0.23f;
 	controlConfigs[configIndex].turnSpeed = 0.2f;
 
-	createDefaultBreakConfig(&controlConfigs[configIndex].breakLookupEntries, &controlConfigs[configIndex].breakLookupEntryCount);
+	createDefaultBrakeConfig(&controlConfigs[configIndex].brakeLookupEntries, &controlConfigs[configIndex].brakeLookupEntryCount);
 	createDefaultAccelerationConfig(&controlConfigs[configIndex].acceleatationLookupEntries, &controlConfigs[configIndex].acceleatationLookupEntryCount);
 
 	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
@@ -250,11 +257,12 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].steeringDerivativeFactor = 0.3f;
     controlConfigs[configIndex].steeringHoldframesAfterTurn = 0;
     controlConfigs[configIndex].brakeRowDistance = 3;
-    controlConfigs[configIndex].straightSpeed = 20.0f;
-    controlConfigs[configIndex].turnSpeed = 8.0f;
-	controlConfigs[configIndex].speedDerivate = 0.4f;
+    controlConfigs[configIndex].straightSpeed = 22.0f;
+    controlConfigs[configIndex].turnSpeed = 11.0f;
+	controlConfigs[configIndex].speedDerivate = 0.2f;
+	controlConfigs[configIndex].slowdownAcceleration = 0.1f;
 
-	createDefaultBreakConfig(&controlConfigs[configIndex].breakLookupEntries, &controlConfigs[configIndex].breakLookupEntryCount);
+	createDefaultBrakeConfig(&controlConfigs[configIndex].brakeLookupEntries, &controlConfigs[configIndex].brakeLookupEntryCount);
 	createDefaultAccelerationConfig(&controlConfigs[configIndex].acceleatationLookupEntries, &controlConfigs[configIndex].acceleatationLookupEntryCount);
 
 	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
@@ -321,11 +329,11 @@ void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlCo
     controlConfigs[configIndex].stopBrakeFrameCount = 3;
     controlConfigs[configIndex].stopBrakeSpeed = -0.2f;
 
-	createDefaultBreakConfig(&controlConfigs[configIndex].breakLookupEntries, &controlConfigs[configIndex].breakLookupEntryCount);
+	createDefaultBrakeConfig(&controlConfigs[configIndex].brakeLookupEntries, &controlConfigs[configIndex].brakeLookupEntryCount);
 	createDefaultAccelerationConfig(&controlConfigs[configIndex].acceleatationLookupEntries, &controlConfigs[configIndex].acceleatationLookupEntryCount);
-	// controlConfigs[configIndex].breakLookupEntries[2].acceleration = 0.0f;
-	// controlConfigs[configIndex].breakLookupEntries[3].acceleration = -0.1f;
-	// controlConfigs[configIndex].breakLookupEntries[4].acceleration = -0.2f;
+	// controlConfigs[configIndex].brakeLookupEntries[2].acceleration = 0.0f;
+	// controlConfigs[configIndex].brakeLookupEntries[3].acceleration = -0.1f;
+	// controlConfigs[configIndex].brakeLookupEntries[4].acceleration = -0.2f;
 
 	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 

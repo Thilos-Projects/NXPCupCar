@@ -119,11 +119,11 @@ bool stopCar(bool stop, float currentSpeed) {
 
 	if (stop) {
 		mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOn);
-		BreakLookupEntry* chosenEntry = &currentConfig->breakLookupEntries[0];
+		BrakeLookupEntry* chosenEntry = &currentConfig->brakeLookupEntries[0];
 		int i = 0;
-		for(i = 0; i < currentConfig->breakLookupEntryCount; i++) {
-			chosenEntry = &currentConfig->breakLookupEntries[i];
-			if(currentConfig->breakLookupEntries[i].minSpeedDifference >= currentSpeed) break;
+		for(i = 0; i < currentConfig->brakeLookupEntryCount; i++) {
+			chosenEntry = &currentConfig->brakeLookupEntries[i];
+			if(currentConfig->brakeLookupEntries[i].minSpeedDifference >= currentSpeed) break;
 		}
 
 		if (stopBrakeAppliedFor < chosenEntry->frameCount) {
@@ -336,7 +336,7 @@ void controlCar() {
 
 	// Speed
 	if (stop) {
-		// TODO: REPLACE
+		// TODO: REPLACE - Test if this still works!?
 		// stopCar(stop, currentSpeed);
 		allowActiveBrake = true;
 		destinationSpeed = 0.0f;
@@ -345,25 +345,10 @@ void controlCar() {
 		trackWidthOverThreshold[6] = trackWidthOverThreshold[5]; // Prevent NullPointerException
 		for (; maxRowForSpeedCalculation > 1 && trackWidthOverThreshold[maxRowForSpeedCalculation] ; maxRowForSpeedCalculation--);
 		if (maxRowForSpeedCalculation < currentConfig->brakeRowDistance) { // Break or Turn
-
-			/*BreakLookupEntry* chosenEntry = &currentConfig->breakLookupEntries[0];
-			int i = 0;
-			for(i = 0; i < currentConfig->breakLookupEntryCount; i++) {
-				chosenEntry = &currentConfig->breakLookupEntries[i];
-				if(currentConfig->breakLookupEntries[i].minSpeedDifference >= currentSpeed) break;
-			}
-
-			if (brakeAppliedFor < chosenEntry->frameCount) {
-				destinationSpeed = chosenEntry->acceleration;
-				brakeAppliedFor++;
-			} else {
-				destinationSpeed = currentConfig->turnSpeed;
-			}*/
-
 			allowActiveBrake = true;
 			destinationSpeed = currentConfig->turnSpeed;
-
 		} else { // Straight
+			allowActiveBrake = false;
 			brakeAppliedFor = 0;
 			destinationSpeed = currentConfig->straightSpeed;
 		}
@@ -391,16 +376,11 @@ float lookupBreakAcceleration(float currentSpeed, float destinationSpeed) {
 			if(currentConfig->acceleatationLookupEntries[i].minSpeedDifference >= difference) break;
 		}
 
-		float diff = chosen2->minSpeedDifference - chosen1->minSpeedDifference;
-		float factor = (difference - chosen1->minSpeedDifference) / diff;
+		float speedDiff = chosen2->minSpeedDifference - chosen1->minSpeedDifference;
+		float factor = (difference - chosen1->minSpeedDifference) / speedDiff;
 		float diffAcc = chosen2->acceleration - chosen1->acceleration;
 
 		float acceleration = chosen1->acceleration + (factor * diffAcc);
-
-		// float acceleration = (chosen1->acceleration + chosen2->acceleration) / 2.0f;
-
-		// TODO: Remove this print
-		printf("Using ACC #%d to %d\n", i, acceleration);
 
 		mLeds_Write(LedMaskEnum::kMaskLed1, kLedOn);
 		mLeds_Write(LedMaskEnum::kMaskLed2, kLedOff);
@@ -409,13 +389,30 @@ float lookupBreakAcceleration(float currentSpeed, float destinationSpeed) {
 
 	} else if (allowActiveBrake) {
 		// TODO: TEST ONLY - REMOVE!
-		return 0.0f;
+		// return 0.0f;
+		
+		BrakeLookupEntry* chosen1 = &currentConfig->brakeLookupEntries[0];
+		BrakeLookupEntry* chosen2 = &currentConfig->brakeLookupEntries[0];
+		int i = 0;
+		for (i = 0; i < currentConfig->brakeLookupEntryCount; i++) {
+			chosen1 = chosen2;
+			chosen2 = &currentConfig->brakeLookupEntries[i];
+			if(currentConfig->brakeLookupEntries[i].minSpeedDifference <= difference) break;
+		}
+
+		float speedDiff = chosen2->minSpeedDifference - chosen1->minSpeedDifference;
+		float factor = (difference - chosen1->minSpeedDifference) / speedDiff;
+		float diffAcc = chosen2->acceleration - chosen1->acceleration;
+		float diffFrameCount = chosen2->frameCount - chosen1->frameCount;
+		float frameCountF = chosen1->frameCount + (factor * diffFrameCount);
+		int8_t frameCount = (int8_t)(frameCountF + 0.5);
+
+		float acceleration = chosen1->acceleration + (factor * diffAcc);
 
 		// Set to 0 after X frames to prevent rolling back
-		if (brakingFor > currentConfig->maxBrakeFrameCount) {
+		if (brakingFor > frameCount) {
 			mLeds_Write(LedMaskEnum::kMaskLed1, kLedOn);
 			mLeds_Write(LedMaskEnum::kMaskLed2, kLedOn);
-			allowActiveBrake = false;
 			return 0.0f;
 		}
 		
@@ -423,21 +420,10 @@ float lookupBreakAcceleration(float currentSpeed, float destinationSpeed) {
 		mLeds_Write(LedMaskEnum::kMaskLed2, kLedOn);
 
 		brakingFor++;
-
-		BreakLookupEntry* chosen = &currentConfig->breakLookupEntries[0];
-		int i = 0;
-		for (i = 0; i < currentConfig->breakLookupEntryCount; i++) {
-			chosen = &currentConfig->breakLookupEntries[i];
-			if(currentConfig->breakLookupEntries[i].minSpeedDifference <= difference) break;
-		}
-		// TODO: Remove this print
-		printf("Using BREAK %d\n", i);
-
-		return chosen->acceleration;
+		return acceleration;
 	} else {
 		if (destinationSpeed > 0.0f) {
-			// TODO: Load min from config
-			return 0.15f;
+			return currentConfig->slowdownAcceleration;
 		}
 		return 0.0f;
 	}
