@@ -88,6 +88,7 @@ struct ControlConfig {
     uint8_t acceleatationLookupEntryCount = 0;
     AccelerationLookupEntry* acceleatationLookupEntries;
     uint8_t maxBrakeFrameCount = 5;
+    float speedDerivate = 0.0f;
     // TODO: Can we remove this? // Speed-Stuff
     uint8_t stopBrakeFrameCount = 0;
     float stopBrakeSpeed = 0.0f;

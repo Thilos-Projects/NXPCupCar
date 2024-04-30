@@ -59,6 +59,7 @@ float batteryAccelerationFactor = 1.0f;
 bool batteryDisable = false;
 bool steeringDiabled = false;
 bool finishLineGraceTimer = false;
+bool allowActiveBrake = false;
 
 void Setup() {
 	mCpu_Setup();
@@ -337,6 +338,7 @@ void controlCar() {
 	if (stop) {
 		// TODO: REPLACE
 		// stopCar(stop, currentSpeed);
+		allowActiveBrake = true;
 		destinationSpeed = 0.0f;
 	} else { // Normal Speed Control
 		uint8_t maxRowForSpeedCalculation = currentRowIndex;
@@ -358,6 +360,7 @@ void controlCar() {
 				destinationSpeed = currentConfig->turnSpeed;
 			}*/
 
+			allowActiveBrake = true;
 			destinationSpeed = currentConfig->turnSpeed;
 
 		} else { // Straight
@@ -399,16 +402,25 @@ float lookupBreakAcceleration(float currentSpeed, float destinationSpeed) {
 		// TODO: Remove this print
 		printf("Using ACC #%d to %d\n", i, acceleration);
 
+		mLeds_Write(LedMaskEnum::kMaskLed1, kLedOn);
+		mLeds_Write(LedMaskEnum::kMaskLed2, kLedOff);
+
 		return acceleration;
 
-	} else {
+	} else if (allowActiveBrake) {
 		// TODO: TEST ONLY - REMOVE!
 		return 0.0f;
 
 		// Set to 0 after X frames to prevent rolling back
 		if (brakingFor > currentConfig->maxBrakeFrameCount) {
+			mLeds_Write(LedMaskEnum::kMaskLed1, kLedOn);
+			mLeds_Write(LedMaskEnum::kMaskLed2, kLedOn);
+			allowActiveBrake = false;
 			return 0.0f;
 		}
+		
+		mLeds_Write(LedMaskEnum::kMaskLed1, kLedOff);
+		mLeds_Write(LedMaskEnum::kMaskLed2, kLedOn);
 
 		brakingFor++;
 
@@ -422,14 +434,18 @@ float lookupBreakAcceleration(float currentSpeed, float destinationSpeed) {
 		printf("Using BREAK %d\n", i);
 
 		return chosen->acceleration;
+	} else {
+		if (destinationSpeed > 0.0f) {
+			// TODO: Load min from config
+			return 0.15f;
+		}
+		return 0.0f;
 	}
 }
 
 void controlMotor() {
+	static float lastAcceleration = 0.0f;
 	if (motorEnabled) {
-		// TODO
-
-		//float speed = speedBattery(destinationSpeed);
 
 		// TODO: Move this to configuration
 		float accMultiplierLeft = mAd_Read(ADCInputEnum::kPot1) + 2;
@@ -442,8 +458,20 @@ void controlMotor() {
 
 		float acceleration = lookupBreakAcceleration(currentSpeed, destinationSpeed);
 
+		// Derivate
+		if (acceleration >= 0.0f) {
+			if (lastAcceleration == 0.0f)
+				lastAcceleration = acceleration;
+			float accelerationDerivate = (lastAcceleration - acceleration) * currentConfig->speedDerivate;
+			acceleration += accelerationDerivate;
+			lastAcceleration = acceleration;
+		} else {
+			lastAcceleration = 0.0f;
+		}
+
 		MotorControl::setSpeed(acceleration * accMultiplierLeft, acceleration * accMultiplierRight);
 	} else {
+		lastAcceleration = 0.0f;
 		MotorControl::setSpeed(0, 0);
 	}
 }

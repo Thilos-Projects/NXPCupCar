@@ -37,7 +37,7 @@ float motorRPWMSpeed = 0.0f;
 
 void MotorControl::Setup(){
 	Scheduler::getTaskHandle([](Scheduler::taskHandle* self){MotorControl::Update();}, 10);
-	Scheduler::getTaskHandle([](Scheduler::taskHandle* self){MotorControl::doSpeedCalc();}, 100);
+	Scheduler::getTaskHandle([](Scheduler::taskHandle* self){MotorControl::doSpeedCalc();}, 50);
 
 	istGeschwindigkeitL = 0;
 	istGeschwindigkeitR = 0;

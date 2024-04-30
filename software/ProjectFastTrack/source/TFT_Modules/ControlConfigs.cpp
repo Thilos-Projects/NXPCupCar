@@ -87,19 +87,19 @@ void createDefaultAccelerationConfig(AccelerationLookupEntry** configs, uint8_t*
 	*configs = (AccelerationLookupEntry*)malloc(sizeof(AccelerationLookupEntry) * *configLength);
 
 	((*configs) + 0)->minSpeedDifference = 0.0f;
-	((*configs) + 0)->acceleration = 0.2f;
+	((*configs) + 0)->acceleration = 0.1f;
 
 	((*configs) + 1)->minSpeedDifference = 3.0f;
-	((*configs) + 1)->acceleration = 0.3f;
+	((*configs) + 1)->acceleration = 0.1f;
 
 	((*configs) + 2)->minSpeedDifference = 6.0f;
-	((*configs) + 2)->acceleration = 0.4f;
+	((*configs) + 2)->acceleration = 0.2f;
 
 	((*configs) + 3)->minSpeedDifference = 10.0f;
-	((*configs) + 3)->acceleration = 0.5f;
+	((*configs) + 3)->acceleration = 0.3f;
 
 	((*configs) + 4)->minSpeedDifference = 15.0f;
-	((*configs) + 4)->acceleration = 0.7f;
+	((*configs) + 4)->acceleration = 0.4f;
 
 	((*configs) + 5)->minSpeedDifference = 20.0f;
 	((*configs) + 5)->acceleration = 0.7f;
@@ -250,8 +250,9 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].steeringDerivativeFactor = 0.3f;
     controlConfigs[configIndex].steeringHoldframesAfterTurn = 0;
     controlConfigs[configIndex].brakeRowDistance = 3;
-    controlConfigs[configIndex].straightSpeed = 40.0f;
-    controlConfigs[configIndex].turnSpeed = 30.0f;
+    controlConfigs[configIndex].straightSpeed = 20.0f;
+    controlConfigs[configIndex].turnSpeed = 8.0f;
+	controlConfigs[configIndex].speedDerivate = 0.4f;
 
 	createDefaultBreakConfig(&controlConfigs[configIndex].breakLookupEntries, &controlConfigs[configIndex].breakLookupEntryCount);
 	createDefaultAccelerationConfig(&controlConfigs[configIndex].acceleatationLookupEntries, &controlConfigs[configIndex].acceleatationLookupEntryCount);
