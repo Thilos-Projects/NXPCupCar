@@ -123,36 +123,6 @@ void createDefaultAccelerationConfig(AccelerationLookupEntry** configs, uint8_t*
 	((*configs) + 6)->acceleration = 1.0f;
 }
 
-void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
-    controlConfigs[configIndex].pixyLedColorR = 255;
-    controlConfigs[configIndex].pixyLedColorG = 255;
-    controlConfigs[configIndex].pixyLedColorB = 31;
-
-    controlConfigs[configIndex].steeringPotentialFactor = 1.6f;
-    controlConfigs[configIndex].steeringPotentialFactorPerSpeed = 0.4f;
-    controlConfigs[configIndex].steeringPotentialFactorSpeedIncrements = 35;
-    controlConfigs[configIndex].steeringDerivativeFactor = 0.3f;
-
-    controlConfigs[configIndex].brakeRowDistance = 3;
-    controlConfigs[configIndex].straightSpeed = 22.0f;
-    controlConfigs[configIndex].turnSpeed = 11.0f;
-	controlConfigs[configIndex].speedDerivate = 0.2f;
-	controlConfigs[configIndex].slowdownAcceleration = 0.15f;
-
-	createDefaultBrakeConfig(&controlConfigs[configIndex].brakeLookupEntries, &controlConfigs[configIndex].brakeLookupEntryCount);
-	createDefaultAccelerationConfig(&controlConfigs[configIndex].acceleatationLookupEntries, &controlConfigs[configIndex].acceleatationLookupEntryCount);
-	createDefaultRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
-
-    // Column Config
-    createDefaultColumnConfig(configIndex, controlConfigs);
-
-	// Finish Line Config
-    controlConfigs[configIndex].finishLineDetection = true;
-    controlConfigs[configIndex].switchConfigAfterFinishLineDetection = true;
-    controlConfigs[configIndex].configAfterFinishLineDetected = 4;
-    controlConfigs[configIndex].switchConfigAfterFinishLineTimeout = 200;
-}
-
 void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].pixyLedColorR = 255;
     controlConfigs[configIndex].pixyLedColorG = 255;
@@ -184,6 +154,36 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 }
 
 void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
+    controlConfigs[configIndex].pixyLedColorR = 255;
+    controlConfigs[configIndex].pixyLedColorG = 255;
+    controlConfigs[configIndex].pixyLedColorB = 31;
+
+    controlConfigs[configIndex].steeringPotentialFactor = 1.6f;
+    controlConfigs[configIndex].steeringPotentialFactorPerSpeed = 0.4f;
+    controlConfigs[configIndex].steeringPotentialFactorSpeedIncrements = 35;
+    controlConfigs[configIndex].steeringDerivativeFactor = 0.3f;
+
+    controlConfigs[configIndex].brakeRowDistance = 3;
+    controlConfigs[configIndex].straightSpeed = 22.0f;
+    controlConfigs[configIndex].turnSpeed = 11.0f;
+	controlConfigs[configIndex].speedDerivate = 0.2f;
+	controlConfigs[configIndex].slowdownAcceleration = 0.15f;
+
+	createDefaultBrakeConfig(&controlConfigs[configIndex].brakeLookupEntries, &controlConfigs[configIndex].brakeLookupEntryCount);
+	createDefaultAccelerationConfig(&controlConfigs[configIndex].acceleatationLookupEntries, &controlConfigs[configIndex].acceleatationLookupEntryCount);
+	createDefaultRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
+
+    // Column Config
+    createDefaultColumnConfig(configIndex, controlConfigs);
+
+	// Finish Line Config
+    controlConfigs[configIndex].finishLineDetection = true;
+    controlConfigs[configIndex].switchConfigAfterFinishLineDetection = true;
+    controlConfigs[configIndex].configAfterFinishLineDetected = 4;
+    controlConfigs[configIndex].switchConfigAfterFinishLineTimeout = 200;
+}
+
+void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].pixyLedColorR = 255;
     controlConfigs[configIndex].pixyLedColorG = 255;
     controlConfigs[configIndex].pixyLedColorB = 31;
