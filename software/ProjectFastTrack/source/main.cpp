@@ -335,14 +335,16 @@ void controlCar() {
 
 	// Speed
 	if (stop) {
-		stopCar(stop, currentSpeed);
+		// TODO: REPLACE
+		// stopCar(stop, currentSpeed);
+		destinationSpeed = 0.0f;
 	} else { // Normal Speed Control
 		uint8_t maxRowForSpeedCalculation = currentRowIndex;
 		trackWidthOverThreshold[6] = trackWidthOverThreshold[5]; // Prevent NullPointerException
 		for (; maxRowForSpeedCalculation > 1 && trackWidthOverThreshold[maxRowForSpeedCalculation] ; maxRowForSpeedCalculation--);
 		if (maxRowForSpeedCalculation < currentConfig->brakeRowDistance) { // Break or Turn
 
-			BreakLookupEntry* chosenEntry = &currentConfig->breakLookupEntries[0];
+			/*BreakLookupEntry* chosenEntry = &currentConfig->breakLookupEntries[0];
 			int i = 0;
 			for(i = 0; i < currentConfig->breakLookupEntryCount; i++) {
 				chosenEntry = &currentConfig->breakLookupEntries[i];
@@ -354,7 +356,9 @@ void controlCar() {
 				brakeAppliedFor++;
 			} else {
 				destinationSpeed = currentConfig->turnSpeed;
-			}
+			}*/
+
+			destinationSpeed = currentConfig->turnSpeed;
 
 		} else { // Straight
 			brakeAppliedFor = 0;
@@ -370,31 +374,52 @@ void controlCar() {
 }
 
 float lookupBreakAcceleration(float currentSpeed, float destinationSpeed) {
+	static uint8_t brakingFor = 0;
 	float difference = destinationSpeed - currentSpeed; // positiv -> BESCHLEUNIGEN // negativ -> BREMSEN
-	if (difference > 0) {
+	if (difference >= 0) {
+		brakingFor = 0;
 
-		AccelerationLookupEntry* chosen = &currentConfig->acceleatationLookupEntries[0];
+		AccelerationLookupEntry* chosen1 = &currentConfig->acceleatationLookupEntries[0];
+		AccelerationLookupEntry* chosen2 = &currentConfig->acceleatationLookupEntries[0];
 		int i = 0;
 		for (i = 0; i < currentConfig->acceleatationLookupEntryCount; i++) {
-			chosen = &currentConfig->acceleatationLookupEntries[i];
-			if(currentConfig->acceleatationLookupEntries[i].minSpeedDifference >= currentSpeed) break;
+			chosen1 = chosen2;
+			chosen2 = &currentConfig->acceleatationLookupEntries[i];
+			if(currentConfig->acceleatationLookupEntries[i].minSpeedDifference >= difference) break;
 		}
-		// TODO: Remove this note
-		printf("Using ACC %d", i);
 
-		return chosen->acceleration;
+		float diff = chosen2->minSpeedDifference - chosen1->minSpeedDifference;
+		float factor = (difference - chosen1->minSpeedDifference) / diff;
+		float diffAcc = chosen2->acceleration - chosen1->acceleration;
+
+		float acceleration = chosen1->acceleration + (factor * diffAcc);
+
+		// float acceleration = (chosen1->acceleration + chosen2->acceleration) / 2.0f;
+
+		// TODO: Remove this print
+		printf("Using ACC #%d to %d\n", i, acceleration);
+
+		return acceleration;
 
 	} else {
-		// TODO: Set to 0 after X frames to prevent rolling back
+		// TODO: TEST ONLY - REMOVE!
+		return 0.0f;
+
+		// Set to 0 after X frames to prevent rolling back
+		if (brakingFor > currentConfig->maxBrakeFrameCount) {
+			return 0.0f;
+		}
+
+		brakingFor++;
 
 		BreakLookupEntry* chosen = &currentConfig->breakLookupEntries[0];
 		int i = 0;
 		for (i = 0; i < currentConfig->breakLookupEntryCount; i++) {
 			chosen = &currentConfig->breakLookupEntries[i];
-			if(currentConfig->breakLookupEntries[i].minSpeedDifference >= currentSpeed) break;
+			if(currentConfig->breakLookupEntries[i].minSpeedDifference <= difference) break;
 		}
-		// TODO: Remove this note
-		printf("Using BREAK %d", i);
+		// TODO: Remove this print
+		printf("Using BREAK %d\n", i);
 
 		return chosen->acceleration;
 	}

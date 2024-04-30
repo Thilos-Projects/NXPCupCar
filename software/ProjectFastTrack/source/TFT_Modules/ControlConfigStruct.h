@@ -79,6 +79,7 @@ struct ControlConfig {
     uint8_t steeringHoldframesAfterTurn = 0;
 
     // Speed v2
+    uint8_t brakeRowDistance = 0;
     float straightSpeed = 0.0f;
     float turnSpeed = 0.0f;
     float minAcceleration = 0.0f;
@@ -86,9 +87,8 @@ struct ControlConfig {
     BreakLookupEntry* breakLookupEntries;
     uint8_t acceleatationLookupEntryCount = 0;
     AccelerationLookupEntry* acceleatationLookupEntries;
-
-    // TODO: REMOVE // Speed-Stuff
-    uint8_t brakeRowDistance = 0;
+    uint8_t maxBrakeFrameCount = 5;
+    // TODO: Can we remove this? // Speed-Stuff
     uint8_t stopBrakeFrameCount = 0;
     float stopBrakeSpeed = 0.0f;
 
