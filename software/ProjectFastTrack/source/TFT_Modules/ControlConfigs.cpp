@@ -1,7 +1,7 @@
 #include "ControlConfigs.h"
 #include "ControlConfigStruct.h"
 
-void makeStandardRowConfig(RowConfig** configs, uint8_t* configLength){
+void createDefaultRowConfig(RowConfig** configs, uint8_t* configLength){
 	*configLength = 5;
 	*configs = (RowConfig*)malloc(sizeof(RowConfig) * *configLength);
 
@@ -54,6 +54,14 @@ void makeStandardRowConfig(RowConfig** configs, uint8_t* configLength){
 	((*configs)[4]).maxCenterDifferenceForTurn = 10;
 	((*configs)[4]).maxTrackWidth = 316;
 	((*configs)[4]).weight = 1.0f;
+}
+
+void createDefaultColumnConfig(uint8_t configIndex, ControlConfig* controlConfigs) {
+    controlConfigs[configIndex].columnConfig.column = 158;
+    controlConfigs[configIndex].columnConfig.edgeThreshold = 18;
+    controlConfigs[configIndex].columnConfig.minEdgeWidth = 0;
+    controlConfigs[configIndex].columnConfig.maxEdgeWidth = 10;
+    controlConfigs[configIndex].columnConfig.minThickness = 0;
 }
 
 void createDefaultBrakeConfig(BrakeLookupEntry** configs, uint8_t* configLength){
@@ -116,31 +124,27 @@ void createDefaultAccelerationConfig(AccelerationLookupEntry** configs, uint8_t*
 }
 
 void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
-	controlConfigs[configIndex].servoSteeringOffset = -0.0f;
-	controlConfigs[configIndex].pixyLedColorR = 255;
-	controlConfigs[configIndex].pixyLedColorG = 255;
-	controlConfigs[configIndex].pixyLedColorB = 31;
-	controlConfigs[configIndex].pixyLamps = 0x0101;
-	controlConfigs[configIndex].cameraProgram = "video";
-	controlConfigs[configIndex].steeringPotentialFactor = 1.6f;
-	controlConfigs[configIndex].steeringPotentialFactorPerSpeed = 0.4f;
-	controlConfigs[configIndex].steeringPotentialFactorSpeedIncrements = 35;
-	controlConfigs[configIndex].steeringDerivativeFactor = 0.0f;
-	controlConfigs[configIndex].brakeRowDistance = 1;
-	controlConfigs[configIndex].straightSpeed = 0.3f;
-	controlConfigs[configIndex].turnSpeed = 0.2f;
+    controlConfigs[configIndex].pixyLedColorR = 255;
+    controlConfigs[configIndex].pixyLedColorG = 255;
+    controlConfigs[configIndex].pixyLedColorB = 31;
+
+    controlConfigs[configIndex].steeringPotentialFactor = 1.6f;
+    controlConfigs[configIndex].steeringPotentialFactorPerSpeed = 0.4f;
+    controlConfigs[configIndex].steeringPotentialFactorSpeedIncrements = 35;
+    controlConfigs[configIndex].steeringDerivativeFactor = 0.3f;
+
+    controlConfigs[configIndex].brakeRowDistance = 3;
+    controlConfigs[configIndex].straightSpeed = 22.0f;
+    controlConfigs[configIndex].turnSpeed = 11.0f;
+	controlConfigs[configIndex].speedDerivate = 0.2f;
+	controlConfigs[configIndex].slowdownAcceleration = 0.15f;
 
 	createDefaultBrakeConfig(&controlConfigs[configIndex].brakeLookupEntries, &controlConfigs[configIndex].brakeLookupEntryCount);
 	createDefaultAccelerationConfig(&controlConfigs[configIndex].acceleatationLookupEntries, &controlConfigs[configIndex].acceleatationLookupEntryCount);
+	createDefaultRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
-	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
-
-	// Column Config
-    controlConfigs[configIndex].columnConfig.column = 158;
-    controlConfigs[configIndex].columnConfig.edgeThreshold = 18;
-    controlConfigs[configIndex].columnConfig.minEdgeWidth = 0;
-    controlConfigs[configIndex].columnConfig.maxEdgeWidth = 10;
-    controlConfigs[configIndex].columnConfig.minThickness = 0;
+    // Column Config
+    createDefaultColumnConfig(configIndex, controlConfigs);
 
 	// Finish Line Config
     controlConfigs[configIndex].finishLineDetection = true;
@@ -150,29 +154,27 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 }
 
 void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
-	controlConfigs[configIndex].servoSteeringOffset = -0.0f;
-	controlConfigs[configIndex].pixyLedColorR = 63;
-	controlConfigs[configIndex].pixyLedColorG = 255;
-	controlConfigs[configIndex].pixyLedColorB = 63;
-	controlConfigs[configIndex].pixyLamps = 0x0101;
-	controlConfigs[configIndex].cameraProgram = "video";
-	controlConfigs[configIndex].steeringPotentialFactor = 2.0f;
-	controlConfigs[configIndex].steeringDerivativeFactor = 0.0f;
-	controlConfigs[configIndex].brakeRowDistance = 2;
-	controlConfigs[configIndex].straightSpeed = 0.23f;
-	controlConfigs[configIndex].turnSpeed = 0.2f;
+    controlConfigs[configIndex].pixyLedColorR = 255;
+    controlConfigs[configIndex].pixyLedColorG = 255;
+    controlConfigs[configIndex].pixyLedColorB = 31;
+
+    controlConfigs[configIndex].steeringPotentialFactor = 1.6f;
+    controlConfigs[configIndex].steeringPotentialFactorPerSpeed = 0.4f;
+    controlConfigs[configIndex].steeringPotentialFactorSpeedIncrements = 35;
+    controlConfigs[configIndex].steeringDerivativeFactor = 0.3f;
+
+    controlConfigs[configIndex].brakeRowDistance = 3;
+    controlConfigs[configIndex].straightSpeed = 22.0f;
+    controlConfigs[configIndex].turnSpeed = 11.0f;
+	controlConfigs[configIndex].speedDerivate = 0.2f;
+	controlConfigs[configIndex].slowdownAcceleration = 0.15f;
 
 	createDefaultBrakeConfig(&controlConfigs[configIndex].brakeLookupEntries, &controlConfigs[configIndex].brakeLookupEntryCount);
 	createDefaultAccelerationConfig(&controlConfigs[configIndex].acceleatationLookupEntries, &controlConfigs[configIndex].acceleatationLookupEntryCount);
-
-	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
+	createDefaultRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
     // Column Config
-    controlConfigs[configIndex].columnConfig.column = 158;
-    controlConfigs[configIndex].columnConfig.edgeThreshold = 18;
-    controlConfigs[configIndex].columnConfig.minEdgeWidth = 0;
-    controlConfigs[configIndex].columnConfig.maxEdgeWidth = 10;
-    controlConfigs[configIndex].columnConfig.minThickness = 0;
+    createDefaultColumnConfig(configIndex, controlConfigs);
 
 	// Finish Line Config
     controlConfigs[configIndex].finishLineDetection = true;
@@ -182,16 +184,15 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 }
 
 void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
-    controlConfigs[configIndex].servoSteeringOffset = -0.0f;
     controlConfigs[configIndex].pixyLedColorR = 255;
     controlConfigs[configIndex].pixyLedColorG = 255;
     controlConfigs[configIndex].pixyLedColorB = 31;
-    controlConfigs[configIndex].pixyLamps = 0x0101;
-    controlConfigs[configIndex].cameraProgram = "video";
+
     controlConfigs[configIndex].steeringPotentialFactor = 1.6f;
     controlConfigs[configIndex].steeringPotentialFactorPerSpeed = 0.4f;
     controlConfigs[configIndex].steeringPotentialFactorSpeedIncrements = 35;
     controlConfigs[configIndex].steeringDerivativeFactor = 0.3f;
+
     controlConfigs[configIndex].brakeRowDistance = 3;
     controlConfigs[configIndex].straightSpeed = 22.0f;
     controlConfigs[configIndex].turnSpeed = 11.0f;
@@ -200,15 +201,10 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 
 	createDefaultBrakeConfig(&controlConfigs[configIndex].brakeLookupEntries, &controlConfigs[configIndex].brakeLookupEntryCount);
 	createDefaultAccelerationConfig(&controlConfigs[configIndex].acceleatationLookupEntries, &controlConfigs[configIndex].acceleatationLookupEntryCount);
-
-	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
+	createDefaultRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
     // Column Config
-    controlConfigs[configIndex].columnConfig.column = 158;
-    controlConfigs[configIndex].columnConfig.edgeThreshold = 18;
-    controlConfigs[configIndex].columnConfig.minEdgeWidth = 0;
-    controlConfigs[configIndex].columnConfig.maxEdgeWidth = 10;
-    controlConfigs[configIndex].columnConfig.minThickness = 0;
+    createDefaultColumnConfig(configIndex, controlConfigs);
 
 	// Finish Line Config
     controlConfigs[configIndex].finishLineDetection = true;
@@ -218,36 +214,27 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 }
 
 void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlConfigs){
-    controlConfigs[configIndex].servoSteeringOffset = -0.0f;
     controlConfigs[configIndex].pixyLedColorR = 255;
     controlConfigs[configIndex].pixyLedColorG = 255;
     controlConfigs[configIndex].pixyLedColorB = 31;
-    controlConfigs[configIndex].pixyLamps = 0x0101;
-    controlConfigs[configIndex].cameraProgram = "video";
+
     controlConfigs[configIndex].steeringPotentialFactor = 1.6f;
     controlConfigs[configIndex].steeringPotentialFactorPerSpeed = 0.4f;
     controlConfigs[configIndex].steeringPotentialFactorSpeedIncrements = 35;
-    controlConfigs[configIndex].steeringDerivativeFactor = 0.0f;
+    controlConfigs[configIndex].steeringDerivativeFactor = 0.3f;
+
     controlConfigs[configIndex].brakeRowDistance = 3;
     controlConfigs[configIndex].straightSpeed = 10.0f;
     controlConfigs[configIndex].turnSpeed = 10.0f;
 	controlConfigs[configIndex].speedDerivate = 0.2f;
-	controlConfigs[configIndex].slowdownAcceleration = 0.1f;
+	controlConfigs[configIndex].slowdownAcceleration = 0.12f;
 
 	createDefaultBrakeConfig(&controlConfigs[configIndex].brakeLookupEntries, &controlConfigs[configIndex].brakeLookupEntryCount);
 	createDefaultAccelerationConfig(&controlConfigs[configIndex].acceleatationLookupEntries, &controlConfigs[configIndex].acceleatationLookupEntryCount);
-	// controlConfigs[configIndex].brakeLookupEntries[2].acceleration = 0.0f;
-	// controlConfigs[configIndex].brakeLookupEntries[3].acceleration = -0.1f;
-	// controlConfigs[configIndex].brakeLookupEntries[4].acceleration = -0.2f;
-
-	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
+	createDefaultRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
     // Column Config
-    controlConfigs[configIndex].columnConfig.column = 158;
-    controlConfigs[configIndex].columnConfig.edgeThreshold = 18;
-    controlConfigs[configIndex].columnConfig.minEdgeWidth = 0;
-    controlConfigs[configIndex].columnConfig.maxEdgeWidth = 10;
-    controlConfigs[configIndex].columnConfig.minThickness = 0;
+    createDefaultColumnConfig(configIndex, controlConfigs);
 
 	// Obstacle Detection
 	controlConfigs[configIndex].obstacleDetection = true;
