@@ -369,34 +369,39 @@ void controlCar() {
 	}
 }
 
+void controlMotor() {
+	if (motorEnabled) {
+		// TODO
+
+		float speed = speedBattery(destinationSpeed);
+
+		// TODO: Move this to configuration
+		float accMultiplierLeft = mAd_Read(ADCInputEnum::kPot1) + 2;
+		float accMultiplierRight = mAd_Read(ADCInputEnum::kPot2) + 2;
+		// printf("SL: %d\tSR: %d", (int32_t)(accMultiplierLeft * 1000000.0f), (int32_t)(accMultiplierRight * 1000000.0f));
+		
+		float leftSpeed, rightSpeed;
+		MotorControl::getSpeed(&leftSpeed, &rightSpeed);
+		float currentSpeed = max(leftSpeed, rightSpeed);
+
+		// TODO: Make this value configurable
+		if (currentSpeed < 21 && destinationSpeed > 0.0f) {
+			// TODO: Make this value(s) configurable
+			MotorControl::setSpeed(1.0f, 1.0f);
+		} else {
+			MotorControl::setSpeed(speed * accMultiplierLeft, speed * accMultiplierRight); //Änderung: Motoren Gleich Schnell fahren lassen
+		}
+
+	} else {
+		MotorControl::setSpeed(0, 0);
+	}
+}
+
 
 void defineTasks() {
 	t_cameraAlgorithm = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		controlCar();
-		// TODO
-		// if(motorEnabled && !batteryDisable) {
-		if(motorEnabled){
-
-			float speed = speedBattery(destinationSpeed);
-
-			// TODO: Not use Potis!?
-			float speedMultiplierLeft = mAd_Read(ADCInputEnum::kPot1) + 2;
-			float speedMultiplierRight = mAd_Read(ADCInputEnum::kPot2) + 2;
-			// printf("SL: %d\tSR: %d", (int32_t)(speedMultiplierLeft * 1000000.0f), (int32_t)(speedMultiplierRight * 1000000.0f));
-			
-			float leftSpeed, rightSpeed;
-			MotorControl::getSpeed(&leftSpeed, &rightSpeed);
-			float currentSpeed = max(leftSpeed, rightSpeed);
-
-			// TODO: Make this value configurable
-			if (currentSpeed < 21 && destinationSpeed > 0.0f) {
-				// TODO: Make this value(s) configurable
-				MotorControl::setSpeed(1.0f, 1.0f);
-			} else {
-				MotorControl::setSpeed(speed * speedMultiplierLeft, speed * speedMultiplierRight); //Änderung: Motoren Gleich Schnell fahren lassen
-			}
-		} else
-			MotorControl::setSpeed(0, 0);
+		controlMotor();
 	}, currentConfig->timePerFrame);
 
 	t_batteryLevelMonitor = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
