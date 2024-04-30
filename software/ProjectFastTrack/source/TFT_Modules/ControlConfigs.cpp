@@ -56,29 +56,29 @@ void makeStandardRowConfig(RowConfig** configs, uint8_t* configLength){
 	((*configs)[4]).weight = 1.0f;
 }
 
-void makeStandardBreakSpeedConfig(BreakSpeedLookupEntry** configs, uint8_t* configLength){
+void makeStandardBreakSpeedConfig(BreakLookupEntry** configs, uint8_t* configLength){
 	*configLength = 5;
-	*configs = (BreakSpeedLookupEntry*)malloc(sizeof(BreakSpeedLookupEntry) * *configLength);
+	*configs = (BreakLookupEntry*)malloc(sizeof(BreakLookupEntry) * *configLength);
 
-	((*configs) + 0)->lowerSpeed = 20;
+	((*configs) + 0)->minSpeedDifference = 20;
 	((*configs) + 0)->frameCount = 0;
-	((*configs) + 0)->breakSpeed = 0.0f;
+	((*configs) + 0)->acceleration = 0.0f;
 
-	((*configs) + 1)->lowerSpeed = 25;
+	((*configs) + 1)->minSpeedDifference = 25;
 	((*configs) + 1)->frameCount = 4;
-	((*configs) + 1)->breakSpeed = -0.0f;
+	((*configs) + 1)->acceleration = -0.0f;
 
-	((*configs) + 2)->lowerSpeed = 30;
+	((*configs) + 2)->minSpeedDifference = 30;
 	((*configs) + 2)->frameCount = 4;
-	((*configs) + 2)->breakSpeed = -0.2f;
+	((*configs) + 2)->acceleration = -0.2f;
 
-	((*configs) + 3)->lowerSpeed = 40;
+	((*configs) + 3)->minSpeedDifference = 40;
 	((*configs) + 3)->frameCount = 4;
-	((*configs) + 3)->breakSpeed = -0.4f;
+	((*configs) + 3)->acceleration = -0.4f;
 
-	((*configs) + 4)->lowerSpeed = 60;
+	((*configs) + 4)->minSpeedDifference = 60;
 	((*configs) + 4)->frameCount = 6;
-	((*configs) + 4)->breakSpeed = -0.5f;
+	((*configs) + 4)->acceleration = -0.5f;
 }
 
 void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
@@ -98,7 +98,7 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].straightSpeed = 0.3f;
 	controlConfigs[configIndex].turnSpeed = 0.2f;
 
-	makeStandardBreakSpeedConfig(&controlConfigs[configIndex].breakSpeedLookupEntrys, &controlConfigs[configIndex].breakSpeedLookupEntryCount);
+	makeStandardBreakSpeedConfig(&controlConfigs[configIndex].breakLookupEntries, &controlConfigs[configIndex].breakLookupEntryCount);
 
 	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
@@ -160,7 +160,7 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 	controlConfigs[configIndex].straightSpeed = 0.23f;
 	controlConfigs[configIndex].turnSpeed = 0.2f;
 
-	makeStandardBreakSpeedConfig(&controlConfigs[configIndex].breakSpeedLookupEntrys, &controlConfigs[configIndex].breakSpeedLookupEntryCount);
+	makeStandardBreakSpeedConfig(&controlConfigs[configIndex].breakLookupEntries, &controlConfigs[configIndex].breakLookupEntryCount);
 
 	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
@@ -224,7 +224,7 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].straightSpeed = 0.3f;
     controlConfigs[configIndex].turnSpeed = 0.2f;
 
-	makeStandardBreakSpeedConfig(&controlConfigs[configIndex].breakSpeedLookupEntrys, &controlConfigs[configIndex].breakSpeedLookupEntryCount);
+	makeStandardBreakSpeedConfig(&controlConfigs[configIndex].breakLookupEntries, &controlConfigs[configIndex].breakLookupEntryCount);
 
 	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
@@ -290,10 +290,10 @@ void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlCo
     controlConfigs[configIndex].stopBrakeFrameCount = 3;
     controlConfigs[configIndex].stopBrakeSpeed = -0.2f;
 
-	makeStandardBreakSpeedConfig(&controlConfigs[configIndex].breakSpeedLookupEntrys, &controlConfigs[configIndex].breakSpeedLookupEntryCount);
-	// controlConfigs[configIndex].breakSpeedLookupEntrys[2].breakSpeed = 0.0f;
-	// controlConfigs[configIndex].breakSpeedLookupEntrys[3].breakSpeed = -0.1f;
-	// controlConfigs[configIndex].breakSpeedLookupEntrys[4].breakSpeed = -0.2f;
+	makeStandardBreakSpeedConfig(&controlConfigs[configIndex].breakLookupEntries, &controlConfigs[configIndex].breakLookupEntryCount);
+	// controlConfigs[configIndex].breakLookupEntries[2].acceleration = 0.0f;
+	// controlConfigs[configIndex].breakLookupEntries[3].acceleration = -0.1f;
+	// controlConfigs[configIndex].breakLookupEntries[4].acceleration = -0.2f;
 
 	makeStandardRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 

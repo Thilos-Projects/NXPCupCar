@@ -32,10 +32,16 @@ struct BatteryLevelLookupEntry {
     bool disableWhenLower = false;
 };
 
-struct BreakSpeedLookupEntry {
-    float lowerSpeed = 0.0f;
+struct BreakLookupEntry {
+    float minSpeedDifference = 0.0f;
+    // TODO: Remove frameCount
     uint8_t frameCount = 0;
-    float breakSpeed = -0.5f;
+    float acceleration = -0.0f;
+};
+
+struct AccelerationLookupEntry {
+    float minSpeedDifference = 0.0f;
+    float acceleration = 0.0f;
 };
 
 struct ControlConfig {
@@ -72,16 +78,21 @@ struct ControlConfig {
 
     uint8_t steeringHoldframesAfterTurn = 0;
 
-    // Speed-Stuff
-    uint8_t brakeRowDistance = 0;
-    uint8_t stopBrakeFrameCount = 0;
+    // Speed v2
     float straightSpeed = 0.0f;
     float turnSpeed = 0.0f;
-    float stopBrakeSpeed = 0.0f;
-    uint8_t breakSpeedLookupEntryCount = 0;
-    BreakSpeedLookupEntry* breakSpeedLookupEntrys;
+    float minAcceleration = 0.0f;
+    uint8_t breakLookupEntryCount = 0;
+    BreakLookupEntry* breakLookupEntries;
+    uint8_t acceleatationLookupEntryCount = 0;
+    AccelerationLookupEntry* acceleatationLookupEntries;
 
-    // Speed-Battery-Control
+    // TODO: REMOVE // Speed-Stuff
+    uint8_t brakeRowDistance = 0;
+    uint8_t stopBrakeFrameCount = 0;
+    float stopBrakeSpeed = 0.0f;
+
+    // TODO: REMOVE // Speed-Battery-Control
     uint16_t batteryLevelCheckInterval = 1000;
     uint8_t batteryLevelLookupLength = 0;
     BatteryLevelLookupEntry* batteryLevelLookup; // From top down (first entry highest voltage)

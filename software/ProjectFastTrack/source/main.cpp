@@ -118,15 +118,15 @@ bool stopCar(bool stop, float currentSpeed) {
 
 	if (stop) {
 		mLeds_Write(LedMaskEnum::kMaskLed2, LedStateEnum::kLedOn);
-		BreakSpeedLookupEntry* chosenEntry = &currentConfig->breakSpeedLookupEntrys[0];
+		BreakLookupEntry* chosenEntry = &currentConfig->breakLookupEntries[0];
 		int i = 0;
-		for(i = 0; i < currentConfig->breakSpeedLookupEntryCount; i++) {
-			chosenEntry = &currentConfig->breakSpeedLookupEntrys[i];
-			if(currentConfig->breakSpeedLookupEntrys[i].lowerSpeed >= currentSpeed) break;
+		for(i = 0; i < currentConfig->breakLookupEntryCount; i++) {
+			chosenEntry = &currentConfig->breakLookupEntries[i];
+			if(currentConfig->breakLookupEntries[i].minSpeedDifference >= currentSpeed) break;
 		}
 
 		if (stopBrakeAppliedFor < chosenEntry->frameCount) {
-			destinationSpeed = chosenEntry->breakSpeed;
+			destinationSpeed = chosenEntry->acceleration;
 			stopBrakeAppliedFor++;
 		} else {
 			destinationSpeed = 0.0f;
@@ -342,15 +342,15 @@ void controlCar() {
 		for (; maxRowForSpeedCalculation > 1 && trackWidthOverThreshold[maxRowForSpeedCalculation] ; maxRowForSpeedCalculation--);
 		if (maxRowForSpeedCalculation < currentConfig->brakeRowDistance) { // Break or Turn
 
-			BreakSpeedLookupEntry* chosenEntry = &currentConfig->breakSpeedLookupEntrys[0];
+			BreakLookupEntry* chosenEntry = &currentConfig->breakLookupEntries[0];
 			int i = 0;
-			for(i = 0; i < currentConfig->breakSpeedLookupEntryCount; i++) {
-				chosenEntry = &currentConfig->breakSpeedLookupEntrys[i];
-				if(currentConfig->breakSpeedLookupEntrys[i].lowerSpeed >= currentSpeed) break;
+			for(i = 0; i < currentConfig->breakLookupEntryCount; i++) {
+				chosenEntry = &currentConfig->breakLookupEntries[i];
+				if(currentConfig->breakLookupEntries[i].minSpeedDifference >= currentSpeed) break;
 			}
 
 			if (brakeAppliedFor < chosenEntry->frameCount) {
-				destinationSpeed = chosenEntry->breakSpeed;
+				destinationSpeed = chosenEntry->acceleration;
 				brakeAppliedFor++;
 			} else {
 				destinationSpeed = currentConfig->turnSpeed;
@@ -369,29 +369,55 @@ void controlCar() {
 	}
 }
 
+float lookupBreakAcceleration(float currentSpeed, float destinationSpeed) {
+	float difference = destinationSpeed - currentSpeed; // positiv -> BESCHLEUNIGEN // negativ -> BREMSEN
+	if (difference > 0) {
+
+		AccelerationLookupEntry* chosen = &currentConfig->acceleatationLookupEntries[0];
+		int i = 0;
+		for (i = 0; i < currentConfig->acceleatationLookupEntryCount; i++) {
+			chosen = &currentConfig->acceleatationLookupEntries[i];
+			if(currentConfig->acceleatationLookupEntries[i].minSpeedDifference >= currentSpeed) break;
+		}
+		// TODO: Remove this note
+		printf("Using ACC %d", i);
+
+		return chosen->acceleration;
+
+	} else {
+		// TODO: Set to 0 after X frames to prevent rolling back
+
+		BreakLookupEntry* chosen = &currentConfig->breakLookupEntries[0];
+		int i = 0;
+		for (i = 0; i < currentConfig->breakLookupEntryCount; i++) {
+			chosen = &currentConfig->breakLookupEntries[i];
+			if(currentConfig->breakLookupEntries[i].minSpeedDifference >= currentSpeed) break;
+		}
+		// TODO: Remove this note
+		printf("Using BREAK %d", i);
+
+		return chosen->acceleration;
+	}
+}
+
 void controlMotor() {
 	if (motorEnabled) {
 		// TODO
 
-		float speed = speedBattery(destinationSpeed);
+		//float speed = speedBattery(destinationSpeed);
 
 		// TODO: Move this to configuration
 		float accMultiplierLeft = mAd_Read(ADCInputEnum::kPot1) + 2;
 		float accMultiplierRight = mAd_Read(ADCInputEnum::kPot2) + 2;
 		// printf("SL: %d\tSR: %d", (int32_t)(accMultiplierLeft * 1000000.0f), (int32_t)(accMultiplierRight * 1000000.0f));
 		
-		float leftSpeed, rightSpeed;
-		MotorControl::getSpeed(&leftSpeed, &rightSpeed);
-		float currentSpeed = max(leftSpeed, rightSpeed);
+		float currentSpeedLeft, currentSpeedRight;
+		MotorControl::getSpeed(&currentSpeedLeft, &currentSpeedRight);
+		float currentSpeed = max(currentSpeedLeft, currentSpeedRight);
 
-		// TODO: Make this value configurable
-		if (currentSpeed < 21 && destinationSpeed > 0.0f) {
-			// TODO: Make this value(s) configurable
-			MotorControl::setSpeed(1.0f, 1.0f);
-		} else {
-			MotorControl::setSpeed(speed * accMultiplierLeft, speed * accMultiplierRight); //Änderung: Motoren Gleich Schnell fahren lassen
-		}
+		float acceleration = lookupBreakAcceleration(currentSpeed, destinationSpeed);
 
+		MotorControl::setSpeed(acceleration * accMultiplierLeft, acceleration * accMultiplierRight);
 	} else {
 		MotorControl::setSpeed(0, 0);
 	}
