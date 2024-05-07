@@ -135,7 +135,7 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 
     controlConfigs[configIndex].brakeRowDistance = 3;
     controlConfigs[configIndex].straightSpeed = 35.0f;
-    controlConfigs[configIndex].turnSpeed = 25.0f;
+    controlConfigs[configIndex].turnSpeed = 30.0f;
 	controlConfigs[configIndex].speedDerivate = 0.2f;
 	controlConfigs[configIndex].slowdownAcceleration = 0.2f;
 
