@@ -134,10 +134,10 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].steeringDerivativeFactor = 0.3f;
 
     controlConfigs[configIndex].brakeRowDistance = 3;
-    controlConfigs[configIndex].straightSpeed = 22.0f;
-    controlConfigs[configIndex].turnSpeed = 11.0f;
+    controlConfigs[configIndex].straightSpeed = 35.0f;
+    controlConfigs[configIndex].turnSpeed = 20.0f;
 	controlConfigs[configIndex].speedDerivate = 0.2f;
-	controlConfigs[configIndex].slowdownAcceleration = 0.15f;
+	controlConfigs[configIndex].slowdownAcceleration = 0.2f;
 
 	createDefaultBrakeConfig(&controlConfigs[configIndex].brakeLookupEntries, &controlConfigs[configIndex].brakeLookupEntryCount);
 	createDefaultAccelerationConfig(&controlConfigs[configIndex].acceleatationLookupEntries, &controlConfigs[configIndex].acceleatationLookupEntryCount);
