@@ -123,6 +123,7 @@ void createDefaultAccelerationConfig(AccelerationLookupEntry** configs, uint8_t*
 	((*configs) + 6)->acceleration = 1.0f;
 }
 
+/* Should be consired "safe" when making it 10 laps */
 void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].pixyLedColorR = 255;
     controlConfigs[configIndex].pixyLedColorG = 255;
@@ -134,7 +135,7 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].steeringDerivativeFactor = 0.3f;
 
     controlConfigs[configIndex].brakeRowDistance = 3;
-    controlConfigs[configIndex].straightSpeed = 35.0f;
+    controlConfigs[configIndex].straightSpeed = 50.0f;
     controlConfigs[configIndex].turnSpeed = 30.0f;
 	controlConfigs[configIndex].speedDerivate = 0.2f;
 	controlConfigs[configIndex].slowdownAcceleration = 0.2f;
@@ -224,10 +225,10 @@ void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlCo
     controlConfigs[configIndex].steeringDerivativeFactor = 0.3f;
 
     controlConfigs[configIndex].brakeRowDistance = 3;
-    controlConfigs[configIndex].straightSpeed = 10.0f;
-    controlConfigs[configIndex].turnSpeed = 10.0f;
+    controlConfigs[configIndex].straightSpeed = 15.0f;
+    controlConfigs[configIndex].turnSpeed = 15.0f;
 	controlConfigs[configIndex].speedDerivate = 0.2f;
-	controlConfigs[configIndex].slowdownAcceleration = 0.12f;
+	controlConfigs[configIndex].slowdownAcceleration = 0.15f;
 
 	createDefaultBrakeConfig(&controlConfigs[configIndex].brakeLookupEntries, &controlConfigs[configIndex].brakeLookupEntryCount);
 	createDefaultAccelerationConfig(&controlConfigs[configIndex].acceleatationLookupEntries, &controlConfigs[configIndex].acceleatationLookupEntryCount);
