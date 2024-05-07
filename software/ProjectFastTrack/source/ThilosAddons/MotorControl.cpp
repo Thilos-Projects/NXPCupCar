@@ -37,7 +37,7 @@ float motorRPWMSpeed = 0.0f;
 
 void MotorControl::Setup(){
 	Scheduler::getTaskHandle([](Scheduler::taskHandle* self){MotorControl::Update();}, 10);
-	Scheduler::getTaskHandle([](Scheduler::taskHandle* self){MotorControl::doSpeedCalc();}, 50);
+	Scheduler::getTaskHandle([](Scheduler::taskHandle* self){MotorControl::doSpeedCalc();}, 17);
 
 	istGeschwindigkeitL = 0;
 	istGeschwindigkeitR = 0;
@@ -138,16 +138,36 @@ void MotorControl::setSpeed(float left, float right){
 
 void MotorControl::doSpeedCalc(){
 	static float lastTime;
+	
 	float time = Scheduler::getMillis();
 	float deltaTime = time - lastTime;
 	lastTime = time;
 
+	static uint32_t frameCountersL[3] = {0};
+	static uint32_t frameCountersR[3] = {0};
+	static uint32_t framePointer = 0;
+
 	static uint32_t lastCounterL, lastCounterR;
-	istGeschwindigkeitL = (((float)(counterL-lastCounterL)) / deltaTime) * 500;
-	istGeschwindigkeitR = (((float)(counterR-lastCounterR)) / deltaTime) * 500;
+
+	// Write current values
+	frameCountersL[framePointer % 3] = ((float)(counterL-lastCounterL));
+	frameCountersR[framePointer % 3] = ((float)(counterR-lastCounterR));
+
+	// Calculate
+	istGeschwindigkeitL = 0.0f;
+	istGeschwindigkeitR = 0.0f;
+	for (uint8_t i = 0; i < 3; i++) {
+		istGeschwindigkeitL += frameCountersL[i];
+		istGeschwindigkeitR += frameCountersR[i];
+	}
+	istGeschwindigkeitL /= deltaTime * 3.0f * 6.0f; // 3 Frames über die wir rechnen * 6 Magneten
+	istGeschwindigkeitL *= 1000.0f; // 1000ms/s
+	istGeschwindigkeitR /= deltaTime * 3.0f * 6.0f; // 3 Frames über die wir rechnen * 6 Magneten
+	istGeschwindigkeitR *= 1000.0f; // 1000ms/s
 
 	lastCounterL = counterL;
 	lastCounterR = counterR;
+	framePointer++;
 }
 //alle 10 ms oder so
 void MotorControl::Update(){

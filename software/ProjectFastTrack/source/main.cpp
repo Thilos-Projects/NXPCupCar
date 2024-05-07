@@ -440,7 +440,7 @@ void defineTasks() {
 	t_spedRead = Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
 		float a,b;
 		MotorControl::getSpeed(&a, &b);
-		printf("Speed %d, %d\n", (int32_t)(a*1), (int32_t)(b*1));
+		printf("Speed %d, %d\n", (int32_t)(a*1000.0f), (int32_t)(b*1000.0f));
 	}, 500, true, true);
 
 	finishLineGraceTimer = false;
