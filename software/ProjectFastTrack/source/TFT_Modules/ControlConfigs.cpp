@@ -69,31 +69,31 @@ void createDefaultBrakeConfig(BrakeLookupEntry** configs, uint8_t* configLength)
 	*configs = (BrakeLookupEntry*)malloc(sizeof(BrakeLookupEntry) * *configLength);
 
 	((*configs) + 0)->minSpeedDifference = -0.0f;
-	((*configs) + 0)->frameCount = 5;
+	((*configs) + 0)->frameCount = 0;
 	((*configs) + 0)->acceleration = -0.0f;
 
 	((*configs) + 1)->minSpeedDifference = -3.0f;
-	((*configs) + 0)->frameCount = 5;
-	((*configs) + 1)->acceleration = -0.2f;
+	((*configs) + 1)->frameCount = 5;
+	((*configs) + 1)->acceleration = -0.3f;
 
 	((*configs) + 2)->minSpeedDifference = -6.0f;
-	((*configs) + 0)->frameCount = 10;
-	((*configs) + 2)->acceleration = -0.3f;
+	((*configs) + 2)->frameCount = 5;
+	((*configs) + 2)->acceleration = -0.7f; 
 
 	((*configs) + 3)->minSpeedDifference = -10.0f;
-	((*configs) + 0)->frameCount = 10;
-	((*configs) + 3)->acceleration = -0.7f;
+	((*configs) + 3)->frameCount = 5;
+	((*configs) + 3)->acceleration = -1.0f;
 
 	((*configs) + 4)->minSpeedDifference = -15.0f;
-	((*configs) + 0)->frameCount = 10;
-	((*configs) + 4)->acceleration = -0.7f;
+	((*configs) + 4)->frameCount = 5;
+	((*configs) + 4)->acceleration = -1.0f;
 
 	((*configs) + 5)->minSpeedDifference = -20.0f;
-	((*configs) + 0)->frameCount = 15;
+	((*configs) + 5)->frameCount = 15;
 	((*configs) + 5)->acceleration = -1.0f;
 
 	((*configs) + 6)->minSpeedDifference = -30.0f;
-	((*configs) + 0)->frameCount = 20;
+	((*configs) + 6)->frameCount = 20;
 	((*configs) + 6)->acceleration = -1.0f;
 }
 
@@ -114,7 +114,7 @@ void createDefaultAccelerationConfig(AccelerationLookupEntry** configs, uint8_t*
 	((*configs) + 3)->acceleration = 0.3f;
 
 	((*configs) + 4)->minSpeedDifference = 15.0f;
-	((*configs) + 4)->acceleration = 0.4f;
+	((*configs) + 4)->acceleration = 0.5f;
 
 	((*configs) + 5)->minSpeedDifference = 20.0f;
 	((*configs) + 5)->acceleration = 0.7f;

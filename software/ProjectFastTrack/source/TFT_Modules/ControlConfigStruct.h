@@ -69,7 +69,7 @@ struct ControlConfig {
     uint8_t minObstacleRow = 0;
 
     // Steering-Stuff
-    float servoSteeringOffset = 0.0f;
+    float servoSteeringOffset = -0.027f;
     float steeringPotentialFactor = 0.0f;
     float steeringPotentialFactorPerSpeed = 0.0f;
     uint8_t steeringPotentialFactorSpeedIncrements = 1;

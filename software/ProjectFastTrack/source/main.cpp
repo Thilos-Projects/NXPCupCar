@@ -293,7 +293,7 @@ void controlCar() {
 	if (!steeringDiabled) {
 		MotorControl::setServo(steeringAngle + currentConfig->servoSteeringOffset);
 	} else {
-		MotorControl::setServo(0);
+		MotorControl::setServo(currentConfig->servoSteeringOffset);
 	}
 
 	// Speed
@@ -348,9 +348,6 @@ float lookupBrakeAcceleration(float currentSpeed, float destinationSpeed) {
 		return acceleration;
 
 	} else if (allowActiveBrake) {
-		// TODO: TEST ONLY - REMOVE!
-		// return 0.0f;
-		
 		BrakeLookupEntry* chosen1 = &currentConfig->brakeLookupEntries[0];
 		BrakeLookupEntry* chosen2 = &currentConfig->brakeLookupEntries[0];
 		int i = 0;
