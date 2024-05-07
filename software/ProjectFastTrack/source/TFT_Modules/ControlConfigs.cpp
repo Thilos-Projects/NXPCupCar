@@ -73,8 +73,8 @@ void createDefaultBrakeConfig(BrakeLookupEntry** configs, uint8_t* configLength)
 	((*configs) + 0)->acceleration = -0.0f;
 
 	((*configs) + 1)->minSpeedDifference = -3.0f;
-	((*configs) + 1)->frameCount = 5;
-	((*configs) + 1)->acceleration = -0.3f;
+	((*configs) + 1)->frameCount = 3;
+	((*configs) + 1)->acceleration = -0.0f;
 
 	((*configs) + 2)->minSpeedDifference = -6.0f;
 	((*configs) + 2)->frameCount = 5;
@@ -135,7 +135,7 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
 
     controlConfigs[configIndex].brakeRowDistance = 3;
     controlConfigs[configIndex].straightSpeed = 35.0f;
-    controlConfigs[configIndex].turnSpeed = 20.0f;
+    controlConfigs[configIndex].turnSpeed = 25.0f;
 	controlConfigs[configIndex].speedDerivate = 0.2f;
 	controlConfigs[configIndex].slowdownAcceleration = 0.2f;
 
