@@ -69,6 +69,7 @@ struct ControlConfig {
     uint8_t minObstacleRow = 0;
 
     // Steering-Stuff
+    uint16_t trackCenter = 154; //TODO: Should be 158 when camera is position correctly!
     float servoSteeringOffset = -0.015f;
     float steeringPotentialFactor = 0.0f;
     float steeringPotentialFactorPerSpeed = 0.0f;
@@ -87,6 +88,7 @@ struct ControlConfig {
     float speedDerivate = 0.0f;
     float linearAcceleration = 0.35f;
     float linearBrake = -0.3f;
+    uint8_t stopAfterFrames = 11;
 };
 
 #endif

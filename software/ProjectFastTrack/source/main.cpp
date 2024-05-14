@@ -56,6 +56,7 @@ bool motorEnabled = false;
 bool steeringDiabled = false;
 bool finishLineGraceTimer = false;
 bool allowActiveBrake = false;
+static bool stop = false;
 
 void Setup() {
 	mCpu_Setup();
@@ -110,9 +111,8 @@ void controlCar() {
 	static float lastSteeringAngle = 0.0f;
 	static uint8_t brakeAppliedFor = 0;
 	static int16_t trackCenterDifferences[6]; // Size: Length of Rows
-	static uint16_t prevTrackCenters[6] = { 154, 154, 154, 154, 154, 154 }; // Size: Length of Rows
+	static uint16_t prevTrackCenters[6] = { 158, 158, 158, 158, 158, 158 }; // Size: Length of Rows
 	static bool trackWidthOverThreshold[7]; // Size: Length of Rows +1!
-	static bool stop = false;
 	static bool switchConfig = false;
 	static uint8_t switchConfigToIndex;
 	static uint32_t switchConfigAfterTime = 0;
@@ -144,7 +144,7 @@ void controlCar() {
 		prevTrackCenters[currentRowIndex] = currentRowAnalysis.trackCenter;
 
 		// Detect Turn / Crossing / Straight
-		int16_t trackCenterDifference = (int16_t)currentRowAnalysis.trackCenter - 154;
+		int16_t trackCenterDifference = (int16_t)currentRowAnalysis.trackCenter - currentConfig->trackCenter;
 		trackWidthOverThreshold[currentRowIndex] = currentRowAnalysis.trackWidth > currentRowConfig->maxTrackWidth;
 		if (abs(trackCenterDifference) > currentRowConfig->maxCenterDifferenceForTurn) {
 			// Update Row
@@ -155,14 +155,14 @@ void controlCar() {
 			currentRowAnalysis.calculateSobelRow();
 			currentRowAnalysis.findBlankArea();
 			
-			int16_t trackCenterCloseDifference = (int16_t)currentRowAnalysis.trackCenter - 154;
+			int16_t trackCenterCloseDifference = (int16_t)currentRowAnalysis.trackCenter - currentConfig->trackCenter;
 
 			if ((trackCenterCloseDifference < 0) == (trackCenterDifference < 0)) { // Turn Track
 				countTurnTracks++;
 				trackCenterDifferences[currentRowIndex] = trackCenterDifference;
 				currentRowIndex++;
 				for (uint8_t resetRowIndex = currentRowIndex; resetRowIndex < currentConfig->rowConfigLength; resetRowIndex++) {
-					prevTrackCenters[resetRowIndex] = 154;
+					prevTrackCenters[resetRowIndex] = currentConfig->trackCenter;
 				}
 				break;
 			} else { // Crossing Strack
@@ -352,8 +352,16 @@ float calculateAcceleration(float currentSpeed, float destSpeed) {
 }
 
 void controlMotor() {
+	static uint8_t stoppedForFrames = 0;
 	static float lastAcceleration = 0.0f;
 	if (motorEnabled) {
+		if (stop) {
+			if (stoppedForFrames > currentConfig->stopAfterFrames) {
+				MotorControl::setSpeed(0, 0);
+				return;
+			}
+			stoppedForFrames++;
+		}
 
 		// TODO: Move this to configuration
 		float accMultiplierLeft = 1.0f; //1.05f; //mAd_Read(ADCInputEnum::kPot1) + 2;
