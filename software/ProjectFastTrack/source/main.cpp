@@ -352,8 +352,7 @@ float calculateAcceleration(float currentSpeed, float destSpeed) {
 }
 
 void controlMotor() {
-	static float lastAccelerationL = 0.0f;
-	static float lastAccelerationR = 0.0f;
+	static float lastAcceleration = 0.0f;
 	if (motorEnabled) {
 
 		// TODO: Move this to configuration
@@ -364,41 +363,30 @@ void controlMotor() {
 		float currentSpeedLeft, currentSpeedRight;
 		MotorControl::getSpeed(&currentSpeedLeft, &currentSpeedRight);
 
-		float accelerationL = calculateAcceleration(currentSpeedLeft, destinationSpeed);
-		float accelerationR = calculateAcceleration(currentSpeedRight, destinationSpeed);
+		float currentSpeed = (currentSpeedLeft + currentSpeedRight) / 2.0f;
 
-		if (abs(destinationSpeed - currentSpeedLeft) < 1.0f) {
+		float acceleration = calculateAcceleration(currentSpeed, destinationSpeed);
+
+		if (abs(destinationSpeed - currentSpeed) < 1.0f) {
 			mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOn);
 		} else {
 			mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOff);
 		}
 
-		// Derivate (L)
-		if (accelerationL >= 0.0f) {
-			if (lastAccelerationL == 0.0f)
-				lastAccelerationL = accelerationL;
-			float accelerationDerivateL = (lastAccelerationL - accelerationL) * currentConfig->speedDerivate;
-			accelerationL += accelerationDerivateL;
-			lastAccelerationL = accelerationL;
+		// Derivate
+		if (acceleration >= 0.0f) {
+			if (lastAcceleration == 0.0f)
+				lastAcceleration = acceleration;
+			float accelerationDerivate = (lastAcceleration - acceleration) * currentConfig->speedDerivate;
+			acceleration += accelerationDerivate;
+			lastAcceleration = acceleration;
 		} else {
-			lastAccelerationL = 0.0f;
+			lastAcceleration = 0.0f;
 		}
 
-		// Derivate (R)
-		if (accelerationR >= 0.0f) {
-			if (lastAccelerationR == 0.0f)
-				lastAccelerationR = accelerationR;
-			float accelerationDerivateR = (lastAccelerationR - accelerationR) * currentConfig->speedDerivate;
-			accelerationR += accelerationDerivateR;
-			lastAccelerationR = accelerationR;
-		} else {
-			lastAccelerationR = 0.0f;
-		}
-
-		MotorControl::setSpeed(accelerationL * accMultiplierLeft, accelerationR * accMultiplierRight);
+		MotorControl::setSpeed(acceleration * accMultiplierLeft, acceleration * accMultiplierRight);
 	} else {
-		lastAccelerationL = 0.0f;
-		lastAccelerationR = 0.0f;
+		lastAcceleration = 0.0f;
 		MotorControl::setSpeed(0, 0);
 	}
 }
