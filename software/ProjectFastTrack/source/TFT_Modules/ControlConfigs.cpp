@@ -65,7 +65,7 @@ void createDefaultColumnConfig(uint8_t configIndex, ControlConfig* controlConfig
 }
 
 /* Should be consired "safe" when making it 10 laps */
-void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
+void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs) {
     controlConfigs[configIndex].pixyLedColorR = 255;
     controlConfigs[configIndex].pixyLedColorG = 255;
     controlConfigs[configIndex].pixyLedColorB = 31;
@@ -80,6 +80,8 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].turnSpeed = 6.666667f;
 	controlConfigs[configIndex].speedDerivate = 0.2f;
 	controlConfigs[configIndex].slowdownAcceleration = 0.25f;
+	controlConfigs[configIndex].linearAcceleration = 0.35f;
+	controlConfigs[configIndex].linearBrake = -0.3f;
 
 	createDefaultRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
@@ -93,21 +95,23 @@ void safeConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].switchConfigAfterFinishLineTimeout = 200;
 }
 
-void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs){
+void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs) {
     controlConfigs[configIndex].pixyLedColorR = 255;
     controlConfigs[configIndex].pixyLedColorG = 255;
     controlConfigs[configIndex].pixyLedColorB = 31;
 
-    controlConfigs[configIndex].steeringPotentialFactor = 1.6f;
+    controlConfigs[configIndex].steeringPotentialFactor = 2.0f;
     controlConfigs[configIndex].steeringPotentialFactorPerSpeed = 0.4f;
     controlConfigs[configIndex].steeringPotentialFactorSpeedIncrements = 35;
-    controlConfigs[configIndex].steeringDerivativeFactor = 0.3f;
+    controlConfigs[configIndex].steeringDerivativeFactor = 0.25f;
 
     controlConfigs[configIndex].brakeRowDistance = 3;
-    controlConfigs[configIndex].straightSpeed = 22.0f;
-    controlConfigs[configIndex].turnSpeed = 11.0f;
+    controlConfigs[configIndex].straightSpeed = 13.333333333f;
+    controlConfigs[configIndex].turnSpeed = 7.777777778f;
 	controlConfigs[configIndex].speedDerivate = 0.2f;
-	controlConfigs[configIndex].slowdownAcceleration = 0.15f;
+	controlConfigs[configIndex].slowdownAcceleration = 0.25f;
+	controlConfigs[configIndex].linearAcceleration = 0.4f;
+	controlConfigs[configIndex].linearBrake = -0.5f;
 
 	createDefaultRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 

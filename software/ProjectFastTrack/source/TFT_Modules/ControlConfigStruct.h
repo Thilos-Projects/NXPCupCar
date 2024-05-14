@@ -69,7 +69,7 @@ struct ControlConfig {
     uint8_t minObstacleRow = 0;
 
     // Steering-Stuff
-    float servoSteeringOffset = -0.029f;
+    float servoSteeringOffset = -0.015f;
     float steeringPotentialFactor = 0.0f;
     float steeringPotentialFactorPerSpeed = 0.0f;
     uint8_t steeringPotentialFactorSpeedIncrements = 1;
@@ -85,6 +85,8 @@ struct ControlConfig {
     uint8_t acceleatationLookupEntryCount = 0;
     AccelerationLookupEntry* acceleatationLookupEntries;
     float speedDerivate = 0.0f;
+    float linearAcceleration = 0.35f;
+    float linearBrake = -0.3f;
 };
 
 #endif

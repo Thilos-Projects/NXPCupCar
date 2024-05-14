@@ -286,9 +286,9 @@ void controlCar() {
 
 	lastSteeringAngle = steeringAngle;
 	if (!steeringDiabled) {
-		MotorControl::setServo(steeringAngle + currentConfig->servoSteeringOffset);
+		MotorControl::setServo(steeringAngle, currentConfig->servoSteeringOffset);
 	} else {
-		MotorControl::setServo(currentConfig->servoSteeringOffset);
+		MotorControl::setServo(0.0f, currentConfig->servoSteeringOffset);
 	}
 
 	// Speed
@@ -332,10 +332,10 @@ float U0OfN(float n) {
 float calculateAcceleration(float currentSpeed, float destSpeed) {
 	float factor;
 	//hier die dynamisch lineare Methode
-	if (destSpeed>=(currentSpeed+2))      factor = 0.35;
-	else if (destSpeed>=currentSpeed)     factor = 0.175 * (destSpeed - currentSpeed); //dieser Koeffizient muss immer halb so gross sein, wie der obige
-	else if (destSpeed>=(currentSpeed-2)) factor = 0.15 * (destSpeed - currentSpeed); //dieser Koeffizient muss immer halb so gross sein, wie der untige
-	else                                  factor = -0.3;
+	if (destSpeed>=(currentSpeed+2))      factor = currentConfig->linearAcceleration;
+	else if (destSpeed>=currentSpeed)     factor = currentConfig->linearAcceleration * 0.5f * (destSpeed - currentSpeed); //dieser Koeffizient muss immer halb so gross sein, wie der obige
+	else if (destSpeed>=(currentSpeed-2)) factor = currentConfig->linearBrake * -0.5f * (destSpeed - currentSpeed); //dieser Koeffizient muss immer halb so gross sein, wie der untige
+	else                                  factor = currentConfig->linearBrake;
 
 	float destU0 = (U0OfN(currentSpeed)/8.3+factor);
 
@@ -357,8 +357,8 @@ void controlMotor() {
 	if (motorEnabled) {
 
 		// TODO: Move this to configuration
-		float accMultiplierLeft = 1.000030f; //mAd_Read(ADCInputEnum::kPot1) + 2;
-		float accMultiplierRight = 1.100616f; //mAd_Read(ADCInputEnum::kPot2) + 2;
+		float accMultiplierLeft = 1.0f; //1.05f; //mAd_Read(ADCInputEnum::kPot1) + 2;
+		float accMultiplierRight = 1.0f; //1.100616f; //mAd_Read(ADCInputEnum::kPot2) + 2;
 		// printf("SL: %d\tSR: %d", (int32_t)(accMultiplierLeft * 1000000.0f), (int32_t)(accMultiplierRight * 1000000.0f));
 		
 		float currentSpeedLeft, currentSpeedRight;

@@ -10,7 +10,7 @@
 
 namespace MotorControl{
 	void Setup();
-	void setServo(float angle);
+	void setServo(float angle, float offset);
 	void getSpeed(float *left, float *right);
 	void setSpeed(float left, float right);
 
