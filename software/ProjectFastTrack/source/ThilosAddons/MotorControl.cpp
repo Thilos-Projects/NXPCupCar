@@ -160,9 +160,9 @@ void MotorControl::doSpeedCalc(){
 		istGeschwindigkeitL += frameCountersL[i];
 		istGeschwindigkeitR += frameCountersR[i];
 	}
-	istGeschwindigkeitL /= deltaTime * 3.0f * 6.0f; // 3 Frames über die wir rechnen * 6 Magneten
+	istGeschwindigkeitL /= (deltaTime * 3.0f) * 6.0f; // 3 Frames über die wir rechnen * 6 Magneten
 	istGeschwindigkeitL *= 1000.0f; // 1000ms/s
-	istGeschwindigkeitR /= deltaTime * 3.0f * 6.0f; // 3 Frames über die wir rechnen * 6 Magneten
+	istGeschwindigkeitR /= (deltaTime * 3.0f) * 6.0f; // 3 Frames über die wir rechnen * 6 Magneten
 	istGeschwindigkeitR *= 1000.0f; // 1000ms/s
 
 	lastCounterL = counterL;

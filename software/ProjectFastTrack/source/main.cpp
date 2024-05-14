@@ -316,65 +316,7 @@ void controlCar() {
 	}
 }
 
-float lookupBrakeAcceleration(float currentSpeed, float destinationSpeed) {
-	static uint8_t brakeAppliedFor = 0;
-	float difference = destinationSpeed - currentSpeed; // positiv -> BESCHLEUNIGEN // negativ -> BREMSEN
-	if (difference >= 0) {
-		brakeAppliedFor = 0;
-
-		AccelerationLookupEntry* chosen1 = &currentConfig->acceleatationLookupEntries[0];
-		AccelerationLookupEntry* chosen2 = &currentConfig->acceleatationLookupEntries[0];
-		int i = 0;
-		for (i = 0; i < currentConfig->acceleatationLookupEntryCount; i++) {
-			chosen1 = chosen2;
-			chosen2 = &currentConfig->acceleatationLookupEntries[i];
-			if(currentConfig->acceleatationLookupEntries[i].minSpeedDifference >= difference) break;
-		}
-
-		float speedDiff = chosen2->minSpeedDifference - chosen1->minSpeedDifference;
-		float factor = (difference - chosen1->minSpeedDifference) / speedDiff;
-		float diffAcc = chosen2->acceleration - chosen1->acceleration;
-
-		float acceleration = chosen1->acceleration + (factor * diffAcc);
-
-		return acceleration;
-
-	} else if (allowActiveBrake) {
-		BrakeLookupEntry* chosen1 = &currentConfig->brakeLookupEntries[0];
-		BrakeLookupEntry* chosen2 = &currentConfig->brakeLookupEntries[0];
-		int i = 0;
-		for (i = 0; i < currentConfig->brakeLookupEntryCount; i++) {
-			chosen1 = chosen2;
-			chosen2 = &currentConfig->brakeLookupEntries[i];
-			if(currentConfig->brakeLookupEntries[i].minSpeedDifference <= difference) break;
-		}
-
-		float speedDiff = chosen2->minSpeedDifference - chosen1->minSpeedDifference;
-		float factor = (difference - chosen1->minSpeedDifference) / speedDiff;
-		float diffAcc = chosen2->acceleration - chosen1->acceleration;
-		float diffFrameCount = chosen2->frameCount - chosen1->frameCount;
-		float frameCountF = chosen1->frameCount + (factor * diffFrameCount);
-		int8_t frameCount = (int8_t)(frameCountF + 0.5);
-
-		float acceleration = chosen1->acceleration + (factor * diffAcc);
-
-		// Set to 0 after X frames to prevent rolling back
-		if (brakeAppliedFor > frameCount) {
-			return 0.0f;
-		}
-
-		brakeAppliedFor++;
-		return acceleration;
-	} else {
-		if (destinationSpeed > 0.0f) {
-			return currentConfig->slowdownAcceleration;
-		}
-		return 0.0f;
-	}
-}
-
-float U0_von_n(float n) {
-	// TODO: REFACTOR!
+float U0OfN(float n) {
 	float U0 = 0.176f * n;
 	if (n > 0.0f) {
 		return U0 + 0.008;
@@ -384,27 +326,27 @@ float U0_von_n(float n) {
 	return U0 + 0.008;
 }
 
-float lookupAcceleration(float nist, float nsoll) {
-	// TODO: REFACTOR!
-	float dummy;
+/*
+* Inspired by Rüders
+*/
+float calculateAcceleration(float currentSpeed, float destSpeed) {
+	float factor;
 	//hier die dynamisch lineare Methode
-	if (nsoll>=(nist+2))      dummy = 0.35;
-	else if (nsoll>=nist)     dummy = 0.175 * (nsoll - nist); //dieser Koeffizient muss immer halb so gross sein, wie der obige
-	else if (nsoll>=(nist-2)) dummy = 0.15 * (nsoll - nist); //dieser Koeffizient muss immer halb so gross sein, wie der untige
-	else                      dummy = -0.3;
+	if (destSpeed>=(currentSpeed+2))      factor = 0.35;
+	else if (destSpeed>=currentSpeed)     factor = 0.175 * (destSpeed - currentSpeed); //dieser Koeffizient muss immer halb so gross sein, wie der obige
+	else if (destSpeed>=(currentSpeed-2)) factor = 0.15 * (destSpeed - currentSpeed); //dieser Koeffizient muss immer halb so gross sein, wie der untige
+	else                                  factor = -0.3;
 
-	// Usollzero = (U0_von_n(nist)/8.3+dummy)*7.5/sUBatt;
+	float destU0 = (U0OfN(currentSpeed)/8.3+factor);
 
-	float Usollzero = (U0_von_n(nist)/8.3+dummy);
+	float minAcc = 0.17f;
 
-	float luecke = 0.17f;
-
-	if (nsoll < -0.0000000000001f) {
-		return Usollzero - luecke;
-	} else if (nsoll > 0.000000001f) {
-		return Usollzero + luecke;
+	if (destSpeed < -0.0000000000001f) {
+		return destU0 - minAcc;
+	} else if (destSpeed > 0.000000001f) {
+		return destU0 + minAcc;
 	} else {
-		return Usollzero;
+		return destU0;
 	}
 
 }
@@ -422,8 +364,8 @@ void controlMotor() {
 		float currentSpeedLeft, currentSpeedRight;
 		MotorControl::getSpeed(&currentSpeedLeft, &currentSpeedRight);
 
-		float accelerationL = lookupAcceleration(currentSpeedLeft, destinationSpeed);
-		float accelerationR = lookupAcceleration(currentSpeedRight, destinationSpeed);
+		float accelerationL = calculateAcceleration(currentSpeedLeft, destinationSpeed);
+		float accelerationR = calculateAcceleration(currentSpeedRight, destinationSpeed);
 
 		if (abs(destinationSpeed - currentSpeedLeft) < 1.0f) {
 			mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOn);
