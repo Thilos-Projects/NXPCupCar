@@ -8,15 +8,14 @@ Wir lassen Auto fahren
 gantt
 dateFormat DD.MM.YYYY
 axisFormat  %d.%m.
-# excludes 24.12.2023, 25.12.2023, 26.12.2023, 27.12.2023, 28.12.2023, 29.12.2023, 30.12.2023, 31.12.2023, 01.01.2024, 02.01.2024
 
 title Zeitplanung Autonomes Fahrzeug [Team TFT]
 
 %% This only works on mermaid.live:
 
-# tickInterval 1week
-# weekday monday
-# todayMarker off
+%% tickInterval 1week
+%% weekday monday
+%% todayMarker off
 
 section 0. Vorbereitung
     Kick-Off : crit, milestone, done, p0, 2023-10-06, 1d
@@ -62,27 +61,29 @@ section 4. Kamera II
 
 
 section 5. Fahren III
-    Meilenstein 5 - Fahren III : active, m5, after m2, 6w
+    Meilenstein 5 - Fahren III : done, m5, after m2, 6w
 
     Sichere 0 fahren : done, milestone, a52, 2023-12-13, 1d
     Sichere 8 fahren : done, milestone, a53, 2024-01-04, 1d
-    Sicher alles fahren : active, milestone, a54, after a42d, 1d
+    Sicher alles fahren : done, milestone, a54, after a42d, 1d
 
     Demo 2 - sichere 0 fahren : done, crit, milestone, p5, 2023-12-19, 1d
-    Demo 3 - sichere 8 fahren : crit, milestone, p6, 2024-01-11, 1d
-    [Platzhalter] Demo 4 - Sicher alles fahren: crit, milestone, p7, 2024-01-26, 1d
+    Demo 3 - sichere 8 fahren : done, crit, milestone, p6, 2024-01-11, 1d
+    Demo 4 - Sicher alles fahren: done, crit, milestone, p7, 2024-02-16, 1d
 
 
 section 6. Optimierung
-    Meilenstein 6 - Optimierung : m6, 2024-01-11, 6w
+    Meilenstein 6 - Optimierung : m6, 2024-01-11, 11w
 
-    # Erkennung Ziellinie : a42d, 2024-01-18, 1w
+    %% Erkennung Ziellinie : a42d, 2024-01-18, 1w
 
 
 section Sonstiges
     Weihnachtsferien : done, p2, 2023-12-23, 11d
-    Prüfungsphase HSD : p8, 2024-01-31, 29d
-    [Platzhalter] Prüfung Autonomes Fahren : crit, milestone, p9, 2024-03-10, 0d
-    Ender der Vorlesungszeit : milestone, p3, 2024-01-28, 1d
+    Prüfungsphase HSD Medien : done, p8, 2024-01-31, 29d
+    Prüfung Autonomes Fahren : crit, milestone, p9, 2024-03-15, 0d
+    Ender der Vorlesungszeit : done, milestone, p3, 2024-01-28, 1d
+
+    Vorentscheid Eindhoven: crit, milestone, nxp0, 2024-04-17, 0d
 
 ```
