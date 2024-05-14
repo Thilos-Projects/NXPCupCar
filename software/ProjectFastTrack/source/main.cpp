@@ -381,26 +381,27 @@ float U0_von_n(float n) {
 	} else if(n < 0.0f) {
 		return U0 - 0.008;
 	}
+	return U0 + 0.008;
 }
 
 float lookupAcceleration(float nist, float nsoll) {
 	// TODO: REFACTOR!
 	float dummy;
 	//hier die dynamisch lineare Methode
-	if (nsoll>=(nist+2))      dummy = 0.25;
-	else if (nsoll>=nist)     dummy = 0.125 * (nsoll - nist); //dieser Koeffizient muss immer halb so gross sein, wie der obige
-	else if (nsoll>=(nist-2)) dummy = 0.1875 * (nsoll - nist); //dieser Koeffizient muss immer halb so gross sein, wie der untige
-	else                      dummy = -0.375;
+	if (nsoll>=(nist+2))      dummy = 0.35;
+	else if (nsoll>=nist)     dummy = 0.175 * (nsoll - nist); //dieser Koeffizient muss immer halb so gross sein, wie der obige
+	else if (nsoll>=(nist-2)) dummy = 0.15 * (nsoll - nist); //dieser Koeffizient muss immer halb so gross sein, wie der untige
+	else                      dummy = -0.3;
 
 	// Usollzero = (U0_von_n(nist)/8.3+dummy)*7.5/sUBatt;
 
 	float Usollzero = (U0_von_n(nist)/8.3+dummy);
 
-	float luecke = 0.0f;
+	float luecke = 0.17f;
 
-	if (nist < -0.000000001f) {
+	if (nsoll < -0.0000000000001f) {
 		return Usollzero - luecke;
-	} else if (nist > 0.000000001f) {
+	} else if (nsoll > 0.000000001f) {
 		return Usollzero + luecke;
 	} else {
 		return Usollzero;
