@@ -24,6 +24,14 @@ void printArray(T* line, uint16_t length){
 	printf("\n");
 }
 
+template<typename T>
+void printPartialArray(T* line, uint16_t length, uint16_t start, uint16_t end){
+	printf("%d", *(line + 0));
+	for(int i = start; i < end; i++)
+		printf(",\t%d", *(line + i));
+	printf("\n");
+}
+
 
 void CameraAnalysis::SingleRowAnalysis::Setup(Pixy2SPI_SS* pixy, uint16_t row, uint16_t edgeThreshold,
 		uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t centerPixel, uint16_t minThickness) {
@@ -34,6 +42,9 @@ void CameraAnalysis::SingleRowAnalysis::Setup(Pixy2SPI_SS* pixy, uint16_t row, u
 	this->maxEdgeWidth = maxEdgeWidth;
 	this->centerPixel = centerPixel;
 	this->minThickness = minThickness;
+
+	this->trackCenter = 0;
+	this->trackWidth = 0;
 }
 void CameraAnalysis::SingleRowAnalysis::getImageRow(){
 	pixy->video.getGrayRect(0, row, 158, row+1, 1, 1, rowDataBuffer + 0, false);
@@ -172,10 +183,8 @@ void CameraAnalysis::SingleRowAnalysis::findBlankArea() {
 	uint16_t rightEdge = getEdgeWithThickness(false, centerPixel, rowSobel, edgeThreshold, minEdgeWidth, maxEdgeWidth, minThickness);
 
 	if(rightEdge <= leftEdge){
-		mLeds_Write(LedMaskEnum::kMaskLed4, LedStateEnum::kLedOn);
-		mTimer_SetMotorDuty(0, 0);
-		mTimer_SetServoDuty(0, 0);
-		while(true);
+		// TODO: Error - Don't care :D
+		// mLeds_Write(LedMaskEnum::kMaskLed4, LedStateEnum::kLedOn);
 	}
 
 	trackWidth = rightEdge - leftEdge;
@@ -186,13 +195,6 @@ void CameraAnalysis::SingleRowAnalysis::findBlankArea() {
 
 }
 
-void CameraAnalysis::SingleRowAnalysis::calculateTrackDifferences() {
-	centerDiff = (uint16_t)abs((int16_t)trackCenter - (int16_t)oldTrackCenter);
-	widthDiff = (uint16_t)abs((int16_t)trackWidth - (int16_t)oldTrackWidth);
-
-	oldTrackCenter = trackCenter;
-	oldTrackWidth = trackWidth;
-}
 
 //----------------------Print-------------------
 void CameraAnalysis::SingleRowAnalysis::printImageRow(){
@@ -200,4 +202,213 @@ void CameraAnalysis::SingleRowAnalysis::printImageRow(){
 }
 void CameraAnalysis::SingleRowAnalysis::printSobleRow(){
 	printArray(rowSobel, 314);
+}
+
+// Column STUFF
+
+
+void CameraAnalysis::SingleColumnAnalysis::Setup(Pixy2SPI_SS* pixy, uint16_t column, uint16_t edgeThreshold,
+		uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t minThickness) {
+	this->pixy = pixy;
+	this->column = column;
+	this->edgeThreshold = edgeThreshold;
+	this->minEdgeWidth = minEdgeWidth;
+	this->maxEdgeWidth = maxEdgeWidth;
+	this->minThickness = minThickness;
+}
+void CameraAnalysis::SingleColumnAnalysis::getImageColumn(){
+	pixy->video.getGrayRect(column, 1, column + 1, 204+1, 1, 1, columnDataBuffer + 0, false);
+}
+void CameraAnalysis::SingleColumnAnalysis::calculateSobel(){
+	for(int i = 0; i < 204; i++)
+		columnSobel[i] = (((int16_t)(*(columnDataBuffer+i))) * 2 + ((int16_t)(*(columnDataBuffer+i+2))) * -2);
+}
+
+
+bool CameraAnalysis::SingleColumnAnalysis::detectObstacle(uint8_t start) {
+	// 44 // 54 // 110 //
+
+	// TODO: Move this stuff to Config
+	uint8_t minDiffObstacleTop = 5;
+	uint8_t maxDiffObstacleTop = 20;
+	uint8_t minDiffObstacleFront = 60;
+	uint8_t maxDiffObstacleFront = 100;
+
+	uint8_t startPosition = 40;
+	uint8_t endPosition = 200;
+	uint8_t foundInThreshold = 0;
+	uint8_t sobelInThreshold[206];
+	uint8_t foundLength = 0;
+	int16_t lastSobel = 0;
+	for (uint8_t i = startPosition; i < endPosition; i++) {
+		if(columnSobel[i] < -edgeThreshold || edgeThreshold < columnSobel[i]) {
+			if (lastSobel != 0 && (lastSobel > 0) != (columnSobel[i] > 0)) {
+				if (foundLength > minEdgeWidth && foundLength < maxEdgeWidth) {
+					sobelInThreshold[foundInThreshold] = i;
+					foundInThreshold++;
+				}
+				foundLength = 0;
+			}
+			foundLength++;
+		} else {
+			if (foundLength > minEdgeWidth && foundLength < maxEdgeWidth) {
+				sobelInThreshold[foundInThreshold] = i;
+				foundInThreshold++;
+			}
+			foundLength = 0;
+		}
+		lastSobel = columnSobel[i];
+	}
+	
+	uint8_t firstEdge = 0, secondEdge = 0, thirdEdge = 0;
+	bool foundObstacle = false;
+	// Search first
+	for (uint8_t i1 = 0; i1 < foundInThreshold; i1++) {
+		// Search second
+		for (uint8_t i2 = i1 + 1; i2 < foundInThreshold; i2++) {
+			// Is over max?
+			if (sobelInThreshold[i2] > sobelInThreshold[i1] + maxDiffObstacleTop)
+				break;
+			// Is second valid?
+			if (sobelInThreshold[i2] >= sobelInThreshold[i1] + minDiffObstacleTop) {
+					// Search third
+					for (uint8_t i3 = i2 + 1; i3 < foundInThreshold; i3++) {
+						// Is over max?
+						if (sobelInThreshold[i3] > sobelInThreshold[i2] + maxDiffObstacleFront)
+							break;
+						// Is third valid?
+						if (sobelInThreshold[i3] >= sobelInThreshold[i2] + minDiffObstacleFront) {
+							firstEdge = sobelInThreshold[i1];
+							secondEdge = sobelInThreshold[i2];
+							thirdEdge = sobelInThreshold[i3];
+							foundObstacle = true;
+							break;
+						}
+					}
+					if (foundObstacle) {
+						printf("Found %d %d %d\n", firstEdge, secondEdge, thirdEdge);
+						break;
+					}
+				}
+		}
+		if (foundObstacle)
+			break;
+	}
+
+	if (foundObstacle) {
+		obstacleBottomEdge = thirdEdge;
+	}
+
+	return foundObstacle;
+
+}
+
+//----------------------Print-------------------
+void CameraAnalysis::SingleColumnAnalysis::printImageColumn(){
+	printArray(columnDataBuffer, 204);
+}
+void CameraAnalysis::SingleColumnAnalysis::printSobleColumn(){
+	printArray(columnSobel, 202);
+}
+void CameraAnalysis::SingleColumnAnalysis::printLines(){
+	printf("%d", 1);
+	for(int i = 2; i < 204 +1; i++)
+		printf(",\t%d", i);
+	printf("\n");
+}
+
+//Partial Colum Stuff
+
+void CameraAnalysis::PartialColumnAnalysis::Setup(Pixy2SPI_SS* pixy, uint16_t column, uint16_t startHeight, uint16_t endHeight, uint16_t edgeThreshold, uint8_t minEdgeWidth, uint8_t maxEdgeWidth, uint16_t minThickness) {
+	this->pixy = pixy;
+	this->column = column;
+	this->startHeight = startHeight;
+	this->endHeight = endHeight;
+	this->edgeThreshold = edgeThreshold;
+	this->minEdgeWidth = minEdgeWidth;
+	this->maxEdgeWidth = maxEdgeWidth;
+	this->minThickness = minThickness;
+}
+void CameraAnalysis::PartialColumnAnalysis::getImageColumn() {
+	pixy->video.getGrayRect(column, startHeight, column+1, endHeight, 1, 1, columnDataBuffer + 0, false);
+}
+void CameraAnalysis::PartialColumnAnalysis::calculateSobel() {
+	for(int i = 0; i < endHeight - startHeight - 2; i++)
+		columnSobel[i] = (((int16_t)(*(columnDataBuffer+i))) * 2 + ((int16_t)(*(columnDataBuffer+i+2))) * -2);
+}
+
+bool CameraAnalysis::PartialColumnAnalysis::detectFinishline() {
+	// TODO: Use configurable values
+	const uint8_t threshold = 30;
+	const uint8_t minWidth = 2;
+	const uint8_t maxWidth = 6;
+	const uint8_t minThicknes = 2;
+	const uint8_t maxThicknes = 15;
+
+	firstPos = 0;
+	secondPos = 0;
+	uint8_t state = 0;
+	uint16_t counter = 0;
+
+	for(int i = 0; i < endHeight - startHeight - 2 && secondPos == 0; i++){
+		switch(state){
+		case 0: {
+			if(columnSobel[i] > threshold){
+				state = 1;
+				counter++;
+			}
+		} break;
+		case 1: {
+			if(columnSobel[i] > threshold){
+				counter++;
+			}else{
+				if(counter < minWidth || counter > maxWidth) {
+					state = 0;
+					counter = 0;
+				} else {
+					state = 2;
+					firstPos = i;
+					counter = 0;
+				}
+			}
+		}break;
+		case 2: {
+			if(columnSobel[i] < -threshold){
+				state = 3;
+				counter++;
+			}
+		} break;
+		case 3: {
+			if(columnSobel[i] < -threshold){
+				counter++;
+			}else{
+				if(counter < minWidth || counter > maxWidth) {
+					state = 2;
+					counter = 0;
+				} else {
+					if(i-firstPos < minThicknes || i-firstPos > maxThicknes){
+						state = 2;
+						counter = 0;
+						firstPos = i;
+					}
+					else{
+						secondPos = i;
+						state = 4;
+					}
+				}
+			}
+		}break;
+		default : break;
+		}
+	}
+
+	return secondPos != 0;
+}
+
+//----------------------Print-------------------
+void CameraAnalysis::PartialColumnAnalysis::printImageColumn(){
+	printPartialArray(columnDataBuffer, 316, 1, endHeight - startHeight);
+}
+void CameraAnalysis::PartialColumnAnalysis::printSobleColumn(){
+	printPartialArray(columnSobel, 314, 1, endHeight - startHeight);
 }

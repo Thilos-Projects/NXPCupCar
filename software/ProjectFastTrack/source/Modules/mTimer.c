@@ -53,7 +53,7 @@ void mTimer_Setup(void)
 {
 
 	// Flextimer setup
-	iFlextimer_Config();
+	// iFlextimer_Config();
 
 	// Pin direction et enable du pont en H en sortie
 	iDio_SetPortDirection(kPortA, kMaskIo15 + kMaskIo16 + kMaskIo17, kIoOutput);
@@ -67,9 +67,9 @@ void mTimer_Setup(void)
 //-----------------------------------------------------------------------------
 void mTimer_Open(void)
 {
-	mTimer_SetServoDuty(0, 0);
-	mTimer_SetServoDuty(1, 0);
-	mTimer_SetMotorDuty(0, 0);
+	// mTimer_SetServoDuty(0, 0);
+	// mTimer_SetServoDuty(1, 0);
+	// mTimer_SetMotorDuty(0, 0);
 	// Enable des ponts en H
 	iDio_SetPort(kPortA, kMaskIo17, kIoOn);
 	iDio_SetPort(kPortA, kMaskIo15, kIoOff);
@@ -88,29 +88,29 @@ void mTimer_Close(void)
 // Moteur A = moteur gauche --> valeur n�gative = en arri�re, valeur pos=en avant
 // Moteur B = moteur droite
 //-----------------------------------------------------------------------------
-void mTimer_GetSpeed(float *aSpeedMotLeft, float *aSpeedMotRight)
+/*void mTimer_GetSpeed(float *aSpeedMotLeft, float *aSpeedMotRight)
 {
 	iFlextimer_GetSpeed(aSpeedMotLeft, aSpeedMotRight);
-}
+}*/
 
 //---------------------------------------------------------------------------
 // Modifie la position du servo
 // Position entre -1.0 to 1.0
 //---------------------------------------------------------------------------
-void mTimer_SetServoDuty(UInt8 aServoNumber, float aPosition)
+/*void mTimer_SetServoDuty(UInt8 aServoNumber, float aPosition)
 {
 	iFlextimer_SetServoDuty(aServoNumber, aPosition);
-}
+}*/
 
 //---------------------------------------------------------------------------
 // Modifie le duty du PWM
 // Moteur A = moteur gauche (-1 � +1)
 // Moteur B = moteur droite (-1 � +1)
 //---------------------------------------------------------------------------
-void mTimer_SetMotorDuty(float aMotorLeft, float aMotorRight)
+/*void mTimer_SetMotorDuty(float aMotorLeft, float aMotorRight)
 {
 	iFlextimer_SetMotorDuty(aMotorLeft, aMotorRight);
-}
+}*/
 
 //---------------------------------------------------------------------------
 // Enable des ponts en H des moteurs DC

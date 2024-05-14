@@ -17,7 +17,7 @@ extern "C" {
 #include <stdint.h>
 
 #define countsProMs 1.00f
-#define maxTaskCount 10
+#define maxTaskCount 12
 
 uint32_t counter;
 Scheduler::taskHandle handles[maxTaskCount];
@@ -58,6 +58,13 @@ void Scheduler::Update(){
 			handles[i].nextActivationAt = handles[i].nextActivationAt + handles[i].delay;
 		}
 	}
+}
+
+void Scheduler::SetActive(Scheduler::taskHandle* task, bool active, bool imidiate) {
+	if (task->isFree || task->active == active)
+		return;
+	task->nextActivationAt = counter + (imidiate ? 0 : task->delay);
+	task->active = active;
 }
 
 //gibt den nächsten freien Handle zurück und richted diesen ein, ist keiner frei wird 0 zurückgegeben

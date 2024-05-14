@@ -50,7 +50,7 @@ $History: $
 // Constantes
 //------------------------------------------------------------
 // FTM0 pour la commande des PWM des moteurs DC
-#define TFC_MOTOR_SWITCHING_FREQUENCY ((float)(20000.0))
+#define TFC_MOTOR_SWITCHING_FREQUENCY ((float)(10000.0)) //TFT: Ursprünglich 20000.0
 #define FTM0_MOD_VALUE (int)((float)(PERIPHERAL_BUS_CLOCK) / TFC_MOTOR_SWITCHING_FREQUENCY)
 #define FTM0_CLOCK PERIPHERAL_BUS_CLOCK
 #define FTM0_CLK_PRESCALE 0
@@ -290,6 +290,7 @@ void iFlextimer_GetSpeed(float *aSpeedMotLeft, float *aSpeedMotRight)
 	*aSpeedMotRight = sSpeedRight;
 }
 
+/*
 //------------------------------------------------------------
 // Interrupt routine FTM1
 //------------------------------------------------------------
@@ -398,6 +399,7 @@ void FTM1_IRQHandler(void)
 		sOverFlowCounterR = 0;
 	}
 }
+*/
 
 //---------------------------------------------------------------------------
 // Modifie la position du servo
@@ -408,14 +410,16 @@ void iFlextimer_SetServoDuty(UInt8 aServoNumber, float aPosition)
 {
 	float aDutyCycle;
 
+	// TFT: 0.8 instead of 1
+
 	// Saturation
-	if (aPosition > 1)
+	if (aPosition > 0.8)
 	{
-		aPosition = 1;
+		aPosition = 0.8;
 	}
-	else if (aPosition < -1)
+	else if (aPosition < -0.8)
 	{
-		aPosition = -1;
+		aPosition = -0.8;
 	}
 
 	// Calcul du duty
