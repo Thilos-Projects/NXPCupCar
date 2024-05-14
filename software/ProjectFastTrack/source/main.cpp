@@ -110,7 +110,7 @@ void controlCar() {
 	static float lastSteeringAngle = 0.0f;
 	static uint8_t brakeAppliedFor = 0;
 	static int16_t trackCenterDifferences[6]; // Size: Length of Rows
-	static uint16_t prevTrackCenters[6] = { 158, 158, 158, 158, 158, 158 }; // Size: Length of Rows
+	static uint16_t prevTrackCenters[6] = { 154, 154, 154, 154, 154, 154 }; // Size: Length of Rows
 	static bool trackWidthOverThreshold[7]; // Size: Length of Rows +1!
 	static bool stop = false;
 	static bool switchConfig = false;
@@ -144,7 +144,7 @@ void controlCar() {
 		prevTrackCenters[currentRowIndex] = currentRowAnalysis.trackCenter;
 
 		// Detect Turn / Crossing / Straight
-		int16_t trackCenterDifference = (int16_t)currentRowAnalysis.trackCenter - 158;
+		int16_t trackCenterDifference = (int16_t)currentRowAnalysis.trackCenter - 154;
 		trackWidthOverThreshold[currentRowIndex] = currentRowAnalysis.trackWidth > currentRowConfig->maxTrackWidth;
 		if (abs(trackCenterDifference) > currentRowConfig->maxCenterDifferenceForTurn) {
 			// Update Row
@@ -155,14 +155,14 @@ void controlCar() {
 			currentRowAnalysis.calculateSobelRow();
 			currentRowAnalysis.findBlankArea();
 			
-			int16_t trackCenterCloseDifference = (int16_t)currentRowAnalysis.trackCenter - 158;
+			int16_t trackCenterCloseDifference = (int16_t)currentRowAnalysis.trackCenter - 154;
 
 			if ((trackCenterCloseDifference < 0) == (trackCenterDifference < 0)) { // Turn Track
 				countTurnTracks++;
 				trackCenterDifferences[currentRowIndex] = trackCenterDifference;
 				currentRowIndex++;
 				for (uint8_t resetRowIndex = currentRowIndex; resetRowIndex < currentConfig->rowConfigLength; resetRowIndex++) {
-					prevTrackCenters[resetRowIndex] = 158;
+					prevTrackCenters[resetRowIndex] = 154;
 				}
 				break;
 			} else { // Crossing Strack

@@ -100,18 +100,18 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs) {
     controlConfigs[configIndex].pixyLedColorG = 255;
     controlConfigs[configIndex].pixyLedColorB = 31;
 
-    controlConfigs[configIndex].steeringPotentialFactor = 2.0f;
+    controlConfigs[configIndex].steeringPotentialFactor = 1.9f;
     controlConfigs[configIndex].steeringPotentialFactorPerSpeed = 0.4f;
     controlConfigs[configIndex].steeringPotentialFactorSpeedIncrements = 35;
     controlConfigs[configIndex].steeringDerivativeFactor = 0.25f;
 
     controlConfigs[configIndex].brakeRowDistance = 3;
-    controlConfigs[configIndex].straightSpeed = 13.333333333f;
+    controlConfigs[configIndex].straightSpeed = 16.0f;
     controlConfigs[configIndex].turnSpeed = 7.777777778f;
 	controlConfigs[configIndex].speedDerivate = 0.2f;
 	controlConfigs[configIndex].slowdownAcceleration = 0.25f;
 	controlConfigs[configIndex].linearAcceleration = 0.4f;
-	controlConfigs[configIndex].linearBrake = -0.5f;
+	controlConfigs[configIndex].linearBrake = -0.575f;
 
 	createDefaultRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
