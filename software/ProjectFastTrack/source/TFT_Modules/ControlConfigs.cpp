@@ -164,10 +164,12 @@ void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlCo
     controlConfigs[configIndex].steeringDerivativeFactor = 0.3f;
 
     controlConfigs[configIndex].brakeRowDistance = 3;
-    controlConfigs[configIndex].straightSpeed = 6.0f;
-    controlConfigs[configIndex].turnSpeed = 6.0f;
+    controlConfigs[configIndex].straightSpeed = 3.0f;
+    controlConfigs[configIndex].turnSpeed = 3.0f;
 	controlConfigs[configIndex].speedDerivate = 0.2f;
-	controlConfigs[configIndex].slowdownAcceleration = 0.15f;
+	controlConfigs[configIndex].slowdownAcceleration = 0.25f;
+	controlConfigs[configIndex].linearAcceleration = 0.3f;
+	controlConfigs[configIndex].linearBrake = -0.5f;
 
 	createDefaultRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
