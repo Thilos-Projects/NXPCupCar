@@ -215,12 +215,7 @@ void controlCar() {
 					switchConfigToIndex = currentConfig->configAfterFinishLineDetected;
 					switchConfigAfterTime = Scheduler::getMillis() + currentConfig->switchConfigAfterFinishLineTimeout;
 				}
-				mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOn);
-			} else {
-				mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOff);
 			}
-		} else {
-			mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOff);
 		}
 	}
 
@@ -342,9 +337,6 @@ float lookupBrakeAcceleration(float currentSpeed, float destinationSpeed) {
 
 		float acceleration = chosen1->acceleration + (factor * diffAcc);
 
-		mLeds_Write(LedMaskEnum::kMaskLed1, kLedOn);
-		mLeds_Write(LedMaskEnum::kMaskLed2, kLedOff);
-
 		return acceleration;
 
 	} else if (allowActiveBrake) {
@@ -368,13 +360,8 @@ float lookupBrakeAcceleration(float currentSpeed, float destinationSpeed) {
 
 		// Set to 0 after X frames to prevent rolling back
 		if (brakeAppliedFor > frameCount) {
-			mLeds_Write(LedMaskEnum::kMaskLed1, kLedOn);
-			mLeds_Write(LedMaskEnum::kMaskLed2, kLedOn);
 			return 0.0f;
 		}
-		
-		mLeds_Write(LedMaskEnum::kMaskLed1, kLedOff);
-		mLeds_Write(LedMaskEnum::kMaskLed2, kLedOn);
 
 		brakeAppliedFor++;
 		return acceleration;
@@ -386,35 +373,89 @@ float lookupBrakeAcceleration(float currentSpeed, float destinationSpeed) {
 	}
 }
 
+float U0_von_n(float n) {
+	// TODO: REFACTOR!
+	float U0 = 0.176f * n;
+	if (n > 0.0f) {
+		return U0 + 0.008;
+	} else if(n < 0.0f) {
+		return U0 - 0.008;
+	}
+}
+
+float lookupAcceleration(float nist, float nsoll) {
+	// TODO: REFACTOR!
+	float dummy;
+	//hier die dynamisch lineare Methode
+	if (nsoll>=(nist+2))      dummy = 0.25;
+	else if (nsoll>=nist)     dummy = 0.125 * (nsoll - nist); //dieser Koeffizient muss immer halb so gross sein, wie der obige
+	else if (nsoll>=(nist-2)) dummy = 0.1875 * (nsoll - nist); //dieser Koeffizient muss immer halb so gross sein, wie der untige
+	else                      dummy = -0.375;
+
+	// Usollzero = (U0_von_n(nist)/8.3+dummy)*7.5/sUBatt;
+
+	float Usollzero = (U0_von_n(nist)/8.3+dummy);
+
+	float luecke = 0.0f;
+
+	if (nist < -0.000000001f) {
+		return Usollzero - luecke;
+	} else if (nist > 0.000000001f) {
+		return Usollzero + luecke;
+	} else {
+		return Usollzero;
+	}
+
+}
+
 void controlMotor() {
-	static float lastAcceleration = 0.0f;
+	static float lastAccelerationL = 0.0f;
+	static float lastAccelerationR = 0.0f;
 	if (motorEnabled) {
 
 		// TODO: Move this to configuration
-		float accMultiplierLeft = mAd_Read(ADCInputEnum::kPot1) + 2;
-		float accMultiplierRight = mAd_Read(ADCInputEnum::kPot2) + 2;
+		float accMultiplierLeft = 1.000030f; //mAd_Read(ADCInputEnum::kPot1) + 2;
+		float accMultiplierRight = 1.100616f; //mAd_Read(ADCInputEnum::kPot2) + 2;
 		// printf("SL: %d\tSR: %d", (int32_t)(accMultiplierLeft * 1000000.0f), (int32_t)(accMultiplierRight * 1000000.0f));
 		
 		float currentSpeedLeft, currentSpeedRight;
 		MotorControl::getSpeed(&currentSpeedLeft, &currentSpeedRight);
-		float currentSpeed = max(currentSpeedLeft, currentSpeedRight);
 
-		float acceleration = lookupBrakeAcceleration(currentSpeed, destinationSpeed);
+		float accelerationL = lookupAcceleration(currentSpeedLeft, destinationSpeed);
+		float accelerationR = lookupAcceleration(currentSpeedRight, destinationSpeed);
 
-		// Derivate
-		if (acceleration >= 0.0f) {
-			if (lastAcceleration == 0.0f)
-				lastAcceleration = acceleration;
-			float accelerationDerivate = (lastAcceleration - acceleration) * currentConfig->speedDerivate;
-			acceleration += accelerationDerivate;
-			lastAcceleration = acceleration;
+		if (abs(destinationSpeed - currentSpeedLeft) < 1.0f) {
+			mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOn);
 		} else {
-			lastAcceleration = 0.0f;
+			mLeds_Write(LedMaskEnum::kMaskLed3, LedStateEnum::kLedOff);
 		}
 
-		MotorControl::setSpeed(acceleration * accMultiplierLeft, acceleration * accMultiplierRight);
+		// Derivate (L)
+		if (accelerationL >= 0.0f) {
+			if (lastAccelerationL == 0.0f)
+				lastAccelerationL = accelerationL;
+			float accelerationDerivateL = (lastAccelerationL - accelerationL) * currentConfig->speedDerivate;
+			accelerationL += accelerationDerivateL;
+			lastAccelerationL = accelerationL;
+		} else {
+			lastAccelerationL = 0.0f;
+		}
+
+		// Derivate (R)
+		if (accelerationR >= 0.0f) {
+			if (lastAccelerationR == 0.0f)
+				lastAccelerationR = accelerationR;
+			float accelerationDerivateR = (lastAccelerationR - accelerationR) * currentConfig->speedDerivate;
+			accelerationR += accelerationDerivateR;
+			lastAccelerationR = accelerationR;
+		} else {
+			lastAccelerationR = 0.0f;
+		}
+
+		MotorControl::setSpeed(accelerationL * accMultiplierLeft, accelerationR * accMultiplierRight);
 	} else {
-		lastAcceleration = 0.0f;
+		lastAccelerationL = 0.0f;
+		lastAccelerationR = 0.0f;
 		MotorControl::setSpeed(0, 0);
 	}
 }
