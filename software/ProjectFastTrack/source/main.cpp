@@ -332,10 +332,10 @@ float U0OfN(float n) {
 float calculateAcceleration(float currentSpeed, float destSpeed) {
 	float factor;
 	//hier die dynamisch lineare Methode
-	if (destSpeed>=(currentSpeed+2))      factor = currentConfig->linearAcceleration;
-	else if (destSpeed>=currentSpeed)     factor = currentConfig->linearAcceleration * 0.5f * (destSpeed - currentSpeed); //dieser Koeffizient muss immer halb so gross sein, wie der obige
-	else if (destSpeed>=(currentSpeed-2)) factor = currentConfig->linearBrake * -0.5f * (destSpeed - currentSpeed); //dieser Koeffizient muss immer halb so gross sein, wie der untige
-	else                                  factor = currentConfig->linearBrake;
+	if (destSpeed >= (currentSpeed + 2))      factor = currentConfig->linearAcceleration;
+	else if (destSpeed >= currentSpeed)       factor = currentConfig->linearAcceleration * 0.5f * (destSpeed - currentSpeed); //dieser Koeffizient muss immer halb so gross sein, wie der obige
+	else if (destSpeed >= (currentSpeed - 2)) factor = currentConfig->linearBrake * -0.5f * (destSpeed - currentSpeed); //dieser Koeffizient muss immer halb so gross sein, wie der untige
+	else                                      factor = currentConfig->linearBrake;
 
 	float destU0 = (U0OfN(currentSpeed)/8.3+factor);
 
@@ -352,15 +352,17 @@ float calculateAcceleration(float currentSpeed, float destSpeed) {
 }
 
 void controlMotor() {
-	static uint8_t stoppedForFrames = 0;
+	static uint8_t brakingForFrames = 0;
 	static float lastAcceleration = 0.0f;
 	if (motorEnabled) {
 		if (stop) {
-			if (stoppedForFrames > currentConfig->stopAfterFrames) {
+			if (brakingForFrames > currentConfig->stopAfterFrames) {
 				MotorControl::setSpeed(0, 0);
 				return;
 			}
-			stoppedForFrames++;
+			brakingForFrames++;
+		} else {
+			brakingForFrames = 0;
 		}
 
 		// TODO: Move this to configuration
