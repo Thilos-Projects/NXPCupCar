@@ -111,7 +111,7 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs) {
 	controlConfigs[configIndex].speedDerivate = 0.2f;
 	controlConfigs[configIndex].slowdownAcceleration = 0.25f;
 	controlConfigs[configIndex].linearAcceleration = 0.4f;
-	controlConfigs[configIndex].linearBrake = -0.575f;
+	controlConfigs[configIndex].linearBrake = -0.65f;
 
 	createDefaultRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
@@ -130,16 +130,18 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].pixyLedColorG = 255;
     controlConfigs[configIndex].pixyLedColorB = 31;
 
-    controlConfigs[configIndex].steeringPotentialFactor = 1.6f;
+    controlConfigs[configIndex].steeringPotentialFactor = 1.9f;
     controlConfigs[configIndex].steeringPotentialFactorPerSpeed = 0.4f;
     controlConfigs[configIndex].steeringPotentialFactorSpeedIncrements = 35;
-    controlConfigs[configIndex].steeringDerivativeFactor = 0.3f;
+    controlConfigs[configIndex].steeringDerivativeFactor = 0.25f;
 
     controlConfigs[configIndex].brakeRowDistance = 3;
-    controlConfigs[configIndex].straightSpeed = 6.0f;
-    controlConfigs[configIndex].turnSpeed = 6.0f;
+    controlConfigs[configIndex].straightSpeed = 16.0f;
+    controlConfigs[configIndex].turnSpeed = 8.0f;
 	controlConfigs[configIndex].speedDerivate = 0.2f;
-	controlConfigs[configIndex].slowdownAcceleration = 0.15f;
+	controlConfigs[configIndex].slowdownAcceleration = 0.25f;
+	controlConfigs[configIndex].linearAcceleration = 1.0f;
+	controlConfigs[configIndex].linearBrake = -0.50f;
 
 	createDefaultRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
@@ -192,6 +194,11 @@ void middleConfigWithoutFinishLineDetection(uint8_t configIndex, ControlConfig* 
     controlConfigs[configIndex].finishLineDetection = false;
 };
 
+void fastConfigWithoutFinishLineDetection(uint8_t configIndex, ControlConfig* controlConfigs) {
+	fastConfig(configIndex, controlConfigs);
+    controlConfigs[configIndex].finishLineDetection = false;
+};
+
 void loadControlConfigs(uint8_t* controlConfigsLength, ControlConfig* controlConfigs) {
     *controlConfigsLength = 4;
 
@@ -199,11 +206,12 @@ void loadControlConfigs(uint8_t* controlConfigsLength, ControlConfig* controlCon
         controlConfigs[i] = ControlConfig();
     }
 
-    safeConfig(0, controlConfigs);
-    middleConfig(1, controlConfigs);
-	safeConfigWithoutFinishLineDetection(2, controlConfigs);
-	middleConfigWithoutFinishLineDetection(3, controlConfigs);
+    // safeConfig(0, controlConfigs);
+    // middleConfig(1, controlConfigs);
     // fastConfig(2, controlConfigs);
+	safeConfigWithoutFinishLineDetection(0, controlConfigs);
+	middleConfigWithoutFinishLineDetection(1, controlConfigs);
+	fastConfigWithoutFinishLineDetection(2, controlConfigs);
 
     middleConfigObstacleDetection(4, controlConfigs);
 }
