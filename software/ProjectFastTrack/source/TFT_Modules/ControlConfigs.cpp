@@ -135,13 +135,13 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].steeringPotentialFactorSpeedIncrements = 35;
     controlConfigs[configIndex].steeringDerivativeFactor = 0.25f;
 
-    controlConfigs[configIndex].brakeRowDistance = 3;
-    controlConfigs[configIndex].straightSpeed = 16.0f;
+    controlConfigs[configIndex].brakeRowDistance = 2;
+    controlConfigs[configIndex].straightSpeed = 30.0f;
     controlConfigs[configIndex].turnSpeed = 8.0f;
 	controlConfigs[configIndex].speedDerivate = 0.2f;
 	controlConfigs[configIndex].slowdownAcceleration = 0.25f;
 	controlConfigs[configIndex].linearAcceleration = 1.0f;
-	controlConfigs[configIndex].linearBrake = -0.50f;
+	controlConfigs[configIndex].linearBrake = -0.60f;
 
 	createDefaultRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
