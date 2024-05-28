@@ -103,10 +103,20 @@ void pixySetup(){
 	pixy.changeProg(currentConfig->cameraProgram);
 }
 
+bool detectObstacle(uint16_t column) {
+	static CameraAnalysis::SingleColumnAnalysis columnAnalysis;
+	columnAnalysis.Setup(&pixy, column, currentConfig->columnConfig.edgeThreshold,
+		currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
+	columnAnalysis.getImageColumn();
+	columnAnalysis.calculateSobel();
+	bool foundObstacle = columnAnalysis.detectObstacle(0);
+	return foundObstacle;
+}
+
 void controlCar() {
 	// Setup
 	static CameraAnalysis::SingleRowAnalysis currentRowAnalysis;
-	static CameraAnalysis::SingleColumnAnalysis columnAnalysis;
+	// static CameraAnalysis::SingleColumnAnalysis columnAnalysis;
 	static CameraAnalysis::PartialColumnAnalysis partColumnAnalysis;
 	static float lastSteeringAngle = 0.0f;
 	static uint8_t brakeAppliedFor = 0;
@@ -221,28 +231,41 @@ void controlCar() {
 
 	// Obstacle Detection
 	if (currentConfig->obstacleDetection){
-		if (lastRow != 0) {
+		//if (lastRow != 0) {
 			// Column detection
-			columnAnalysis.Setup(&pixy, prevTrackCenters[0], currentConfig->columnConfig.edgeThreshold,
+			/*columnAnalysis.Setup(&pixy, prevTrackCenters[0], currentConfig->columnConfig.edgeThreshold,
 				currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
 			columnAnalysis.getImageColumn();
 			columnAnalysis.calculateSobel();
-			bool foundObstacle = columnAnalysis.detectObstacle(lastRow);
+			bool foundObstacle = columnAnalysis.detectObstacle(lastRow);*/
+
+			uint8_t foundObstacles = 0;
+
+			for (uint16_t x = 90; x < 210; x += 5) {
+				if (detectObstacle(x)) {
+					foundObstacles++;
+					printf("Found in row #%d\n ", x);
+				}
+			}
+			printf("/n");
 
 			// TODO: Comment Debug
-			columnAnalysis.printLines();
-			columnAnalysis.printSobleColumn();
+			// columnAnalysis.printLines();
+			// columnAnalysis.printSobleColumn();
+
+			printf("Found Obstacles: %d\n", foundObstacles);
 			
-			if (foundObstacle) {
-				if (columnAnalysis.obstacleBottomEdge > currentConfig->minObstacleRow) {
+			if (foundObstacles > 4) {
+				//if (columnAnalysis.obstacleBottomEdge > currentConfig->minObstacleRow) {
+					printf("Obstacle Found in Row #%d\n", prevTrackCenters[0]);
 					stop = true;
-				}
+				//}
 				
 				mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
 			} else {
 				mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOff);
 			}
-		}
+		//}
 	}
 
 	// Control Car

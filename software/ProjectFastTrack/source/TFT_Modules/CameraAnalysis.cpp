@@ -226,15 +226,18 @@ void CameraAnalysis::SingleColumnAnalysis::calculateSobel(){
 
 
 bool CameraAnalysis::SingleColumnAnalysis::detectObstacle(uint8_t start) {
-	// 44 // 54 // 110 //
+	// 44 //  54 // 110 //
+	// 60 //  84 // 166 // 20cm
+	// 74 // 111 // 201 //
+	// 70 // 106 // 198 // 10cm
 
 	// TODO: Move this stuff to Config
-	uint8_t minDiffObstacleTop = 5;
-	uint8_t maxDiffObstacleTop = 20;
+	uint8_t minDiffObstacleTop = 20;
+	uint8_t maxDiffObstacleTop = 40;
 	uint8_t minDiffObstacleFront = 60;
 	uint8_t maxDiffObstacleFront = 100;
 
-	uint8_t startPosition = 40;
+	uint8_t startPosition = 60;
 	uint8_t endPosition = 200;
 	uint8_t foundInThreshold = 0;
 	uint8_t sobelInThreshold[206];

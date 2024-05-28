@@ -58,7 +58,7 @@ void createDefaultRowConfig(RowConfig** configs, uint8_t* configLength){
 
 void createDefaultColumnConfig(uint8_t configIndex, ControlConfig* controlConfigs) {
     controlConfigs[configIndex].columnConfig.column = 158;
-    controlConfigs[configIndex].columnConfig.edgeThreshold = 18;
+    controlConfigs[configIndex].columnConfig.edgeThreshold = 15;
     controlConfigs[configIndex].columnConfig.minEdgeWidth = 0;
     controlConfigs[configIndex].columnConfig.maxEdgeWidth = 10;
     controlConfigs[configIndex].columnConfig.minThickness = 0;
@@ -111,7 +111,7 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs) {
 	controlConfigs[configIndex].speedDerivate = 0.2f;
 	controlConfigs[configIndex].slowdownAcceleration = 0.25f;
 	controlConfigs[configIndex].linearAcceleration = 0.4f;
-	controlConfigs[configIndex].linearBrake = -0.65f;
+	controlConfigs[configIndex].linearBrake = -0.575f;
 
 	createDefaultRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
@@ -206,12 +206,13 @@ void loadControlConfigs(uint8_t* controlConfigsLength, ControlConfig* controlCon
         controlConfigs[i] = ControlConfig();
     }
 
-    // safeConfig(0, controlConfigs);
-    // middleConfig(1, controlConfigs);
-    // fastConfig(2, controlConfigs);
-	safeConfigWithoutFinishLineDetection(0, controlConfigs);
-	middleConfigWithoutFinishLineDetection(1, controlConfigs);
-	fastConfigWithoutFinishLineDetection(2, controlConfigs);
+    safeConfig(0, controlConfigs);
+    middleConfig(1, controlConfigs);
+    fastConfig(2, controlConfigs);
+	// safeConfigWithoutFinishLineDetection(0, controlConfigs);
+	// middleConfigWithoutFinishLineDetection(1, controlConfigs);
+	// fastConfigWithoutFinishLineDetection(2, controlConfigs);
 
+    middleConfigObstacleDetection(3, controlConfigs);
     middleConfigObstacleDetection(4, controlConfigs);
 }
