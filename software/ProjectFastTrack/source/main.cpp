@@ -287,6 +287,8 @@ void controlCar() {
 	MotorControl::getSpeed(&leftSpeed, &rightSpeed);
 	float currentSpeed = max(leftSpeed, rightSpeed);
 
+	uint8_t maxRowForSpeedCalculation = currentRowIndex;
+
 	// Steering
 	float steeringAngle = avgTrackCenterDifference;
 	steeringAngle /= 79.0f;
@@ -302,6 +304,12 @@ void controlCar() {
 	steeringAngle *= steeringAngleFactor;*/
 
 	float steeringAngleFactor = currentConfig->steeringPotentialFactor;
+
+	if (maxRowForSpeedCalculation < currentConfig->brakeRowDistance) { // Break or Turn
+		steeringAngleFactor *= 1.0f;
+	} else { // Straight
+		steeringAngleFactor *= 2.2f;
+	}
 
 	float steeringAngleDerivative = (lastSteeringAngle - steeringAngle) * currentConfig->steeringDerivativeFactor;
 
@@ -319,7 +327,6 @@ void controlCar() {
 		allowActiveBrake = true;
 		destinationSpeed = 0.0f;
 	} else { // Normal Speed Control
-		uint8_t maxRowForSpeedCalculation = currentRowIndex;
 		trackWidthOverThreshold[6] = trackWidthOverThreshold[5]; // Prevent NullPointerException
 		for (; maxRowForSpeedCalculation > 1 && trackWidthOverThreshold[maxRowForSpeedCalculation] ; maxRowForSpeedCalculation--);
 		if (maxRowForSpeedCalculation < currentConfig->brakeRowDistance) { // Break or Turn

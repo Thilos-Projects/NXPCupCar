@@ -125,7 +125,7 @@ void middleConfig(uint8_t configIndex, ControlConfig* controlConfigs) {
     controlConfigs[configIndex].switchConfigAfterFinishLineTimeout = 200;
 }
 
-void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
+void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs) {
     controlConfigs[configIndex].pixyLedColorR = 255;
     controlConfigs[configIndex].pixyLedColorG = 255;
     controlConfigs[configIndex].pixyLedColorB = 31;
@@ -136,12 +136,12 @@ void fastConfig(uint8_t configIndex, ControlConfig* controlConfigs){
     controlConfigs[configIndex].steeringDerivativeFactor = 0.25f;
 
     controlConfigs[configIndex].brakeRowDistance = 2;
-    controlConfigs[configIndex].straightSpeed = 30.0f;
-    controlConfigs[configIndex].turnSpeed = 8.0f;
+    controlConfigs[configIndex].straightSpeed = 40.0f;
+    controlConfigs[configIndex].turnSpeed = 8.5f;
 	controlConfigs[configIndex].speedDerivate = 0.2f;
 	controlConfigs[configIndex].slowdownAcceleration = 0.25f;
 	controlConfigs[configIndex].linearAcceleration = 1.0f;
-	controlConfigs[configIndex].linearBrake = -0.60f;
+	controlConfigs[configIndex].linearBrake = -1.0f;
 
 	createDefaultRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
 
