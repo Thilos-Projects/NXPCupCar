@@ -103,20 +103,19 @@ void pixySetup(){
 	pixy.changeProg(currentConfig->cameraProgram);
 }
 
-bool detectObstacle(uint16_t column) {
-	static CameraAnalysis::SingleColumnAnalysis columnAnalysis;
-	columnAnalysis.Setup(&pixy, column, currentConfig->columnConfig.edgeThreshold,
+bool detectObstacle(CameraAnalysis::SingleColumnAnalysis* columnAnalysis, uint16_t column) {
+	columnAnalysis->Setup(&pixy, column, currentConfig->columnConfig.edgeThreshold,
 		currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
-	columnAnalysis.getImageColumn();
-	columnAnalysis.calculateSobel();
-	bool foundObstacle = columnAnalysis.detectObstacle(0);
+	columnAnalysis->getImageColumn();
+	columnAnalysis->calculateSobel();
+	bool foundObstacle = columnAnalysis->detectObstacle(0);
 	return foundObstacle;
 }
 
 void controlCar() {
 	// Setup
 	static CameraAnalysis::SingleRowAnalysis currentRowAnalysis;
-	// static CameraAnalysis::SingleColumnAnalysis columnAnalysis;
+	static CameraAnalysis::SingleColumnAnalysis columnAnalysis;
 	static CameraAnalysis::PartialColumnAnalysis partColumnAnalysis;
 	static float lastSteeringAngle = 0.0f;
 	static uint8_t brakeAppliedFor = 0;
@@ -240,28 +239,36 @@ void controlCar() {
 			bool foundObstacle = columnAnalysis.detectObstacle(lastRow);*/
 
 			uint8_t foundObstacles = 0;
+			uint32_t obstacleBottomEdge = 0;
 
-			for (uint16_t x = 90; x < 210; x += 5) {
-				if (detectObstacle(x)) {
+			static bool foundObstaclesBefore = false;
+
+			for (uint16_t x = 90; x <= 210; x += 12) {
+				if (detectObstacle(&columnAnalysis, x)) {
 					foundObstacles++;
+					obstacleBottomEdge += columnAnalysis.obstacleBottomEdge;
 					printf("Found in row #%d\n ", x);
 				}
 			}
-			printf("/n");
+
+			obstacleBottomEdge /= foundObstacles;
 
 			// TODO: Comment Debug
 			// columnAnalysis.printLines();
 			// columnAnalysis.printSobleColumn();
 
-			printf("Found Obstacles: %d\n", foundObstacles);
+			printf("Found Obstacles: %d\tBottom Edge: %d\n", foundObstacles, (uint32_t)obstacleBottomEdge);
 			
-			if (foundObstacles > 4) {
+			if (foundObstacles >= 5) {
+					foundObstaclesBefore = true;
 				//if (columnAnalysis.obstacleBottomEdge > currentConfig->minObstacleRow) {
-					printf("Obstacle Found in Row #%d\n", prevTrackCenters[0]);
-					stop = true;
+					// printf("Obstacle Found in Row #%d\n", prevTrackCenters[0]);
+					//stop = true;
 				//}
 				
 				mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
+			} else if (foundObstacles == 0 && foundObstaclesBefore) {
+				stop = true;
 			} else {
 				mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOff);
 			}
@@ -308,7 +315,7 @@ void controlCar() {
 	if (maxRowForSpeedCalculation < currentConfig->brakeRowDistance) { // Break or Turn
 		steeringAngleFactor *= 1.0f;
 	} else { // Straight
-		steeringAngleFactor *= 2.2f;
+		steeringAngleFactor *= 2.5f;
 	}
 
 	float steeringAngleDerivative = (lastSteeringAngle - steeringAngle) * currentConfig->steeringDerivativeFactor;

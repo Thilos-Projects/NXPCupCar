@@ -58,9 +58,9 @@ void createDefaultRowConfig(RowConfig** configs, uint8_t* configLength){
 
 void createDefaultColumnConfig(uint8_t configIndex, ControlConfig* controlConfigs) {
     controlConfigs[configIndex].columnConfig.column = 158;
-    controlConfigs[configIndex].columnConfig.edgeThreshold = 15;
+    controlConfigs[configIndex].columnConfig.edgeThreshold = 10;
     controlConfigs[configIndex].columnConfig.minEdgeWidth = 0;
-    controlConfigs[configIndex].columnConfig.maxEdgeWidth = 10;
+    controlConfigs[configIndex].columnConfig.maxEdgeWidth = 20;
     controlConfigs[configIndex].columnConfig.minThickness = 0;
 }
 
@@ -174,6 +174,7 @@ void middleConfigObstacleDetection(uint8_t configIndex, ControlConfig* controlCo
 	controlConfigs[configIndex].linearBrake = -0.5f;
 
 	createDefaultRowConfig(&controlConfigs[configIndex].rowConfigs, &controlConfigs[configIndex].rowConfigLength);
+	controlConfigs[configIndex].rowConfigLength = 2;
 
     // Column Config
     createDefaultColumnConfig(configIndex, controlConfigs);
