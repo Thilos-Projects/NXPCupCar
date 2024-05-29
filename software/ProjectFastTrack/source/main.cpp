@@ -230,7 +230,7 @@ void controlCar() {
 
 	// Obstacle Detection
 	if (currentConfig->obstacleDetection){
-		//if (lastRow != 0) {
+		if (lastRow != 0) {
 			// Column detection
 			/*columnAnalysis.Setup(&pixy, prevTrackCenters[0], currentConfig->columnConfig.edgeThreshold,
 				currentConfig->columnConfig.minEdgeWidth, currentConfig->columnConfig.maxEdgeWidth, currentConfig->columnConfig.minThickness);
@@ -241,7 +241,7 @@ void controlCar() {
 			uint8_t foundObstacles = 0;
 			uint32_t obstacleBottomEdge = 0;
 
-			static bool foundObstaclesBefore = false;
+			static uint8_t foundObstaclesBefore = 0;
 
 			for (uint16_t x = 90; x <= 210; x += 12) {
 				if (detectObstacle(&columnAnalysis, x)) {
@@ -257,22 +257,28 @@ void controlCar() {
 			// columnAnalysis.printLines();
 			// columnAnalysis.printSobleColumn();
 
-			printf("Found Obstacles: %d\tBottom Edge: %d\n", foundObstacles, (uint32_t)obstacleBottomEdge);
+			uint8_t BottomRowForObstacle = currentConfig->rowConfigs[currentRowIndex].row;
+
+			printf("Found Obstacles: %d\tBottom Edge: %d\tExpected: %d\n", foundObstacles, (uint32_t)obstacleBottomEdge, (uint32_t)BottomRowForObstacle);
 			
-			if (foundObstacles >= 5) {
-					foundObstaclesBefore = true;
+			if (foundObstacles >= 5 && columnAnalysis.obstacleBottomEdge > BottomRowForObstacle) {
+				foundObstaclesBefore++;
 				//if (columnAnalysis.obstacleBottomEdge > currentConfig->minObstacleRow) {
 					// printf("Obstacle Found in Row #%d\n", prevTrackCenters[0]);
 					//stop = true;
 				//}
 				
 				mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOn);
-			} else if (foundObstacles == 0 && foundObstaclesBefore) {
-				stop = true;
+			} else if (foundObstacles < 5) {
+				if (foundObstacles == 0 && foundObstaclesBefore >= 2) {
+					stop = true;
+				}
+				mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOff);
 			} else {
+				foundObstaclesBefore = 0;
 				mLeds_Write(LedMaskEnum::kMaskLed1, LedStateEnum::kLedOff);
 			}
-		//}
+		}
 	}
 
 	// Control Car
@@ -467,6 +473,12 @@ void defineTasks() {
 		finishLineGraceTimer = true;
 		mLeds_Write(LedMaskEnum::kMaskLed4, LedStateEnum::kLedOff);
 	}, currentConfig->startFinishLineDetectionAfter, false, false);
+
+	// TODO: REMOVE!
+	Scheduler::getTaskHandle([](Scheduler::taskHandle* self){
+		currentConfig = &controlConfigs[4];
+		self->active = false;
+	}, 1000, true, false);
 }
 
 int main(){

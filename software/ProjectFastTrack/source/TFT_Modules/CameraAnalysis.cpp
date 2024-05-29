@@ -232,7 +232,7 @@ bool CameraAnalysis::SingleColumnAnalysis::detectObstacle(uint8_t start) {
 	// 70 // 106 // 198 // 10cm
 
 	// TODO: Move this stuff to Config
-	uint8_t minDiffObstacleTop = 10;
+	uint8_t minDiffObstacleTop = 15;
 	uint8_t maxDiffObstacleTop = 40;
 	uint8_t minDiffObstacleFront = 60;
 	uint8_t maxDiffObstacleFront = 100;
